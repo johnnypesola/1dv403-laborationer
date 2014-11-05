@@ -14,11 +14,11 @@ var makePerson = function(persArr){
 	    // Kontrollerar data
 	    if(typeof(personObj.age) != "number")
 	    {
-	        throw "Värdet 'age' saknas i objektet. Det måste vara av typen 'number' och ha ett giltigt värde."
+	        throw "Värdet 'age' saknas i objektet. Det måste vara av typen 'number' och ha ett giltigt värde.";
 	    }
         else if(typeof(personObj.name) != "string")
 	    {
-	        throw "Värdet 'name' saknas i objektet. Det måste vara av typen 'string' och ha ett giltigt värde."
+	        throw "Värdet 'name' saknas i objektet. Det måste vara av typen 'string' och ha ett giltigt värde.";
 	    }
 	    
 	    agesArray.push(personObj.age);
