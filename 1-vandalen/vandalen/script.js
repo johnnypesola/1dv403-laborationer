@@ -10,6 +10,17 @@ var makePerson = function(persArr){
 	
 	// Loopar igenom alla objekt och fyller olika arrays med olika typern av data.
 	persArr.forEach(function(personObj){
+	    
+	    // Kontrollerar data
+	    if(typeof(personObj.age) != "number")
+	    {
+	        throw "Värdet 'age' saknas i objektet. Det måste vara av typen 'number' och ha ett giltigt värde."
+	    }
+        else if(typeof(personObj.name) != "string")
+	    {
+	        throw "Värdet 'name' saknas i objektet. Det måste vara av typen 'string' och ha ett giltigt värde."
+	    }
+	    
 	    agesArray.push(personObj.age);
 	    namesArray.push(personObj.name);
 
