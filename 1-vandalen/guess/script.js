@@ -71,6 +71,7 @@ window.onload = function(){
 		// [false, "Det hemliga talet är högre!"]
 		// [false, "Det hemliga talet är lägre!"]
 		// [false, "Talet är utanför intervallet 0 - 100"]
+		
 	};
 	
 	// ------------------------------------------------------------------------------
