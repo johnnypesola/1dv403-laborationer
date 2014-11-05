@@ -8,11 +8,36 @@ window.onload = function(){
 		// Returnera den konverterade strängen.
 		// Vid fel, kasta ett undantag med ett meddelande till användaren. 
 	
+		var returnStr = "";
+	
+		// Deklarera undantagsklass
+		function stringException(message) {
+			this.message = message;
+		}
+		
+		// Funktion för att invertera gemener och versaler.
+		function invertCase(character)
+		{
+			var returnCharacter;
+			
+			if(character == character.toUpperCase())
+			{
+				returnCharacter = character.toLowerCase();
+			}
+			else
+			{
+				returnCharacter = character.toUpperCase();
+			}
+			
+			return returnCharacter;
+		}
 
+		returnStr = str.replace(/[A-Z,Å,Ä,Ö,åäö]/gi, invertCase);
 
+		return returnStr;
 
-
-
+		// Kasta undantag
+		throw new stringException("Det funkar inte");
 
 	};
 	// ------------------------------------------------------------------------------
