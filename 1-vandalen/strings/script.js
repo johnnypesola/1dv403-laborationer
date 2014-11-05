@@ -38,7 +38,7 @@ window.onload = function(){
 			throw new stringException("Var vänlig skriv minst ett tecken.");
 		}
 		
-		returnStr = str.replace(/[A-Z,Å,Ä,Ö,åäö]/gi, invertCharCase);
+		returnStr = str.replace(/[a-z,å,ä,ö]/gi, invertCharCase);
 		returnStr = returnStr.replace(/[a]/gi, "#");
 
 		return returnStr;
