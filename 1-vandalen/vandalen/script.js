@@ -8,29 +8,25 @@ var makePerson = function(persArr){
 	var namesArray = new Array();
 	var ageSum = 0;
 	
+	// Loopar igenom alla objekt och fyller olika arrays med olika typern av data.
 	persArr.forEach(function(personObj){
 	    agesArray.push(personObj.age);
 	    namesArray.push(personObj.name);
 
+        // Räknar ålderssumma
 	    ageSum += personObj.age;
-	})
+	});
+	
+	// Sorterar namn, även åäö.
+	namesArray.sort(function (a, b) {
+        return a.localeCompare(b);
+    });
 
     return  {
                 minAge : Math.min.apply(null, agesArray), 
                 maxAge : Math.max.apply(null, agesArray),
                 averageAge : Math.round(ageSum / agesArray.length),
-                names : namesArray.sort().join(", ")
+                names : namesArray.join(", ")
             };
-
-/*
-    Objektet som returneras ska innehålla fyra egenskaper:
-    
-    minAge - nummer innehållande den ålder i de inskickade objekten som är lägst.
-    maxAge -nummer innehållande den ålder i de inskickade objekten som är högst.
-    avarageAge - nummer innehållande medelåldern av de inskickade objektens ålder.
-    names - sträng innehållande samtliga personers namn separerade med ", " 
-    (komma och efterföljande mellanslag). Namnen sorteras i bokstavsordning.
-*/
-
 }
 
