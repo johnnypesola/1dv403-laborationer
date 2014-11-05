@@ -11,7 +11,7 @@ window.onload = function(){
 		var dateParsed = new Date(date);
 		var dateNow = new Date();
 		var daysToBday;
-		var msInDay = (1000*60*60*24);
+		var msInDay = 1000*60*60*24;
 
 		// Deklarera undantagsklass
 		function stringException(message) {
@@ -32,7 +32,7 @@ window.onload = function(){
 				dateParsed.setFullYear(dateParsed.getFullYear() + 1)
 			}
 			
-			// Eftersom vi använder getTime() metoden så behöver vi inte oroa oss för skottår.
+			// Eftersom vi använder Date.getTime() metoden så behöver vi inte oroa oss för skottår.
 			daysToBday =  Math.ceil( (dateParsed.getTime() - dateNow.getTime()) / msInDay );
 			
 			return daysToBday
