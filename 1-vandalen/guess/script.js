@@ -16,51 +16,44 @@ window.onload = function(){
 		var min = 0;
 		var returnMsg = "";
 		var returnState = false;
-
-		// Deklarera guessCount om det behövs.		
-		if(typeof window.guessCount === 'undefined')
-		{
-
+		var parsedNumber = parseFloat(number);
+		
+		// Deklarera globala guessCount om det behövs.
+		if(typeof window.guessCount === 'undefined'){
 			window.guessCount = 0;
 		}
 
 		// Slumpa fram ett hemligt tal om det behövs.
-		if(window.guessCount == 0)
-		{
+		if(window.guessCount === 0){
 			secret = Math.floor( Math.random() * (max-min)+1 )+min; Math.floor( Math.random() * (100-1)+1) + 1; Math.floor( Math.random() * 100)+1;
 		}
 
 		window.guessCount++;
 		
-		if(!(!isNaN(parseFloat(number)) && isFinite(number) && number % 1 === 0))
-		{
+		// Kollar om det parsade talet är ett giltigt heltal.
+		if(!(!isNaN(parsedNumber) && isFinite(parsedNumber) && parsedNumber % 1 === 0)){
 			returnMsg = "Du måste ange ett giltigt heltal emellan 0 och 100";
 			returnState = false;
 		}
-		else if(number > max || number < min)
-		{
+		else if(parsedNumber > max || parsedNumber < min){
 			returnMsg = "Talet är utanför intervallet 0 - 100";
 			returnState = false;
 		}
-		else if(secret == number)
-		{
-			returnMsg = "Grattis du vann! Det hemliga talet var " + secret + " och du behövde " + guessCount + " gissningar för att hitta det."
+		else if(secret === parsedNumber){
+			returnMsg = "Grattis du vann! Det hemliga talet var " + secret + " och du behövde " + window.guessCount + " gissningar för att hitta det.";
 			returnState = true;
 			window.guessCount = 0;
 		}
-		else if(secret > number)
-		{
-			returnMsg = "Det hemliga talet är högre!"
+		else if(secret > parsedNumber){
+			returnMsg = "Det hemliga talet är högre!";
 			returnState = false;
 		}
-		else if(secret < number)
-		{
-			returnMsg = "Det hemliga talet är lägre!"
+		else if(secret < parsedNumber){
+			returnMsg = "Det hemliga talet är lägre!";
 			returnState = false;
 		}
-		else
-		{
-			returnMsg = "FEL: Hantering av värde ej implementerad."
+		else {
+			returnMsg = "FEL: Hantering av värde ej implementerad.";
 			returnState = false;
 		}
 

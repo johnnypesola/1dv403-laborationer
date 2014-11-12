@@ -13,33 +13,27 @@ window.onload = function(){
 		var daysToBday;
 		var msInDay = 1000*60*60*24;
 
-		// Deklarera undantagsklass
-		function stringException(message) {
-			this.message = message;
-		}
-
 		// Datumobjekt
-		if(!isNaN(dateParsed))
-		{
+		if(!isNaN(dateParsed)){
+			
 			// Uppdatera parsed year med det aktuella året
 			dateParsed.setFullYear(dateNow.getFullYear());
 
 			// Öka dateParsed med ett år om födelsedagen har passerat.
 			if( dateParsed.getMonth() < dateNow.getMonth() || 
-				dateParsed.getMonth() == dateNow.getMonth() && 
+				dateParsed.getMonth() === dateNow.getMonth() && 
 				dateParsed.getDate() < dateNow.getDate() )
 			{
-				dateParsed.setFullYear(dateParsed.getFullYear() + 1)
+				dateParsed.setFullYear(dateParsed.getFullYear() + 1);
 			}
 			
 			// Eftersom vi använder Date.getTime() metoden så behöver vi inte oroa oss för skottår.
 			daysToBday =  Math.ceil( (dateParsed.getTime() - dateNow.getTime()) / msInDay );
 			
-			return daysToBday
+			return daysToBday;
 		}
-		else
-		{
-			throw new stringException("Skriv födelsedatumet efter formatet: åååå-mm-dd exempelvis 1999-12-24");
+		else {
+			throw new Error("Skriv födelsedatumet efter formatet: åååå-mm-dd exempelvis 1999-12-24");
 		}
 	};
 	// ------------------------------------------------------------------------------

@@ -9,23 +9,16 @@ window.onload = function(){
 		// Vid fel, kasta ett undantag med ett meddelande till användaren. 
 	
 		var returnStr = "";
-	
-		// Deklarera undantagsklass
-		function stringException(message) {
-			this.message = message;
-		}
 		
 		// Funktion för att invertera gemener och versaler.
-		function invertCharCase(character)
-		{
+		function invertCharCase(character) {
+			
 			var returnCharacter;
 			
-			if(character == character.toUpperCase())
-			{
+			if(character === character.toUpperCase()){
 				returnCharacter = character.toLowerCase();
 			}
-			else
-			{
+			else {
 				returnCharacter = character.toUpperCase();
 			}
 			
@@ -33,9 +26,8 @@ window.onload = function(){
 		}
 
 		// Kasta undantag om användaren glömde skriva värde innan submit.
-		if(str.length <= 0)
-		{
-			throw new stringException("Var vänlig skriv minst ett tecken.");
+		if(str.length <= 0){
+			throw new Error("Var vänlig skriv minst ett tecken.");
 		}
 		
 		returnStr = str.replace(/[a-z,å,ä,ö]/gi, invertCharCase);
