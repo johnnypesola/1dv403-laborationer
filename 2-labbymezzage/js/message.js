@@ -5,12 +5,7 @@
         var _date;
         var _message;
         
-    // Assign constructor default values
-        this.date = date || new Date();
-        this.text = message || "";
-        
     // Assign Properties with getters and setters
-
         // Message.text property
         Object.defineProperty(this, "text", {
             get: function() { return this._message || ""; },
@@ -28,13 +23,17 @@
                 this._date = value;
             }
         });
+        
+        // Assign constructors default values to properties
+        this.date = date || new Date();
+        this.text = message || "";
     }
 
 // Add shared Prototype Methods for Message Object
     Message.prototype.toString = function(){
-        return this.getText()+" ("+this.getDate()+")";
+        return this.text+" ("+this.date+")";
     }
     
     Message.prototype.getHTMLText = function(){
-        return (this.getText()+" ("+this.getDate()+")").replace(/\n/g, "<br>");
+        return (this.text+" ("+this.date+")").replace(/\n/g, "<br>");
     }

@@ -3,12 +3,15 @@
 var AppContainer = {
     message : null,
     run: function(){
-        // Start labbymezzage application
-        this.message = new Message("my message", "my date");
-
-        this.message.date = new Date();
+        try {
+            // Start labbymezzage application
+            this.message = new Message("my message and it is good!");
+        }
         
-        this.message.date = "korv";
+        catch (error)
+        {
+            alert(error.message);
+        }
     }
 }
 
