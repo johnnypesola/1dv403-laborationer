@@ -31,7 +31,7 @@ window.onload = function(){
 		window.guessCount++;
 		
 		// Kollar om det parsade talet är ett giltigt heltal.
-		if(!(!isNaN(parsedNumber) && isFinite(parsedNumber) && parsedNumber % 1 === 0)){
+		if(!(!isNaN(parsedNumber) && isFinite(parsedNumber) && parsedNumber % 1 === 0 && number == parsedNumber)){
 			returnMsg = "Du måste ange ett giltigt heltal emellan 0 och 100";
 			returnState = false;
 		}
