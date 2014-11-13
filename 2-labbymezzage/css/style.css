@@ -1,3 +1,143 @@
 body {
-    background: #F8F8FF;
+    background: url('../img/wallpaper_background.svg') repeat-x #3d3659;
+    text-align: center;
 }
+
+header {
+    position: relative;
+    margin: 50px;
+    z-index: 2;
+}
+
+header div.logo {
+    position: absolute;
+    /*clip: rect(0px,308px,170px,0px); */
+    background: url('../img/image_map.svg') no-repeat;
+    height: 170px;
+    width: 308px;
+    background-position: 0px 0px;
+}
+
+div.lightning1 {
+    position: absolute;
+    top: 115px;
+    left: 45px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 35px;
+    width: 25px;
+    background-position: -380px 0px;
+}
+
+div.lightning2 {
+    position: absolute;
+    top: 115px;
+    left: 190px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 35px;
+    width: 25px;
+    background-position: -406px 0px;
+}
+
+div.moon {
+    position: absolute;
+    top: 350px;
+    left: 260px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 56px;
+    width: 51px;
+    background-position: -506px -57px;    
+}
+
+div.cloud1 {
+    position: fixed;
+    top: 40px;
+    left: -170px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 72px;
+    width: 170px;
+    background-position: -313px -103px;
+}
+
+div.cloud2 {
+    position: fixed;
+    top: 110px;
+    left: -128px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 50px;
+    width: 128px;
+    background-position: -313px -43px;
+    
+    z-index: 3;
+    
+    -webkit-animation-delay: 20s; /* Chrome, Safari, Opera */
+    animation-delay: 20s;
+}
+
+div.cloud3 {
+    position: fixed;
+    top: 160px;
+    left: -71px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 34px;
+    width: 71px;
+    background-position: -313px 0px;
+    
+    -webkit-animation-delay: 60s; /* Chrome, Safari, Opera */
+    animation-delay: 60s;
+}
+
+div.cloud4 {
+    position: fixed;
+    top: 250px;
+    left: -95px;
+    
+    background: url('../img/image_map.svg') no-repeat;
+    height: 46px;
+    width: 95px;
+    background-position: -486px -126px;
+    
+    -webkit-animation-delay: 8s; /* Chrome, Safari, Opera */
+    animation-delay: 8s;
+}
+
+/* Animations */
+
+.spinAnimation {
+    -webkit-animation:spin 8s linear infinite;
+    -moz-animation:spin 8s linear infinite;
+    animation:spin 8s linear infinite;
+}
+
+    /* Spin */
+    @-moz-keyframes spin {
+        100% { -moz-transform: rotateY(360deg); }
+    }
+    @-webkit-keyframes spin {
+        100% { -webkit-transform: rotateY(360deg); }
+    }
+    @keyframes spin {
+        100% { -webkit-transform: Yrotate(360deg); transform:rotateY(360deg); }
+    }
+
+.cloudAnimation {
+    -webkit-animation:cloud1 160s linear infinite;
+    -moz-animation:cloud1 160s linear infinite;
+    animation:cloud1 160s linear infinite;
+}
+
+    /* Cloud1 */
+    @-moz-keyframes cloud1 {
+        100% { -moz-transform: translate(2000px, 0); opacity: 0; }
+    }
+    @-webkit-keyframes cloud1 {
+        100% { -webkit-transform: translate(2000px, 0); opacity: 0; }
+    }
+    @keyframes cloud1 {
+        100% { -webkit-transform: translate(2000px, 0); transform:translate(2000px, 0); opacity: 0; }
+    }
