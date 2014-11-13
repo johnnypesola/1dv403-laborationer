@@ -8,10 +8,8 @@ window.onload = function(){
 		// Returnera den konverterade strängen.
 		// Vid fel, kasta ett undantag med ett meddelande till användaren. 
 	
-		var returnStr = "";
-		
 		// Funktion för att invertera gemener och versaler.
-		function invertCharCase(character) {
+		function invertCharCase(character){
 			
 			var returnCharacter;
 			
@@ -30,10 +28,7 @@ window.onload = function(){
 			throw new Error("Var vänlig skriv minst ett tecken.");
 		}
 		
-		returnStr = str.replace(/[a-z,å,ä,ö]/gi, invertCharCase);
-		returnStr = returnStr.replace(/[a]/gi, "#");
-
-		return returnStr;
+		return str.replace(/[a-z,å,ä,ö]/gi, invertCharCase).replace(/[a]/gi, "#");
 
 	};
 	// ------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 window.onload = function(){
 	
 	var secret = 50; // Detta tal behöver bytas ut mot ett slumpat tal.
+	var guessCount = 0;
 	
 	// I denna funktion ska du skriva koden för att hantera "spelet"
 	var guess = function(number){
@@ -17,18 +18,13 @@ window.onload = function(){
 		var returnMsg = "";
 		var returnState = false;
 		var parsedNumber = parseFloat(number);
-		
-		// Deklarera globala guessCount om det behövs.
-		if(typeof window.guessCount === 'undefined'){
-			window.guessCount = 0;
-		}
 
 		// Slumpa fram ett hemligt tal om det behövs.
-		if(window.guessCount === 0){
+		if(guessCount === 0){
 			secret = Math.floor( Math.random() * (max-min)+1 )+min; Math.floor( Math.random() * (100-1)+1) + 1; Math.floor( Math.random() * 100)+1;
 		}
 
-		window.guessCount++;
+		guessCount++;
 		
 		// Kollar om det parsade talet är ett giltigt heltal.
 		if(!(!isNaN(parsedNumber) && isFinite(parsedNumber) && parsedNumber % 1 === 0 && number == parsedNumber)){
@@ -40,9 +36,9 @@ window.onload = function(){
 			returnState = false;
 		}
 		else if(secret === parsedNumber){
-			returnMsg = "Grattis du vann! Det hemliga talet var " + secret + " och du behövde " + window.guessCount + " gissningar för att hitta det.";
+			returnMsg = "Grattis du vann! Det hemliga talet var " + secret + " och du behövde " + guessCount + " gissningar för att hitta det.";
 			returnState = true;
-			window.guessCount = 0;
+			guessCount = 0;
 		}
 		else if(secret > parsedNumber){
 			returnMsg = "Det hemliga talet är högre!";
