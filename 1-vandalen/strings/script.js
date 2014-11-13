@@ -54,7 +54,4 @@ window.onload = function(){
 		}
 	
 	});
-
-
-
 };
