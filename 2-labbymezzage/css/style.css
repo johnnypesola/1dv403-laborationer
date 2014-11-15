@@ -1,44 +1,55 @@
 body {
-    background: url('../img/wallpaper_background.svg') repeat-x #3d3659;
+    background: url('../img/wallpaper_background.svg') repeat-x #3d3659; /* fixed is nicer, but slow in chrome */
+    margin: 0;
     text-align: center;
+    font-family: 'Indie Flower', sans-serif, verdana;
+    font-size: 28px;
+    color: #3d3659;
 }
 
 header {
     position: relative;
-    margin: 50px;
+    margin: 60px auto;
     z-index: 2;
-}
-
-header div.logo {
-    position: absolute;
-    /*clip: rect(0px,308px,170px,0px); */
+    
     background: url('../img/image_map.svg') no-repeat;
     height: 170px;
     width: 308px;
     background-position: 0px 0px;
+    text-transform: uppercase;
 }
-
-div.lightning1 {
-    position: absolute;
-    top: 115px;
-    left: 45px;
     
-    background: url('../img/image_map.svg') no-repeat;
-    height: 35px;
-    width: 25px;
-    background-position: -380px 0px;
-}
+    header h1 {
+        color: #ffffff;
+        font-family: verdana, sans-serif;
+        font-weight: normal;
+        font-size: 11px;
+        position: relative;
+        top: 174px;
+        opacity: 0.5;
+    }
 
-div.lightning2 {
-    position: absolute;
-    top: 115px;
-    left: 190px;
+    header div.lightning1 {
+        position: absolute;
+        top: 115px;
+        left: 45px;
+        
+        background: url('../img/image_map.svg') no-repeat;
+        height: 35px;
+        width: 25px;
+        background-position: -380px 0px;
+    }
     
-    background: url('../img/image_map.svg') no-repeat;
-    height: 35px;
-    width: 25px;
-    background-position: -406px 0px;
-}
+    header div.lightning2 {
+        position: absolute;
+        top: 115px;
+        left: 190px;
+        
+        background: url('../img/image_map.svg') no-repeat;
+        height: 35px;
+        width: 25px;
+        background-position: -406px 0px;
+    }
 
 div.moon {
     position: absolute;
@@ -52,7 +63,6 @@ div.moon {
 }
 
 div.cloud1 {
-    position: fixed;
     top: 40px;
     left: -170px;
     
@@ -63,7 +73,6 @@ div.cloud1 {
 }
 
 div.cloud2 {
-    position: fixed;
     top: 110px;
     left: -128px;
     
@@ -72,14 +81,11 @@ div.cloud2 {
     width: 128px;
     background-position: -313px -43px;
     
-    z-index: 3;
-    
     -webkit-animation-delay: 20s; /* Chrome, Safari, Opera */
     animation-delay: 20s;
 }
 
 div.cloud3 {
-    position: fixed;
     top: 160px;
     left: -71px;
     
@@ -93,7 +99,6 @@ div.cloud3 {
 }
 
 div.cloud4 {
-    position: fixed;
     top: 250px;
     left: -95px;
     
@@ -105,6 +110,79 @@ div.cloud4 {
     -webkit-animation-delay: 8s; /* Chrome, Safari, Opera */
     animation-delay: 8s;
 }
+
+main {
+    margin: 0 auto;
+    min-width: 308px;
+    max-width: 500px;
+}
+
+    main article {
+        background: #FFFFFF;
+        position: relative;
+        text-shadow: 0px 0px 10px rgba(150, 150, 150, 0.5);
+        min-height: 200px;
+        line-height: 200px;
+        
+        margin: 45px auto;
+        
+    min-width: 308px;
+    max-width: 500px;
+    }
+    
+    main article p {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: normal;
+        margin-left: 40px;
+        margin-right: 40px;
+    }
+    
+    main article div.time {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        
+        background: url('../img/image_map.svg') no-repeat;
+        height: 35px;
+        background-position: -455px -13px;
+        
+        line-height: normal;
+        padding: 7px 0 0 30px;
+        
+        font-size: 20px;
+        
+        color: #bbbbbb;
+    }
+    
+    main article a.close {
+        display: block;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background: url('../img/image_map.svg') no-repeat;
+        height: 40px;
+        width: 45px;
+        background-position: -452px -68px;
+    }
+    
+    main article a.close:hover {
+        cursor: pointer;
+        -webkit-animation:spin 1s linear infinite;
+        -moz-animation:spin 1s linear infinite;
+        animation:spin 1s linear infinite;
+    }
+    
+    main article div.flap {
+        position: absolute;
+        bottom: -26px;
+        right: 30px;
+        
+        background: url('../img/image_map.svg') no-repeat;
+        height: 30px;
+        width: 30px;
+        background-position: -512px -20px;
+    }
 
 /* Animations */
 
@@ -126,18 +204,20 @@ div.cloud4 {
     }
 
 .cloudAnimation {
-    -webkit-animation:cloud1 160s linear infinite;
-    -moz-animation:cloud1 160s linear infinite;
-    animation:cloud1 160s linear infinite;
+    opacity: 0.5;
+    position: fixed;
+    -webkit-animation:cloud 160s linear infinite;
+    -moz-animation:cloud 160s linear infinite;
+    animation:cloud 160s linear infinite;
 }
 
-    /* Cloud1 */
-    @-moz-keyframes cloud1 {
-        100% { -moz-transform: translate(2000px, 0); opacity: 0; }
+    /* Cloud */
+    @-moz-keyframes cloud {
+        100% { -moz-transform: translate(2000px, 0); opacity: 0;}
     }
-    @-webkit-keyframes cloud1 {
-        100% { -webkit-transform: translate(2000px, 0); opacity: 0; }
+    @-webkit-keyframes cloud {
+        100% { -webkit-transform: translate(2000px, 0); opacity: 0;}
     }
-    @keyframes cloud1 {
+    @keyframes cloud {
         100% { -webkit-transform: translate(2000px, 0); transform:translate(2000px, 0); opacity: 0; }
     }
