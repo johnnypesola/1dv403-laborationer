@@ -11,29 +11,17 @@
 <body>
     <header>
         <h1>Labby Mezzage version 0.1</h1>
-        <div class="lightning1 spinAnimation"></div>
-        <div class="lightning2 spinAnimation"></div>
+        <div class="lightning1 spin-animation"></div>
+        <div class="lightning2 spin-animation"></div>
     </header>
     
     <div class="moon"></div>
-    <div class="cloud1 cloudAnimation"></div>
-    <div class="cloud2 cloudAnimation"></div>
-    <div class="cloud3 cloudAnimation"></div>
-    <div class="cloud4 cloudAnimation"></div>
+    <div class="cloud1 cloud-animation"></div>
+    <div class="cloud2 cloud-animation"></div>
+    <div class="cloud3 cloud-animation"></div>
+    <div class="cloud4 cloud-animation"></div>
     
-    <main>
-        <article>
-            <p>"I like this I like this I like this I like this I like this I like this"</p>
-            <div class="time">23.15</div>
-            <div class="flap"></div>
-            <a class="close"></a>
-        </article>
-        <article>
-            <p>"I like this I like this I like this I like this I like this I like this"</p>
-            <div class="time">23.15</div>
-            <div class="flap"></div>
-            <a class="close"></a>
-        </article>
+    <main id="message-list">
         <article>
             <p>"I like this I like this I like this I like this I like this I like this"</p>
             <div class="time">23.15</div>
@@ -47,5 +35,12 @@
             <a class="close"></a>
         </article>
     </main>
+    <section>
+        <textarea id="message-text">Enter thoughts</textarea>
+        <button id="submit-message">Express thoughts</button>
+        <div class="message-counter">Total number of messages: <span id="message-count">0</span></div>
+        <div class="big-bouble"></div>
+        <div class="small-bouble"></div>
+    </section>
 </body>
 </html>
