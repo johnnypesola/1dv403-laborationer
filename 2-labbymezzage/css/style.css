@@ -208,7 +208,8 @@ div.cloud4 {
         min-width: 308px;
         max-width: 500px;
         
-        border-radius: 20px;
+        border-radius: 8px;
+        line-height: 20px;
     }
     
         .instance section textarea {
@@ -237,8 +238,8 @@ div.cloud4 {
         }
         
         .instance section button {
-            position: relative;
-            bottom: 10px;
+
+            line-height: 28px;
             border-radius: 5px;
             background: #6D416D;
             color: #FFFFFF;
@@ -277,14 +278,26 @@ div.cloud4 {
 
 /* Animations */
 
-.message-enter {
-  -webkit-transition: 3s;
-  -moz-transition: 3s;
-  -ms-transition: 3s;
-  -o-transition: 3s;
-  transition: 3s;
-  margin-left: 50% !important;
+.message-animation {
+    -webkit-animation: fade-in 0.5s ease-out 0s 1;
+    -moz-animation: fade-in 0.5s ease-out 0s 1;
+    animation: fade-in 0.5s ease-out 0s 1;
 }
+    /* Fade in */
+    @-moz-keyframes fade-in {
+        from { transform: scale(0.8, 0.8); opacity: 0; }
+        to { transform: scale(1, 1); opacity: 1; }        
+    }
+
+    @-webkit-keyframes fade-in {
+        from { transform: scale(0.8, 0.8); opacity: 0; }
+        to { transform: scale(1, 1); opacity: 1; }        
+    }
+
+    @keyframes fade-in {
+        from { transform: scale(0.8, 0.8); opacity: 0; }
+        to { transform: scale(1, 1); opacity: 1; }
+    }
 
 .spin-animation {
     -webkit-animation:spin 8s linear infinite;
@@ -304,7 +317,7 @@ div.cloud4 {
     }
 
 .cloud-animation {
-    opacity: 0.5;
+    opacity: 1;
     position: fixed;
     -webkit-animation:cloud 160s linear infinite;
     -moz-animation:cloud 160s linear infinite;

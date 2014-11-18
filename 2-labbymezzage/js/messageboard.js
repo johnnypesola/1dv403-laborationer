@@ -118,7 +118,7 @@
         this._messages.push(new Message(this.newMsgContainer.value));
         
         // Print out added message
-        this.renderMessage(this._messages.length-1);
+        this.renderMessage(this._messages.length-1, true);
         
         // Update count
         this.updateCount();
@@ -230,7 +230,7 @@
     }
         
     // Render one message
-    MessageBoard.prototype.renderMessage = function(index){
+    MessageBoard.prototype.renderMessage = function(index, isNew){
         
         var msg = this._messages[index];
         
@@ -249,6 +249,11 @@
         time.setAttribute("class", "time");
         flap.setAttribute("class", "flap");
         close.setAttribute("class", "close");
+        
+        if(isNew)
+        {
+            article.setAttribute("class", "message-animation");
+        }
         
         // Append elements
         time.appendChild(timeContent);
@@ -286,6 +291,6 @@
         // Add all messages, including new one
         for(var index=0; index < this._messages.length; index++)
         {
-            this.renderMessage(index);
+            this.renderMessage(index, false);
         }
     }
