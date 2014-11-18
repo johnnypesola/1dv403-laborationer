@@ -111,163 +111,169 @@ div.cloud4 {
     animation-delay: 8s;
 }
 
-main {
-    margin: 0 auto;
-    min-width: 308px;
-    max-width: 500px;
+.instance {
+/*    float: left;
+    margin: 0 0 0 100px;
+*/
 }
 
-    main article {
-        background: #FFFFFF;
-        position: relative;
-        text-shadow: 0px 0px 10px rgba(150, 150, 150, 0.5);
-        min-height: 200px;
-        line-height: 200px;
-        
-        margin: 45px auto;
-        
+    .instance main {
+        margin: 0 auto;
         min-width: 308px;
         max-width: 500px;
     }
     
-    main article p {
-        display: inline-block;
-        vertical-align: middle;
-        line-height: normal;
-        margin-left: 40px;
-        margin-right: 40px;
-    }
-    
-    main article a.time {
-        position: absolute;
-        top: 3px;
-        left: 3px;
-        
-        background: url('../img/image_map.svg') no-repeat;
-        height: 35px;
-        background-position: -455px -13px;
-        
-        line-height: normal;
-        padding: 7px 0 0 30px;
-        
-        cursor: pointer;
-        
-        font-size: 20px;
-        
-        color: #BBBBBB;
-    }
-    
-        main article a.time:hover {
-            color: #000000;
+        .instance main article {
+            background: #FFFFFF;
+            position: relative;
+            text-shadow: 0px 0px 10px rgba(150, 150, 150, 0.5);
+            min-height: 200px;
+            line-height: 200px;
+            
+            margin: 45px auto;
+            
+            min-width: 308px;
+            max-width: 500px;
         }
-    
-    main article a.close {
-        display: block;
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        background: url('../img/image_map.svg') no-repeat;
-        height: 40px;
-        width: 45px;
-        background-position: -452px -68px;
-    }
-    
-    main article a.close:hover {
-        cursor: pointer;
-        -webkit-animation:spin 1s linear infinite;
-        -moz-animation:spin 1s linear infinite;
-        animation:spin 1s linear infinite;
-    }
-    
-    main article div.flap {
-        position: absolute;
-        bottom: -26px;
-        right: 30px;
         
-        background: url('../img/image_map.svg') no-repeat;
-        height: 30px;
-        width: 30px;
-        background-position: -512px -20px;
-    }
-
-section {
-    position: relative;
-    background: #FFFFFF;
-    position: relative;
-    text-shadow: 0px 0px 10px rgba(150, 150, 150, 0.5);
-    min-height: 200px;
-    
-    margin: 45px auto 300px auto;
-    
-    min-width: 308px;
-    max-width: 500px;
-    
-    border-radius: 20px;
-}
-
-    section textarea {
-        margin: 10px 0 0 0;
-        height: 84px;
-        width: 420px;
-        border: none;
-        text-align: center;
-        border-radius: 5px;
-        border: 2px solid #DDDDDD;
-        font-family: 'Indie Flower', sans-serif, verdana;
-        font-size: 28px;
-        color: #3d3659;
-        resize: none;
-        background: none;
+        .instance main article p {
+            display: inline-block;
+            vertical-align: middle;
+            line-height: normal;
+            margin-left: 40px;
+            margin-right: 40px;
+        }
         
-        padding: 30px;
-    }
-    
-    section .message-counter {
-        font-size: 22px;
-        position: absolute;
-        bottom: -50px;
-        left: 120px;
-        color: #C2D3DB;
-    }
-    
-    section button {
+        .instance main article a.time {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            
+            background: url('../img/image_map.svg') no-repeat;
+            height: 35px;
+            background-position: -455px -13px;
+            
+            line-height: normal;
+            padding: 7px 0 0 30px;
+            
+            cursor: pointer;
+            
+            font-size: 20px;
+            
+            color: #BBBBBB;
+        }
+        
+            main article a.time:hover {
+                color: #000000;
+            }
+        
+        .instance main article a.close {
+            display: block;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background: url('../img/image_map.svg') no-repeat;
+            height: 40px;
+            width: 45px;
+            background-position: -452px -68px;
+        }
+        
+        .instance main article a.close:hover {
+            cursor: pointer;
+            -webkit-animation:spin 1s linear infinite;
+            -moz-animation:spin 1s linear infinite;
+            animation:spin 1s linear infinite;
+        }
+        
+        .instance main article div.flap {
+            position: absolute;
+            bottom: -26px;
+            right: 30px;
+            
+            background: url('../img/image_map.svg') no-repeat;
+            height: 30px;
+            width: 30px;
+            background-position: -512px -20px;
+        }
+
+    .instance section {
         position: relative;
-        bottom: 10px;
-        border-radius: 5px;
-        background: #6D416D;
-        color: #FFFFFF;
-        border: none;
-        font-family: 'Indie Flower', sans-serif, verdana;
-        font-size: 20px;
-        padding: 2px 8px;
-    }
-    
-    section button:hover {
-        background: #3d3659;
-        cursor: pointer;
-        font-family: 'Indie Flower', sans-serif, verdana;
-        font-size: 20px;
-    }
-    
-    section .big-bouble {
-        position: absolute;
-        bottom: -30px;
-        right: 20px;
-        width: 24px;
-        height: 24px;
-        border-radius: 12px;
         background: #FFFFFF;
+        position: relative;
+        text-shadow: 0px 0px 10px rgba(150, 150, 150, 0.5);
+        min-height: 200px;
+        
+        margin: 45px auto 100px auto;
+        
+        min-width: 308px;
+        max-width: 500px;
+        
+        border-radius: 20px;
     }
     
-    section .small-bouble {
-        position: absolute;
-        bottom: -46px;
-        right: 10px;
-        width: 14px;
-        height: 14px;
-        border-radius: 7px;
-        background: #FFFFFF;
-    }
+        .instance section textarea {
+            margin: 10px 0 0 0;
+            height: 84px;
+            width: 80%;
+            border: none;
+            text-align: center;
+            border-radius: 5px;
+            border: 2px solid #DDDDDD;
+            font-family: 'Indie Flower', sans-serif, verdana;
+            font-size: 28px;
+            color: #3d3659;
+            resize: none;
+            background: none;
+            
+            padding: 30px;
+        }
+        
+        .instance section .message-counter {
+            font-size: 22px;
+            position: absolute;
+            bottom: -50px;
+            left: 20px;
+            color: #C2D3DB;
+        }
+        
+        .instance section button {
+            position: relative;
+            bottom: 10px;
+            border-radius: 5px;
+            background: #6D416D;
+            color: #FFFFFF;
+            border: none;
+            font-family: 'Indie Flower', sans-serif, verdana;
+            font-size: 20px;
+            padding: 2px 8px;
+        }
+        
+        .instance section button:hover {
+            background: #3d3659;
+            cursor: pointer;
+            font-family: 'Indie Flower', sans-serif, verdana;
+            font-size: 20px;
+        }
+        
+        .instance section .big-bouble {
+            position: absolute;
+            bottom: -30px;
+            right: 20px;
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            background: #FFFFFF;
+        }
+        
+        .instance section .small-bouble {
+            position: absolute;
+            bottom: -46px;
+            right: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 7px;
+            background: #FFFFFF;
+        }
 
 /* Animations */
 

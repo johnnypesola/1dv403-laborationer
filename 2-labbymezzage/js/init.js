@@ -1,40 +1,57 @@
 "use scrict";
 
-// Constructor function for LabbyMezzage
-function LabbyMezzage(parentContainerId) {
-    
-    var _parentContainer = document.getElementById(parentContainerId) || document;
-    var _msgContainer;
-    var _newMsgContainer;
-    var _msgCountContainer;
-    var _submitMsgButton;
-
-    var _messages = [];
-    
-    var that = this;
-    
-    // Main app Static method
-    this.run = function(){
+/* Constructor function */
+    function LabbyMezzage(parentContainerId) {
         
-        this.createElements();
+        this._parentContainer = document.getElementById(parentContainerId) || document;
+        this._msgContainer = "";
+        this._newMsgContainer = "";
+        this._msgCountContainer;
+        this._submitMsgButton;
+        this._messages = [];
         
-        // Event listener: Add message on submit button press
-        _submitMsgButton.onclick = function(){
-            that.addMessage();
+        // Main app Static method
+        this.run = function(){
+            
+            this.createElements();
+            
+            var that = this;
+            
+            // Event listener: Add message on submit button press
+            this._submitMsgButton.onclick = function(){
+                that.addMessage();
+            }
+            
+            // Event listener: Add message on enter key press
+            this.addEnterListener();
         }
-        
-        // Event listener: Add message on enter key press
-        this.addEnterListener();
-    },
-
-// Methods
+    }
     
-    this.createElements = function(){
+/* Prototype methods */
+
+    // Add new message
+    LabbyMezzage.prototype.addMessage = function(){
+        
+        // Create new message and push to container array
+        this._messages.push(new Message(this._newMsgContainer.value));
+        
+        // Print out added message
+        this.renderMessage(this._messages.length-1);
+        
+        // Update count
+        this.updateCount();
+        
+        // Empty the textarea
+        this._newMsgContainer.value = '';
+    }
+
+    // Initialize elements
+    LabbyMezzage.prototype.createElements = function(){
     
     // Message list
         
         // Container
-            _msgContainer = document.createElement("main");
+            this._msgContainer = document.createElement("main");
     
     // Message form
     
@@ -42,76 +59,60 @@ function LabbyMezzage(parentContainerId) {
             var section = document.createElement("section");
         
         // Textarea
-            _newMsgContainer = document.createElement("textarea");
-            _newMsgContainer.setAttribute("id", "message-text")
+            this._newMsgContainer = document.createElement("textarea");
+            this._newMsgContainer.setAttribute("id", "message-text")
         
         // Submit button
-            _submitMsgButton = document.createElement("button");
-            _submitMsgButton.setAttribute("id", "submit-message");
-            _submitMsgButton.appendChild(document.createTextNode("Express thoughts"));
+            this._submitMsgButton = document.createElement("button");
+            this._submitMsgButton.setAttribute("id", "submit-message");
+            this._submitMsgButton.appendChild(document.createTextNode("Express thoughts"));
         
         // Counter
             var counterParent = document.createElement("div");
-            var counterParentText = document.createTextNode("Total number of messages: ")
-            counterParent.appendChild(counterParent);
+            var counterParentText = document.createTextNode("Message count: ")
+            counterParent.appendChild(counterParentText);
             
-            _msgCountContainer = document.createElement("span");
+            this._msgCountContainer = document.createElement("span");
             var counterText = document.createTextNode("0");
-            _msgCountContainer.appendChild(counterText);
+            this._msgCountContainer.appendChild(counterText);
             
             counterParent.setAttribute("class", "message-counter");
-            _msgCountContainer.setAttribute("id", "message-count");
+            this._msgCountContainer.setAttribute("id", "message-count");
             
-            counterParent.appendChild(_msgCountContainer);
+            counterParent.appendChild(this._msgCountContainer);
+        
+        // Boubles, not really necessary, but for fun.
+            var bouble1 = document.createElement("div");
+            var bouble2 = document.createElement("div");
+            bouble1.setAttribute("class", "big-bouble");
+            bouble2.setAttribute("class", "small-bouble");
         
         // Append stuff
-            section.appendChild(_newMsgContainer);
-            section.appendChild(_submitMsgButton);
+            section.appendChild(this._newMsgContainer);
+            section.appendChild(this._submitMsgButton);
             section.appendChild(counterParent);
+            section.appendChild(bouble1);
+            section.appendChild(bouble2);
             
-            _parentContainer.appendChild(_msgContainer);
-            _parentContainer.appendChild(section);
-        
-        // TODO boubles, if not fixed with css.
-        
-        
+            this._parentContainer.appendChild(this._msgContainer);
+            this._parentContainer.appendChild(section);
     }
     
-    this.addMessage = function(){
-        
-        // Try to create new message and push to container array
-        try {
-            _messages.push(new Message(_newMsgContainer.value));
-        }
-        catch (error)
-        {
-            alert(error.message);
-        }
-        
-        // Print out added message
-        this.renderMessage(_messages.length-1);
-        
-        // Update count
-        this.updateCount();
-        
-        // Empty the textarea
-        _newMsgContainer.value = '';
-    },
-    
     // Remove one message
-    this.removeMessage = function(index){
+    LabbyMezzage.prototype.removeMessage = function(index){
         if(confirm("Are you sure you want to remove this message?")){
-            _messages.splice(index, 1);
+            this._messages.splice(index, 1);
             this.renderMessages();
             this.updateCount();
         }
-    },
+    }
     
-
-    // Add message if user presses enter key without shift key.
-    this.addEnterListener = function (){
-
-        _newMsgContainer.onkeypress = function(e){
+    // Add enter key listener
+    LabbyMezzage.prototype.addEnterListener = function (){
+        
+        var that = this;
+        
+        this._newMsgContainer.onkeypress = function(e){
             
             // If enter is pressed without shift key.
             if(!e.shiftKey && e.keyCode === 13){
@@ -122,10 +123,10 @@ function LabbyMezzage(parentContainerId) {
                 return false;
             }
         }
-    },
-        
+    }
+    
     // Remove all children from parent if children exists
-    this.removeChildren = function(parent){
+    LabbyMezzage.prototype.removeChildren = function(parent){
         
         if(typeof(parent) !== "undefined")
         {
@@ -133,23 +134,23 @@ function LabbyMezzage(parentContainerId) {
                 parent.removeChild(parent.firstChild);
             }
         }
-    },
-        
-    // Update message count
-    this.updateCount = function(){
-        
-        var countText = document.createTextNode(_messages.length);
+    }
 
-        this.removeChildren(_msgCountContainer);
+    // Update message count
+    LabbyMezzage.prototype.updateCount = function(){
         
-        _msgCountContainer.appendChild(countText);
+        var countText = document.createTextNode(this._messages.length);
+
+        this.removeChildren(this._msgCountContainer);
         
-    },
+        this._msgCountContainer.appendChild(countText);
+        
+    }
         
     // Render one message
-    this.renderMessage = function(index){
+    LabbyMezzage.prototype.renderMessage = function(index){
         
-        var msg = _messages[index];
+        var msg = this._messages[index];
         
         // Create elements
         var article = document.createElement("article");
@@ -177,6 +178,8 @@ function LabbyMezzage(parentContainerId) {
         article.appendChild(close);
 
         // Add events
+        
+        var that = this;
         close.onclick = function()
         {
             that.removeMessage(index);
@@ -188,31 +191,34 @@ function LabbyMezzage(parentContainerId) {
         }
         
         // Add this new message to dom
-        _msgContainer.appendChild(article);
+        this._msgContainer.appendChild(article);
         
-    },
+    }
         
     // Render all messages, clears container in process.
-    this.renderMessages = function(){
-        
-        var msgContainer = document.getElementById(_msgContainer);
+    LabbyMezzage.prototype.renderMessages = function(){
         
         // Clear previous messages
-        this.removeChildren(_msgContainer);
+        this.removeChildren(this._msgContainer);
         
         // Add all messages, including new one
-        for(var index=0; index < _messages.length; index++)
+        for(var index=0; index < this._messages.length; index++)
         {
             this.renderMessage(index);
         }
     }
-}
 
-// Start the application
-window.onload = function(){
-    var labby1 = new LabbyMezzage("message-list1");
-    labby1.run();
-    
-    var labby2 = new LabbyMezzage("message-list2");
-    labby2.run();
-}
+
+/* Static onload function */
+
+    // Start the application
+    window.onload = function(){
+        
+        (function() {
+            var labby1 = new LabbyMezzage("message-list1");
+            labby1.run();    
+        
+            var labby2 = new LabbyMezzage("message-list2");
+            labby2.run();
+        })();
+    }
