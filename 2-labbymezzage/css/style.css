@@ -138,7 +138,7 @@ main {
         margin-right: 40px;
     }
     
-    main article div.time {
+    main article a.time {
         position: absolute;
         top: 3px;
         left: 3px;
@@ -150,10 +150,16 @@ main {
         line-height: normal;
         padding: 7px 0 0 30px;
         
+        cursor: pointer;
+        
         font-size: 20px;
         
-        color: #bbbbbb;
+        color: #BBBBBB;
     }
+    
+        main article a.time:hover {
+            color: #000000;
+        }
     
     main article a.close {
         display: block;

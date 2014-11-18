@@ -7,7 +7,7 @@ var LabbyMezzage = {
     msgContainer: "message-list",
     msgCountContainer: "message-count",
     newMsgContainer: "message-text",
-    addButton: "submit-message",
+    submitMsgButton: "submit-message",
     
     // Other declarations
     messages: [],
@@ -16,31 +16,36 @@ var LabbyMezzage = {
     run: function(){
             
         try {
-
-            var addButton = document.getElementById(LabbyMezzage.addButton);
-
+            
             // Attach event to button
-            addButton.onclick = function(){
-                
-                var newMessage = document.getElementById(LabbyMezzage.newMsgContainer).value;
-
-                // Create new message and push to container array
-                LabbyMezzage.messages.push(new Message(newMessage));
-                
-                // Print out added message
-                LabbyMezzage.dom.renderMessage(LabbyMezzage.messages.length-1);
-                
-                // Update count
-                LabbyMezzage.dom.updateCount();
+            document.getElementById(LabbyMezzage.submitMsgButton).onclick = function(){
+                LabbyMezzage.addMessage();
             }
+            
+            LabbyMezzage.dom.addEnterListener();
         }
         catch (error)
         {
             alert(error.message);
         }
     },
-    
+
     // Static methods
+    addMessage: function(){
+        // Create new message and push to container array
+        LabbyMezzage.messages.push(new Message(document.getElementById(LabbyMezzage.newMsgContainer).value));
+        
+        // Print out added message
+        LabbyMezzage.dom.renderMessage(LabbyMezzage.messages.length-1);
+        
+        // Update count
+        LabbyMezzage.dom.updateCount();
+        
+        // Empty the textarea
+        document.getElementById(LabbyMezzage.newMsgContainer).value = "";
+    },
+    
+    // Remove on message in message array container
     removeMessage: function(index){
         LabbyMezzage.messages.splice(index, 1);
     },
@@ -48,6 +53,23 @@ var LabbyMezzage = {
     // DOM specific Static Methods
     dom: {
         
+        // Add message if user presses enter key without shift key.
+        addEnterListener: function (){
+            var newMsgContainer = document.getElementById(LabbyMezzage.newMsgContainer);
+            
+            newMsgContainer.onkeypress = function(e){
+                
+                if(!e.shiftKey && e.keyCode === 13){
+                    
+                    LabbyMezzage.addMessage();
+                    
+                    // Scroll to the bottom of the page.
+                    window.scrollTo(0,document.body.scrollHeight);
+                }
+            }
+        },
+        
+        // Remove all children from parent if children exists
         removeChildren: function(parent){
             
             if(typeof(parent) !== "undefined")
@@ -57,7 +79,8 @@ var LabbyMezzage = {
                 }
             }
         },
-            
+        
+        // Update message count
         updateCount: function(){
             
             var countContainer = document.getElementById(LabbyMezzage.msgCountContainer);
@@ -68,7 +91,8 @@ var LabbyMezzage = {
             countContainer.appendChild(countText);
             
         },
-            
+        
+        // Render one message
         renderMessage: function(index){
             
             var msg = LabbyMezzage.messages[index];
@@ -77,17 +101,12 @@ var LabbyMezzage = {
             // Create elements
             var article = document.createElement("article");
             var text = document.createElement("p");
-            var time = document.createElement("div");
+            var time = document.createElement("a");
             var flap = document.createElement("div");
             var close = document.createElement("a");
             
-            // Format time
-            var hours = ('0' + msg.date.getHours()).slice(-2);
-            var minutes = ('0' + msg.date.getMinutes()).slice(-2);
-            var seconds = ('0' + msg.date.getSeconds()).slice(-2);
-            
             // Create content
-            var timeContent = document.createTextNode(hours+":"+minutes+":"+seconds);
+            var timeContent = document.createTextNode(msg.date.getHoursMinutesSeconds());
             var textContent = document.createTextNode(msg.text);
             
             // Set classes
@@ -112,11 +131,17 @@ var LabbyMezzage = {
                 LabbyMezzage.dom.updateCount();
             }
             
+            time.onclick = function()
+            {
+                alert("Inlägget skapades " + msg.date.toLocaleString());
+            }
+            
             // Add this new message to dom
             msgContainer.appendChild(article);
             
         },
-            
+        
+        // Render all messages, clears container in process.
         renderMessages: function(){
             
             var msgContainer = document.getElementById(LabbyMezzage.msgContainer);

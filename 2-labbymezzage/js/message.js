@@ -29,11 +29,21 @@
         this.text = message || "";
     }
 
-// Add shared Prototype Methods for Message Object
+// Add shared Prototype Methods for Message Objects
     Message.prototype.toString = function(){
         return this.text+" ("+this.date+")";
     }
     
     Message.prototype.getHTMLText = function(){
         return (this.text+" ("+this.date+")").replace(/\n/g, "<br>");
+    }
+
+// Add custom Prototype Method for Date Objects
+    Date.prototype.getHoursMinutesSeconds = function()
+    {
+        var hours = ('0' + this.getHours()).slice(-2);
+        var minutes = ('0' + this.getMinutes()).slice(-2);
+        var seconds = ('0' + this.getSeconds()).slice(-2);
+        
+        return hours + ":" + minutes + ":" + seconds;
     }
