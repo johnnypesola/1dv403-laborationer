@@ -35,7 +35,7 @@
     }
     
     Message.prototype.getHTMLText = function(){
-        return (this.text+" ("+this.date+")").replace(/\n/g, "<br>");
+        return this.text.replace(/\n/g, "<br>");
     }
 
 // Add custom Prototype Method for Date Objects
