@@ -12,7 +12,7 @@ var LabbyMezzage = {
     // Other declarations
     messages: [],
     
-    // Main app Static function
+    // Main app Static method
     run: function(){
             
         try {
@@ -27,11 +27,11 @@ var LabbyMezzage = {
                 // Create new message and push to container array
                 LabbyMezzage.messages.push(new Message(newMessage));
                 
-                // Print out messages
-                LabbyMezzage.dom.renderMessages();
+                // Print out added message
+                LabbyMezzage.dom.renderMessage(LabbyMezzage.messages.length-1);
                 
                 // Update count
-                LabbyMezzage.dom.updateCount(LabbyMezzage.messages.length);
+                LabbyMezzage.dom.updateCount();
             }
         }
         catch (error)
@@ -40,7 +40,12 @@ var LabbyMezzage = {
         }
     },
     
-    /* DOM specific Static Methods */
+    // Static methods
+    removeMessage: function(index){
+        LabbyMezzage.messages.splice(index, 1);
+    },
+    
+    // DOM specific Static Methods
     dom: {
         
         removeChildren: function(parent){
@@ -53,10 +58,10 @@ var LabbyMezzage = {
             }
         },
             
-        updateCount: function(count){
+        updateCount: function(){
             
             var countContainer = document.getElementById(LabbyMezzage.msgCountContainer);
-            var countText = document.createTextNode(count);
+            var countText = document.createTextNode(LabbyMezzage.messages.length);
     
             LabbyMezzage.dom.removeChildren(countContainer);
             
@@ -64,8 +69,9 @@ var LabbyMezzage = {
             
         },
             
-        renderMessage: function(msg){
+        renderMessage: function(index){
             
+            var msg = LabbyMezzage.messages[index];
             var msgContainer = document.getElementById(LabbyMezzage.msgContainer);
             
             // Create elements
@@ -75,8 +81,13 @@ var LabbyMezzage = {
             var flap = document.createElement("div");
             var close = document.createElement("a");
             
+            // Format time
+            var hours = ('0' + msg.date.getHours()).slice(-2);
+            var minutes = ('0' + msg.date.getMinutes()).slice(-2);
+            var seconds = ('0' + msg.date.getSeconds()).slice(-2);
+            
             // Create content
-            var timeContent = document.createTextNode(msg.date.getHours()+":"+msg.date.getMinutes()+":"+msg.date.getSeconds());
+            var timeContent = document.createTextNode(hours+":"+minutes+":"+seconds);
             var textContent = document.createTextNode(msg.text);
             
             // Set classes
@@ -92,8 +103,18 @@ var LabbyMezzage = {
             article.appendChild(time);
             article.appendChild(flap);
             article.appendChild(close);
+
+            // Add events
+            close.onclick = function()
+            {
+                LabbyMezzage.removeMessage(index);
+                LabbyMezzage.dom.renderMessages();
+                LabbyMezzage.dom.updateCount();
+            }
             
+            // Add this new message to dom
             msgContainer.appendChild(article);
+            
         },
             
         renderMessages: function(){
@@ -104,9 +125,10 @@ var LabbyMezzage = {
             LabbyMezzage.dom.removeChildren(msgContainer);
             
             // Add all messages, including new one
-            LabbyMezzage.messages.forEach(function(msg){
-                LabbyMezzage.dom.renderMessage(msg)
-            });
+            for(var index=0; index < LabbyMezzage.messages.length; index++)
+            {
+                LabbyMezzage.dom.renderMessage(index);
+            }
         }
     }
 }
