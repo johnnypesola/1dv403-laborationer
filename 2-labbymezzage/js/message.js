@@ -1,11 +1,11 @@
 "use strict";
 
-// Constructor function for Message Object
+/* Constructor function */
     function Message(message, date){
         var _date;
         var _message;
         
-        // Assign Properties with getters and setters
+        // Properties with getters and Setters
         Object.defineProperties(this, {
             "text": {
                 get: function() { return this._message || ""; },
@@ -28,7 +28,7 @@
         this.text = message || "";
     }
 
-// Add shared Prototype Methods for Message Objects
+/* Prototype methods */
     Message.prototype.toString = function(){
         return this.text+" ("+this.date+")";
     }
@@ -37,7 +37,7 @@
         return this.text.replace(/\n/g, "<br>");
     }
 
-// Add custom Prototype Method for Date Objects
+/* Extended prototype methods for Date Objects */
     Date.prototype.getHoursMinutesSeconds = function()
     {
         var hours = ('0' + this.getHours()).slice(-2);

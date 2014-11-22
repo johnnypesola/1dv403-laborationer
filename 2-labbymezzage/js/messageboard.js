@@ -8,7 +8,7 @@
         var _submitMsgButton;
         this._messages = [];
         
-        // Properties with Getters and setters
+        // Properties with Getters and Setters
         Object.defineProperties(this, {
             
             "parentContainer": {
