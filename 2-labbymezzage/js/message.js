@@ -5,22 +5,21 @@
         var _date;
         var _message;
         
-    // Assign Properties with getters and setters
-        // Message.text property
-        Object.defineProperty(this, "text", {
-            get: function() { return this._message || ""; },
-            set: function(value) { this._message = value; }
-        });
-        
-        // Message.date property
-        Object.defineProperty(this, "date", {
-            get: function() { return this._date || ""; },
-            set: function(value) {
-                if(!(value instanceof Date))
-                {
-                    throw new Error("FEL: egenskapen date får endast innehålla datumobjekt");
+        // Assign Properties with getters and setters
+        Object.defineProperties(this, {
+            "text": {
+                get: function() { return this._message || ""; },
+                set: function(value) { this._message = value; }
+            },
+            "date": {
+                get: function() { return this._date || ""; },
+                set: function(value) {
+                    if(!(value instanceof Date))
+                    {
+                        throw new Error("ERROR: the date property can only contain a date object");
+                    }
+                    this._date = value;
                 }
-                this._date = value;
             }
         });
         

@@ -8,83 +8,76 @@
         var _submitMsgButton;
         this._messages = [];
         
-    // Properties with Getters and setters
+        // Properties with Getters and setters
+        Object.defineProperties(this, {
+            
+            "parentContainer": {
+                get: function() { return this._parentContainer || ""; },
 
-        // .parentContainer property
-        Object.defineProperty(this, "parentContainer", {
-            get: function() { return this._parentContainer || ""; },
-            
-            set: function(element) {
-                if(element !== null && typeof(element.nodeName) !== "undefined")
-                {
-                    this._parentContainer = element;
+                set: function(element) {
+                    if(element !== null && typeof(element.nodeName) !== "undefined")
+                    {
+                        this._parentContainer = element;
+                    }
+                    else
+                    {
+                        throw new Error("ERROR: MessageBoard:s container must be an element");
+                    }
                 }
-                else
-                {
-                    throw new Error("ERROR: MessageBoard:s container must be an element");
+            },
+            "msgContainer": {
+                get: function() { return this._msgContainer || ""; },
+                
+                set: function(element) {
+                    if(element !== null && typeof(element.nodeName) !== "undefined")
+                    {
+                        this._msgContainer = element;
+                    }
+                    else
+                    {
+                        throw new Error("ERROR: msgContainer must be an element");
+                    }
                 }
-            }
-        });
-        
-        // .msgContainer property
-        Object.defineProperty(this, "msgContainer", {
-            get: function() { return this._msgContainer || ""; },
-            
-            set: function(element) {
-                if(element !== null && typeof(element.nodeName) !== "undefined")
-                {
-                    this._msgContainer = element;
+            },
+            "newMsgContainer": {
+                get: function() { return this._newMsgContainer || ""; },
+                
+                set: function(element) {
+                    if(element !== null && typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "textarea")
+                    {
+                        this._newMsgContainer = element;
+                    }
+                    else
+                    {
+                        throw new Error("ERROR: newMsgContainer property can only contain an textarea element");
+                    }
                 }
-                else
-                {
-                    throw new Error("ERROR: msgContainer must be an element");
+            },
+            "msgCountContainer": {
+                get: function() { return this._msgCountContainer || ""; },
+                
+                set: function(element) {
+                    if(element !== null && typeof(element.nodeName) !== "undefined")
+                    {
+                        this._msgCountContainer = element;
+                    }
+                    else
+                    {
+                        throw new Error("ERROR: msgCountContainer must be an element");
+                    }
                 }
-            }
-        });
-        
-        // .newMsgContainer property
-        Object.defineProperty(this, "newMsgContainer", {
-            get: function() { return this._newMsgContainer || ""; },
-            
-            set: function(element) {
-                if(element !== null && typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "textarea")
-                {
-                    this._newMsgContainer = element;
-                }
-                else
-                {
-                    throw new Error("ERROR: newMsgContainer property can only contain an textarea element");
-                }
-            }
-        });
-
-        // .msgCountContainer property
-        Object.defineProperty(this, "msgCountContainer", {
-            get: function() { return this._msgCountContainer || ""; },
-            
-            set: function(element) {
-                if(element !== null && typeof(element.nodeName) !== "undefined")
-                {
-                    this._msgCountContainer = element;
-                }
-                else
-                {
-                    throw new Error("ERROR: msgCountContainer must be an element");
-                }
-            }
-        });
-        
-        // .submitMsgButton property
-        Object.defineProperty(this, "submitMsgButton", {
-            get: function() { return this._submitMsgButton || ""; },
-            set: function(element) {
-                if(typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "button")
-                {
-                    this._submitMsgButton = element;
-                }
-                else
-                {
-                    throw new Error("ERROR: submitMsgButton property can only contain an button element");
+            },
+            "submitMsgButton": {
+                get: function() { return this._submitMsgButton || ""; },
+                set: function(element) {
+                    if(typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "button")
+                    {
+                        this._submitMsgButton = element;
+                    }
+                    else
+                    {
+                        throw new Error("ERROR: submitMsgButton property can only contain an button element");
+                    }
                 }
             }
         });
