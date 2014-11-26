@@ -28,16 +28,21 @@
         this.text = message || "";
     }
 
-/* Prototype methods */
-    Message.prototype.toString = function(){
-        return this.text+" ("+this.date+")";
-    }
-    
-    Message.prototype.getHTMLText = function(){
-        return this.text.replace(/\n/g, "<br>");
-    }
+/* Prototype methods, replace prototype with custom object with methods */
+    Message.prototype = {
+        
+        constructor: Message, // Reestablish constructor pointer
+        
+        toString: function(){
+            return this.text+" ("+this.date+")";    
+        },
+        
+        getHTMLText: function(){
+            return this.text.replace(/\n/g, "<br>");
+        }
+    };
 
-/* Extended prototype methods for Date Objects */
+/* Extended prototype method for Date data structure */
     Date.prototype.getHoursMinutesSeconds = function()
     {
         var hours = ('0' + this.getHours()).slice(-2);
