@@ -1,17 +1,15 @@
 "use scrict";
 
-/* Static onload function */
-
     // Start the application
     window.onload = function(){
         
-        (function() {
+        (function(){
             try {
                 var msgBoard1 = new MessageBoard("message-board1");
-                msgBoard1.run();    
+                msgBoard1.run();
             
                 var msgBoard2 = new MessageBoard("message-board2");
-                msgBoard2.run();   
+                msgBoard2.run();
             }
             catch (error){
                 alert(error.message);

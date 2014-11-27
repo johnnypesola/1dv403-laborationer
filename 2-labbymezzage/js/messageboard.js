@@ -1,82 +1,71 @@
 /* Constructor function */
 
-    function MessageBoard(parentContainerId) {
+    function MessageBoard(parentContainerId){
         
-        var _parentContainer;
-        var _msgContainer;
-        var _newMsgContainer;
-        var _msgCountContainer;
-        var _submitMsgButton;
+        var _parentContainer,
+            _msgContainer,
+            _newMsgContainer,
+            _msgCountContainer,
+            _submitMsgButton;
         this._messages = [];
         
         // Properties with Getters and Setters
         Object.defineProperties(this, {
-            
             "parentContainer": {
-                get: function() { return this._parentContainer || ""; },
+                get: function(){ return this._parentContainer || ""; },
 
-                set: function(element) {
-                    if(element !== null && typeof(element.nodeName) !== "undefined")
-                    {
+                set: function(element){
+                    if(element !== null && typeof(element.nodeName) !== "undefined"){
                         this._parentContainer = element;
                     }
-                    else
-                    {
+                    else{
                         throw new Error("ERROR: MessageBoard:s container must be an element");
                     }
                 }
             },
             "msgContainer": {
-                get: function() { return this._msgContainer || ""; },
+                get: function(){ return this._msgContainer || ""; },
                 
-                set: function(element) {
-                    if(element !== null && typeof(element.nodeName) !== "undefined")
-                    {
+                set: function(element){
+                    if(element !== null && typeof(element.nodeName) !== "undefined"){
                         this._msgContainer = element;
                     }
-                    else
-                    {
+                    else{
                         throw new Error("ERROR: msgContainer must be an element");
                     }
                 }
             },
             "newMsgContainer": {
-                get: function() { return this._newMsgContainer || ""; },
+                get: function(){ return this._newMsgContainer || ""; },
                 
-                set: function(element) {
-                    if(element !== null && typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "textarea")
-                    {
+                set: function(element){
+                    if(element !== null && typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "textarea"){
                         this._newMsgContainer = element;
                     }
-                    else
-                    {
+                    else{
                         throw new Error("ERROR: newMsgContainer property can only contain an textarea element");
                     }
                 }
             },
             "msgCountContainer": {
-                get: function() { return this._msgCountContainer || ""; },
+                get: function(){ return this._msgCountContainer || ""; },
                 
-                set: function(element) {
-                    if(element !== null && typeof(element.nodeName) !== "undefined")
-                    {
+                set: function(element){
+                    if(element !== null && typeof(element.nodeName) !== "undefined"){
                         this._msgCountContainer = element;
                     }
-                    else
-                    {
+                    else{
                         throw new Error("ERROR: msgCountContainer must be an element");
                     }
                 }
             },
             "submitMsgButton": {
-                get: function() { return this._submitMsgButton || ""; },
-                set: function(element) {
-                    if(typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "button")
-                    {
+                get: function(){ return this._submitMsgButton || ""; },
+                set: function(element){
+                    if(typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() == "button"){
                         this._submitMsgButton = element;
                     }
-                    else
-                    {
+                    else{
                         throw new Error("ERROR: submitMsgButton property can only contain an button element");
                     }
                 }
@@ -108,7 +97,7 @@
     MessageBoard.prototype = {
         constructor: MessageBoard, // Reestablish constructor pointer
         
-        addMessage: function() {
+        addMessage: function(){
             // Create new message and push to container array
             this._messages.push(new Message(this.newMsgContainer.value));
             
@@ -127,7 +116,7 @@
         // Message list
             
             // Container
-                this.msgContainer = document.createElement("main");
+                this.msgContainer = document.createElement("div");
         
         // Message form
         
@@ -136,12 +125,10 @@
             
             // Textarea
                 this.newMsgContainer = document.createElement("textarea");
-                this.newMsgContainer.setAttribute("id", "message-text")
             
             // Submit button
                 this.submitMsgButton = document.createElement("button");
-                this.submitMsgButton.setAttribute("id", "submit-message");
-                this.submitMsgButton.appendChild(document.createTextNode("Express thoughts"));
+                this.submitMsgButton.appendChild(document.createTextNode("Write"));
             
             // Counter
                 var counterParent = document.createElement("div");
@@ -153,7 +140,6 @@
                 this.msgCountContainer.appendChild(counterText);
                 
                 counterParent.setAttribute("class", "message-counter");
-                this.msgCountContainer.setAttribute("id", "message-count");
                 
                 counterParent.appendChild(this.msgCountContainer);
             
@@ -201,9 +187,8 @@
         
         removeChildren: function(parent){
         
-            if(typeof(parent) !== "undefined")
-            {
-                while (parent.firstChild) {
+            if(typeof(parent) !== "undefined"){
+                while (parent.firstChild){
                     parent.removeChild(parent.firstChild);
                 }
             }
@@ -223,23 +208,24 @@
             var msg = this._messages[index];
             
             // Create elements
-            var article = document.createElement("article");
-            var text = document.createElement("p");
-            var time = document.createElement("a");
-            var flap = document.createElement("div");
-            var close = document.createElement("a");
+            var article = document.createElement("article"),
+                text = document.createElement("p"),
+                time = document.createElement("a"),
+                flap = document.createElement("div"),
+                close = document.createElement("a");
             
             // Create content
-            var timeContent = document.createTextNode(msg.date.getHoursMinutesSeconds());
-            var textContent = msg.getHTMLText();
+            var timeContent = document.createTextNode(msg.date.getHoursMinutesSeconds()),
+                textContent = msg.getHTMLText();
             
             // Set classes
             time.setAttribute("class", "time");
+            
+            //flap.classlistAdd()
             flap.setAttribute("class", "flap");
             close.setAttribute("class", "close");
             
-            if(isNew)
-            {
+            if(isNew){
                 article.setAttribute("class", "message-animation");
             }
             
@@ -253,15 +239,12 @@
             article.appendChild(close);
     
             // Add events
-            
             var that = this;
-            close.onclick = function()
-            {
+            close.onclick = function(){
                 that.removeMessage(index);
             }
             
-            time.onclick = function()
-            {
+            time.onclick = function(){
                 alert("Inlägget skapades " + msg.date.toLocaleString());
             }
             
@@ -272,12 +255,13 @@
         
         renderMessages: function(){
         
+            var index;
+        
             // Clear previous messages
             this.removeChildren(this.msgContainer);
             
             // Add all messages, including new one
-            for(var index=0; index < this._messages.length; index++)
-            {
+            for(index=0; index < this._messages.length; index++){
                 this.renderMessage(index, false);
             }
         }
