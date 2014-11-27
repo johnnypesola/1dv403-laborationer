@@ -78,9 +78,11 @@
     // Main app method
         this.run = function(){
             
+            var that;
+            
             this.createElements();
             
-            var that = this;
+            that = this;
             
             // Event listener: Add message on submit button press
             this.submitMsgButton.onclick = function(){
@@ -113,6 +115,13 @@
         
         createElements: function(){
         
+            var section,
+                counterParentText,
+                counterParent,
+                counterText,
+                bouble1,
+                bouble2;
+        
         // Message list
             
             // Container
@@ -121,7 +130,7 @@
         // Message form
         
             // Section parent tag
-                var section = document.createElement("section");
+                section = document.createElement("section");
             
             // Textarea
                 this.newMsgContainer = document.createElement("textarea");
@@ -131,12 +140,12 @@
                 this.submitMsgButton.appendChild(document.createTextNode("Write"));
             
             // Counter
-                var counterParent = document.createElement("div");
-                var counterParentText = document.createTextNode("Message count: ")
+                counterParent = document.createElement("div");
+                counterParentText = document.createTextNode("Message count: ");
                 counterParent.appendChild(counterParentText);
                 
                 this.msgCountContainer = document.createElement("span");
-                var counterText = document.createTextNode("0");
+                counterText = document.createTextNode("0");
                 this.msgCountContainer.appendChild(counterText);
                 
                 counterParent.setAttribute("class", "message-counter");
@@ -144,8 +153,8 @@
                 counterParent.appendChild(this.msgCountContainer);
             
             // Boubles, not really necessary, but for fun.
-                var bouble1 = document.createElement("div");
-                var bouble2 = document.createElement("div");
+                bouble1 = document.createElement("div");
+                bouble2 = document.createElement("div");
                 bouble1.setAttribute("class", "big-bouble");
                 bouble2.setAttribute("class", "small-bouble");
             
@@ -170,7 +179,9 @@
         
         addEnterListener: function (){
         
-            var that = this;
+            var that;
+            
+            that = this;
             
             this.newMsgContainer.onkeypress = function(e){
                 
@@ -195,8 +206,10 @@
         },
         
         updateCount: function(){
+            
+            var countText;
         
-            var countText = document.createTextNode(this._messages.length);
+            countText = document.createTextNode(this._messages.length);
     
             this.removeChildren(this.msgCountContainer);
             
@@ -205,18 +218,29 @@
         
         renderMessage: function(index, isNew){
         
-            var msg = this._messages[index];
+            var msg,
+                article,
+                text,
+                time,
+                flap,
+                close,
+                timeContent,
+                textContent,
+                that;
+            
+             msg = this._messages[index]
+             that = this;
             
             // Create elements
-            var article = document.createElement("article"),
-                text = document.createElement("p"),
-                time = document.createElement("a"),
-                flap = document.createElement("div"),
-                close = document.createElement("a");
+            article = document.createElement("article");
+            text = document.createElement("p");
+            time = document.createElement("a");
+            flap = document.createElement("div");
+            close = document.createElement("a");
             
             // Create content
-            var timeContent = document.createTextNode(msg.date.getHoursMinutesSeconds()),
-                textContent = msg.getHTMLText();
+            timeContent = document.createTextNode(msg.date.getHoursMinutesSeconds());
+            textContent = msg.getHTMLText();
             
             // Set classes
             time.setAttribute("class", "time");
@@ -239,7 +263,6 @@
             article.appendChild(close);
     
             // Add events
-            var that = this;
             close.onclick = function(){
                 that.removeMessage(index);
             }
