@@ -148,15 +148,15 @@
                 counterText = document.createTextNode("0");
                 this.msgCountContainer.appendChild(counterText);
                 
-                counterParent.setAttribute("class", "message-counter");
+                counterParent.classList.add("message-counter");
                 
                 counterParent.appendChild(this.msgCountContainer);
             
             // Boubles, not really necessary, but for fun.
                 bouble1 = document.createElement("div");
                 bouble2 = document.createElement("div");
-                bouble1.setAttribute("class", "big-bouble");
-                bouble2.setAttribute("class", "small-bouble");
+                bouble1.classList.add("big-bouble");
+                bouble2.classList.add("small-bouble");
             
             // Append stuff
                 section.appendChild(this.newMsgContainer);
@@ -243,14 +243,14 @@
             textContent = msg.getHTMLText();
             
             // Set classes
-            time.setAttribute("class", "time");
+            time.classList.add("time");
             
             //flap.classlistAdd()
-            flap.setAttribute("class", "flap");
-            close.setAttribute("class", "close");
+            flap.classList.add("flap");
+            close.classList.add("close");
             
             if(isNew){
-                article.setAttribute("class", "message-animation");
+                article.classList.add("message-animation");
             }
             
             // Append elements
