@@ -1,0 +1,185 @@
+body {
+    background: #3d3659; /*  */
+    margin: 0;
+    text-align: center;
+    font-family: 'Indie Flower', sans-serif, verdana;
+    font-size: 20px;
+    line-height: 20px;
+    color: #000000;
+    margin: 40px;
+}
+
+.card-instance {
+    width: 800px;
+}
+
+            /* entire container, keeps perspective */
+            .card-container {
+                float: left;
+                margin: 0px;
+                
+                position: relative;
+            	perspective: 1000px;
+            	
+                width: 200px;
+                height: 280px;
+            }
+            
+                .card-container .flipper {
+            		transform-origin: 100% 105px; /* half of height */
+            	}
+            	
+            	/* flip the pane when hovered */
+            	.card-container:hover .flipper .back {
+            		transform: rotateX(0deg) scale(1);
+            		
+            		-webkit-box-shadow: 30px 30px 30px 0px rgba(50, 50, 50, 0.25);
+                    -moz-box-shadow:    30px 30px 30px 0px rgba(50, 50, 50, 0.25);
+                    box-shadow:         30px 30px 30px 0px rgba(50, 50, 50, 0.25);
+            	}
+            	
+            	/* flip the pane when hovered */
+            	.card-container:hover .flipper .front {
+            		transform: rotateX(180deg) scale(1);
+            	}
+            	
+            
+            /* flip speed goes here */
+            .flipper {
+            	position: relative;
+            	
+                width: inherit;
+                height: inherit;
+            }
+            
+            /* hide back of pane during swap */
+            .card-container .flipper .front, .card-container .flipper .back {
+            	backface-visibility: hidden;
+            
+            	position: absolute;
+            	top: 0;
+            	left: 0;
+            	
+            	-webkit-box-shadow: 0px 0px 4px 0px rgba(50, 50, 50, 0.75);
+                -moz-box-shadow:    0px 0px 4px 0px rgba(50, 50, 50, 0.75);
+                box-shadow:         0px 0px 4px 0px rgba(50, 50, 50, 0.75);
+            }
+            
+            /* front pane, placed above back */
+            .card-container .flipper .front {
+                background: url('../img/amiga_game_card.png') no-repeat;
+                background-size: 200px 280px;
+                
+                backface-visibility: hidden;
+            	transition: 0.8s;
+            	transform-style: preserve-3d;
+                
+                border-radius: 8px;
+                
+                width: inherit;
+                height: inherit;
+                
+            	z-index: 2;
+            	
+            	/* for firefox 31 */
+            	transform: rotateY(0deg) scale(0.8);
+            }
+            
+            /* back, initially hidden pane */
+            .card-container .flipper .back {
+            	transform: rotateX(180deg) scale(0.8);
+            	
+            	backface-visibility: hidden;
+            	transition: 0.8s;
+            	transform-style: preserve-3d;
+            	
+            	background: #FFFFFF;
+            	border-radius: 8px;
+            	
+            	width: inherit;
+                height: inherit;
+            }
+
+/* Game images */
+
+.card-container .flipper .back div {
+    margin: 50% 5% 0 5%;
+    width: 90%;
+    height: 35%;
+    border-radius: 10px;
+    
+    position: relative;
+    
+    text-align: center;
+}
+
+.card-container .flipper .back div span {
+    position: relative;
+    top: -50px;
+    left: 0px;
+}
+    
+    .simon-the-sorcerer {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: 0px -352px;
+    }
+
+    .cannon-fodder {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: 0px -20px;
+    }
+    
+    .flashback {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: 0px -124px;
+    }
+
+    .it-came-from-the-desert {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: 0px -224px;
+    }
+
+    .pirates {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: -180px 0px;
+    }
+
+    .stunt-racer {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: -180px -140px;
+    }
+
+    .beneath-a-steel-sky {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: -180px -250px;
+    }
+    
+    .leisure-suit-larry-3 {
+        background: url('../img/amiga_game_pics.png') no-repeat;
+        background-size: 200%;
+        background-position: -180px -360px;
+    }
+
+.spin-animation {
+    -webkit-animation:spin 8s linear infinite;
+    -moz-animation:spin 8s linear infinite;
+    animation:spin 8s linear infinite;
+}
+
+    /* Spin */
+    @-moz-keyframes spin {
+        100% { -moz-transform: rotateY(360deg); }
+    }
+    @-webkit-keyframes spin {
+        100% { -webkit-transform: rotateY(360deg); }
+    }
+    @keyframes spin {
+        100% { -webkit-transform: Yrotate(360deg); transform:rotateY(360deg); }
+    }

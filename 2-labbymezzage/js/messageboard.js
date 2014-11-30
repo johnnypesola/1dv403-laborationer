@@ -1,3 +1,5 @@
+"use strict"
+
 /* Constructor function */
 
     function MessageBoard(parentContainerId){
@@ -9,7 +11,7 @@
             _submitMsgButton;
         this._messages = [];
         
-        // Properties with Getters and Setters
+    // Properties with Getters and Setters
         Object.defineProperties(this, {
             "parentContainer": {
                 get: function(){ return this._parentContainer || ""; },
