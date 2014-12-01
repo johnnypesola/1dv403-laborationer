@@ -7,11 +7,13 @@
             _cardTemplateArray,
             _number,
             _rows,
-            _cardsVisibleNum,
+            _cardsOpenNum,
             _columns;
         this._cards = [];
         this.CARDS_OPEN_TIME = 1000; // In miliseconds
+        this.CARDS_FLIP_DURATION = 800 // In miliseconds
         this.MAX_CARDS_OPEN = 2;
+        this.cardsLocked = false;
         
     // Properties with Getters and Setters
         Object.defineProperties(this, {
@@ -51,16 +53,16 @@
                     this._columns = value;
                 }
             },
-            "cardsVisibleNum": {
-                get: function(){ return this._cardsVisibleNum || 0 },
+            "cardsOpenNum": {
+                get: function(){ return this._cardsOpenNum || 0 },
                 
                 set: function(value){
                     var parsedValue = parseFloat(value);
                     if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value == parsedValue)){
-                        throw new Error("ERROR: cardsVisibleNum property must be an integer and at least 0");
+                        throw new Error("ERROR: cardsOpenNum property must be an integer and at least 0");
                     }
                     
-                    this._cardsVisibleNum = value;
+                    this._cardsOpenNum = value;
                 }
             }
             
@@ -70,7 +72,7 @@
         this.parentContainer = document.getElementById(parentContainerId);
         this.rows = rows || 2;
         this.columns = columns || 2;
-        this.cardsVisibleNum = 0;
+        this.cardsOpenNum = 0;
 
     // Main app method
         this.run = function(){
@@ -143,7 +145,7 @@
             }
     	},
     	
-        renderCard: function(id){
+        renderCard: function(CardId){
         
             var cardContainer,
                 flipper,
@@ -151,21 +153,15 @@
                 back,
                 titleContainer,
                 titleTextContainer,
-                titleTextNode,
                 that;
                 
             that = this;
             
-            // Game title text
-                titleTextNode = document.createTextNode(this._cards[id].getTitle());
-            
             // Game title text container
                 titleTextContainer = document.createElement("span");
-                titleTextContainer.appendChild(titleTextNode);
-            
+
             // Game container
                 titleContainer = document.createElement("div");
-                titleContainer.classList.add(this._cards[id].getCssClass());
                 titleContainer.appendChild(titleTextContainer);
             
             // Front side of the card
@@ -191,11 +187,11 @@
                 
                 // Add events
                 cardContainer.onclick = function(){
-                    that.showCard(this, that);
+                    that.showCard(this, CardId);
                 }
                 
                 // If its the beginning of a row, add a class to container
-                if(id % this.columns === 0){
+                if(CardId % this.columns === 0){
                     cardContainer.classList.add("new-row");
                 }
                 
@@ -210,21 +206,30 @@
             }
         },
         
-        showCard: function(cardContainer, MemoryBoardObj){
+        showCard: function(cardContainer, CardId){
             
             var that;
             
             that = this;
-            
-            
-            if(this.cardsVisibleNum < this.MAX_CARDS_OPEN){
+
+            // Open a card if we are under the max amount
+            if(!this.cardsLocked && this.cardsOpenNum < this.MAX_CARDS_OPEN){
                 
+                // Add class which toggles the open animation
                 cardContainer.classList.add("card-open");
-                this.cardsVisibleNum += 1;
+
+                // Add info to the card
+                this.addCardInfo(cardContainer, CardId);
+                
+                // Increase cards open count
+                this.cardsOpenNum += 1;
             }
             
-            // If we have two open cards
-            if(this.cardsVisibleNum >= this.MAX_CARDS_OPEN){
+            // If we have the max amount of open cards
+            if(!this.cardsLocked && this.cardsOpenNum == this.MAX_CARDS_OPEN){
+                
+                // Lock cards
+                this.cardsLocked = true;
                 
                 // Show cards for an ammount of time, and then hide all open cards.
                 setTimeout(function(){
@@ -233,20 +238,79 @@
             }
         },
         
+        findMatch: function(){
+            
+        },
+        
         hideCards: function(){
             
             var cardElements,
+                that,
                 i;
             
-            // Get all open card elements
+            that = this;
+
+            // Get all open card elements.
             cardElements = this.parentContainer.querySelectorAll(".card-open");
             
-            // Loop through cards and remove card-open class
+            // Loop through cards and remove card-open class, make them flip back.
             for(i = 0; i < cardElements.length; ++i){
                 cardElements[i].classList.remove("card-open");
             }
             
-            // No cards visible anymore
-            this.cardsVisibleNum = 0;
+            // Wait for cards to hide and then clear card elements info.
+            setTimeout(function(){
+                
+                that.clearCardsInfo();
+                
+                // No cards visible anymore.
+                that.cardsOpenNum = 0;
+                that.cardsLocked = false;
+                
+            }, this.CARDS_FLIP_DURATION / 2);
+        },
+        
+        addCardInfo: function(cardContainer, CardId){
+            
+            var titleTextNode,
+                titleTextContainer,
+                titleText,
+                className;
+            
+            // Fetch card info
+            titleText = this._cards[CardId].getTitle();
+            className = this._cards[CardId].getCssClass();
+            
+            // Create game title text and append to span element
+            titleTextNode = document.createTextNode(titleText);
+            titleTextContainer = cardContainer.querySelector("span");
+            titleTextContainer.appendChild(titleTextNode);
+            
+            // Add class to titleText parent to add game background image.
+            titleTextContainer.parentNode.classList.add(className);
+        },
+        
+        clearCardsInfo: function(){
+            
+            var cardTitleElements,
+                i;
+            
+            // I cannot get the affected elements 
+            cardTitleElements = this.parentContainer.querySelectorAll("span");
+            
+            // Loop through game titles and remove them
+            for(i = 0; i < cardTitleElements.length; ++i){
+                
+                var cardTitleParent = cardTitleElements[i];
+
+                // Remove child text nodes, no matter how many.
+                while (cardTitleParent.firstChild){
+                    cardTitleParent.removeChild(cardTitleParent.firstChild);
+                }
+            
+                // Remove css class that has game background image.    
+                cardTitleParent.parentNode.removeAttribute("class");
+            }
         }
+        
     };
