@@ -13,8 +13,13 @@ body {
     width: 800px;
 }
 
+            .card-instance .new-row {
+                clear: left;   
+            }
+
             /* entire container, keeps perspective */
             .card-container {
+                display: block;
                 float: left;
                 margin: 0px;
                 
@@ -30,17 +35,17 @@ body {
             	}
             	
             	/* flip the pane when hovered */
-            	.card-container:hover .flipper .back {
-            		transform: rotateX(0deg) scale(1);
+            	.card-open .flipper .back {
+            		transform: rotateX(0deg) scale(1) !important;
             		
-            		-webkit-box-shadow: 30px 30px 30px 0px rgba(50, 50, 50, 0.25);
-                    -moz-box-shadow:    30px 30px 30px 0px rgba(50, 50, 50, 0.25);
-                    box-shadow:         30px 30px 30px 0px rgba(50, 50, 50, 0.25);
+            		-webkit-box-shadow: 30px 30px 30px 0px rgba(50, 50, 50, 0.25) !important;
+                    -moz-box-shadow:    30px 30px 30px 0px rgba(50, 50, 50, 0.25) !important;
+                    box-shadow:         30px 30px 30px 0px rgba(50, 50, 50, 0.25) !important;
             	}
             	
             	/* flip the pane when hovered */
-            	.card-container:hover .flipper .front {
-            		transform: rotateX(180deg) scale(1);
+            	.card-open .flipper .front {
+            		transform: rotateX(180deg) scale(1) !important;
             	}
             	
             

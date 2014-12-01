@@ -5,7 +5,7 @@
         
         (function(){
             try {
-                var memoryBoard1 = new MemoryBoard(2, 2, "in-memory-of-amiga1");
+                var memoryBoard1 = new MemoryBoard(2, 4, "in-memory-of-amiga1");
                 memoryBoard1.run();
             }
             catch (error){

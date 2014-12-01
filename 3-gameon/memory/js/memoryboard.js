@@ -7,8 +7,11 @@
             _cardTemplateArray,
             _number,
             _rows,
+            _cardsVisibleNum,
             _columns;
         this._cards = [];
+        this.CARDS_OPEN_TIME = 1000; // In miliseconds
+        this.MAX_CARDS_OPEN = 2;
         
     // Properties with Getters and Setters
         Object.defineProperties(this, {
@@ -20,7 +23,7 @@
                         this._parentContainer = element;
                     }
                     else{
-                        throw new Error("ERROR: MemoryBoard:s container must be an element");
+                        throw new Error("ERROR: MemoryBoard:s parent container must be an element");
                     }
                 }
             },
@@ -47,13 +50,27 @@
                     
                     this._columns = value;
                 }
+            },
+            "cardsVisibleNum": {
+                get: function(){ return this._cardsVisibleNum || 0 },
+                
+                set: function(value){
+                    var parsedValue = parseFloat(value);
+                    if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value == parsedValue)){
+                        throw new Error("ERROR: cardsVisibleNum property must be an integer and at least 0");
+                    }
+                    
+                    this._cardsVisibleNum = value;
+                }
             }
+            
         });
         
     // Assign constructors default values to properties
-        this.parentContainer = parentContainerId;
+        this.parentContainer = document.getElementById(parentContainerId);
         this.rows = rows || 2;
         this.columns = columns || 2;
+        this.cardsVisibleNum = 0;
 
     // Main app method
         this.run = function(){
@@ -61,18 +78,11 @@
             // Generate array to fill with cards
             _cardTemplateArray = this.getPictureArray(rows, columns);
             
-            // Generate card for each entry in _cards array
-            for(_number in _cardTemplateArray){
-                this._cards.push(new MemoryCard(_number))
-            }
+            // Create cards from template array
+            this.createCards(_cardTemplateArray);
             
-            
-            
-            console.log(this._cards.length);
-            
-            console.log(this._cards[0].getTitle());
-            
-            console.log("Memoryboard run");
+            // Render cards to html
+            this.renderCards();
         }
     }
     
@@ -124,7 +134,16 @@
     		return imgPlace;
     	},
     	
-        createCardElement: function(id){
+    	createCards: function(templateArray){
+            // Generate card for each entry in _cards array
+            var i;
+            
+            for(i = 0; i < templateArray.length; i++){
+                this._cards.push(new MemoryCard(templateArray[i]))
+            }
+    	},
+    	
+        renderCard: function(id){
         
             var cardContainer,
                 flipper,
@@ -132,7 +151,10 @@
                 back,
                 titleContainer,
                 titleTextContainer,
-                titleTextNode;
+                titleTextNode,
+                that;
+                
+            that = this;
             
             // Game title text
                 titleTextNode = document.createTextNode(this._cards[id].getTitle());
@@ -147,12 +169,13 @@
                 titleContainer.appendChild(titleTextContainer);
             
             // Front side of the card
-                front = document.createElement("div");
+                front = document.createElement("a");
                 front.classList.add("front");
             
             // Back side of the card
                 back = document.createElement("div");
                 back.classList.add("back");
+                back.appendChild(titleContainer);
                 
             // Card flipper container, necessary for css card flip animation
                 flipper = document.createElement("div");
@@ -161,14 +184,69 @@
                 flipper.appendChild(back);
                 
             // Container
-                cardContainer = document.createElement("div");
-                flipper.classList.add("card-container");
+                cardContainer = document.createElement("a");
+                cardContainer.setAttribute("href", "#");
+                cardContainer.classList.add("card-container");
                 cardContainer.appendChild(flipper);
                 
-
+                // Add events
+                cardContainer.onclick = function(){
+                    that.showCard(this, that);
+                }
                 
-                this.parentContainer.appendChild(this.msgContainer);
-                this.parentContainer.appendChild(section);
-        }
+                // If its the beginning of a row, add a class to container
+                if(id % this.columns === 0){
+                    cardContainer.classList.add("new-row");
+                }
+                
+            // Append to parent container
+                this.parentContainer.appendChild(cardContainer);
+        },
         
+        renderCards: function(){
+            var i;
+            for(i = 0; i < this._cards.length; i++){
+                this.renderCard(i);
+            }
+        },
+        
+        showCard: function(cardContainer, MemoryBoardObj){
+            
+            var that;
+            
+            that = this;
+            
+            
+            if(this.cardsVisibleNum < this.MAX_CARDS_OPEN){
+                
+                cardContainer.classList.add("card-open");
+                this.cardsVisibleNum += 1;
+            }
+            
+            // If we have two open cards
+            if(this.cardsVisibleNum >= this.MAX_CARDS_OPEN){
+                
+                // Show cards for an ammount of time, and then hide all open cards.
+                setTimeout(function(){
+                    that.hideCards();
+                }, this.CARDS_OPEN_TIME);
+            }
+        },
+        
+        hideCards: function(){
+            
+            var cardElements,
+                i;
+            
+            // Get all open card elements
+            cardElements = this.parentContainer.querySelectorAll(".card-open");
+            
+            // Loop through cards and remove card-open class
+            for(i = 0; i < cardElements.length; ++i){
+                cardElements[i].classList.remove("card-open");
+            }
+            
+            // No cards visible anymore
+            this.cardsVisibleNum = 0;
+        }
     };
