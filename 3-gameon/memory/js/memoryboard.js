@@ -8,13 +8,13 @@
             _columns,
             _userGuessCount,
             _cardTemplateArray,
+            _cardsLocked,
             _CARDS_OPEN_TIME = 1000, // In miliseconds
             _CARDS_FLIP_DURATION = 800, // In miliseconds
             _MAX_CARDS_OPEN = 2;
 
-        this._cards = [];
-        this.cardsLocked = false;
-        
+        this._cardObjArray = [];
+
     // Properties with Getters and Setters
         Object.defineProperties(this, {
             "parentContainer": {
@@ -71,7 +71,7 @@
                     
                     count = 0;
                     
-                    this._cards.forEach(function(card){
+                    this._cardObjArray.forEach(function(card){
                         count += (card.isCardOpen ? 1 : 0);
                     });
                     
@@ -84,11 +84,21 @@
                     
                     count = 0;
                     
-                    this._cards.forEach(function(card){
+                    this._cardObjArray.forEach(function(card){
                         count += (card.isMatchFound ? 1 : 0);
                     });
 
                     return count;
+                }
+            },
+            "cardsLocked": {
+                get: function(){ return _cardsLocked },
+                set: function(value){
+                    if(typeof value !== "boolean" ){
+                        throw new Error("ERROR: cardsLocked property must be a boolean type.");
+                    }
+                    
+                    _cardsLocked = value;
                 }
             },
             "CARDS_OPEN_TIME": {
@@ -107,6 +117,7 @@
         this.rows = rows || 2;
         this.columns = columns || 2;
         this.userGuessCount = 0;
+        this.cardsLocked = false;
 
     // Main app method
         this.run = function(){
@@ -123,16 +134,17 @@
             this.createCards(_cardTemplateArray);
             
             // Throw error if sum of rows and columns exceed total card type count
-            if(this._cards[0].titleArray.length * 2 < _cardTemplateArray.length){
-                throw new Error("ERROR: Current total card limit is " + this._cards[0].titleArray.length * 2 + " due to number of cardtypes available, the sum of rows * colums is " + _cardTemplateArray.length);
+            if(this._cardObjArray[0].titleArray.length * 2 < _cardTemplateArray.length){
+                throw new Error("ERROR: Current total card limit is " + this._cardObjArray[0].titleArray.length * 2 + " due to number of cardtypes available, the sum of rows * colums is " + _cardTemplateArray.length);
             }
             
             // Render cards to html
             this.renderCards();
-        }
+        };
     }
     
     MemoryBoard.prototype = {
+        
         constructor:    MemoryBoard,
         
         getPictureArray: function(rows, cols){
@@ -182,11 +194,12 @@
     	},
     	
     	createCards: function(templateArray){
-            // Generate card for each entry in _cards array
+            
             var i;
             
+            // Generate card for each entry in templateArray
             for(i = 0; i < templateArray.length; i++){
-                this._cards.push(new MemoryCard(templateArray[i]))
+                this._cardObjArray.push(new MemoryCard(templateArray[i]))
             }
         },
     	
@@ -231,9 +244,10 @@
                 cardContainer.appendChild(flipper);
                 
                 // Add events
-                cardContainer.onclick = function(){
+                cardContainer.onclick = function(e){
+                    e.preventDefault();
                     that.showCard(this, cardId);
-                }
+                };
                 
                 // If its the beginning of a row, add a class to container
                 if(cardId % this.columns === 0){
@@ -245,33 +259,33 @@
         },
         
         renderCards: function(){
+            
             var i;
-            for(i = 0; i < this._cards.length; i++){
+            
+            for(i = 0; i < this._cardObjArray.length; i++){
                 this.renderCard(i);
             }
         },
         
         showCard: function(cardContainer, cardId){
             
-            var that;
-            
-            that = this;
+            var that = this;
             
             // Open a card if we are under the max amount, and the card isnt allready opened
             if( !this.cardsLocked &&
                 (this.cardsOpenNum - this.cardsMatchedNum) < this.MAX_CARDS_OPEN &&
-                !this._cards[cardId].isCardOpen){
+                !this._cardObjArray[cardId].isCardOpen){
                 
                 // Add class which toggles the open animation
                 cardContainer.classList.add("card-open");
                 
                 // Marks the card object as open (in container array)
-                this._cards[cardId].isCardOpen = true;
+                this._cardObjArray[cardId].isCardOpen = true;
 
                 // Add info to the card
                 this.addCardInfo(cardContainer, cardId);
                 
-                // If match for this card
+                // If match is found for this card
                 if(this.findMatchingCard(cardId)){
                     
                     // Increase user guess count (only if two cards are open)
@@ -302,30 +316,24 @@
         },
         
         findMatchingCard: function(cardId){
-            //this._cards[cardId].isEqual()
             
-            var count,
-                cardInArray,
-                that,
-                returnValue;
-            
-            that = this;
-            returnValue = false;
+            var that  = this,
+                returnValue = false;
 
             // Check if the card given in the argument is open
-            if(this._cards[cardId].isCardOpen){
+            if(this._cardObjArray[cardId].isCardOpen){
                 
                 // Loop through all cards
-                this._cards.forEach(function(cardInArray){
+                this._cardObjArray.forEach(function(cardInArray){
                 
                     // See if the cards are equal, but not the same reference
                     if( cardInArray.isCardOpen && 
-                        cardInArray.isEqualTo(that._cards[cardId]) &&
-                        cardInArray !== that._cards[cardId] ){
+                        cardInArray.isEqualTo(that._cardObjArray[cardId]) &&
+                        cardInArray !== that._cardObjArray[cardId] ){
                         
                         // Mark both cards that they found a match
                         cardInArray.isMatchFound = true;
-                        that._cards[cardId].isMatchFound = true;
+                        that._cardObjArray[cardId].isMatchFound = true;
                         
                         returnValue = true;
                     }
@@ -335,9 +343,9 @@
             return returnValue;
         },
         
-        closeCards: function(){
+        closeCardObjecs: function(){
             
-            this._cards.forEach(function(cardInArray){
+            this._cardObjArray.forEach(function(cardInArray){
                 if(!cardInArray.isMatchFound){
                     cardInArray.isCardOpen = false;
                 }
@@ -347,13 +355,11 @@
         hideCards: function(){
             
             var cardElements,
-                that,
+                that = this,
                 i;
             
-            that = this;
-            
-            // Close all card objects in array witch have a match
-            this.closeCards();
+            // Close all card objects in array which do not have a match
+            this.closeCardObjecs();
             
             // Get all open card elements.
             cardElements = this.parentContainer.querySelectorAll(".card-container");
@@ -361,7 +367,7 @@
             // Loop through cards and remove card-open class, make them flip back.
             for(i = 0; i < cardElements.length; ++i){
 
-                if(!this._cards[i].isMatchFound){
+                if(!this._cardObjArray[i].isMatchFound){
                     cardElements[i].classList.remove("card-open");
                 }
             }
@@ -369,9 +375,10 @@
             // Wait for cards to hide and then clear card elements info.
             setTimeout(function(){
                 
+                // Clear card info, prevent cheating
                 that.clearCardsInfo();
                 
-                // No cards visible anymore.
+                // No cards visible/open anymore, unlock cards.
                 that.cardsLocked = false;
                 
             }, this.CARDS_FLIP_DURATION / 2);
@@ -385,8 +392,8 @@
                 className;
             
             // Fetch card info
-            titleText = this._cards[cardId].getTitle();
-            className = this._cards[cardId].getCssClass();
+            titleText = this._cardObjArray[cardId].getTitle();
+            className = this._cardObjArray[cardId].getCssClass();
             
             // Create game title text and append to span element
             titleTextNode = document.createTextNode(titleText);
@@ -409,7 +416,7 @@
                 
                 var cardTitleParent = cardTitleElements[i];
 
-                if(!this._cards[i].isMatchFound)
+                if(!this._cardObjArray[i].isMatchFound)
                 {
                     // Remove child text nodes, no matter how many.
                     while (cardTitleParent.firstChild){
@@ -427,7 +434,7 @@
         isGameFinished: function(){
             var cardsLeft = 0;
             
-            this._cards.forEach(function(card){
+            this._cardObjArray.forEach(function(card){
                 if(!card.isMatchFound){
                     ++cardsLeft;
                 }

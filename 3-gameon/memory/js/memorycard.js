@@ -47,7 +47,7 @@
         this.isMatchFound = false;
     }
 
-/* Prototypes */
+/* Prototype */
     MemoryCard.prototype = {
         constructor:    MemoryCard,
         

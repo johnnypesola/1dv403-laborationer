@@ -247,9 +247,12 @@
             // Set classes
             time.classList.add("time");
             
-            //flap.classlistAdd()
             flap.classList.add("flap");
             close.classList.add("close");
+            
+            // Set href attributes
+            time.setAttribute("href", "#");
+            close.setAttribute("href", "#");
             
             if(isNew){
                 article.classList.add("message-animation");
@@ -265,11 +268,13 @@
             article.appendChild(close);
     
             // Add events
-            close.onclick = function(){
+            close.onclick = function(e){
+                e.preventDefault();
                 that.removeMessage(index);
             }
             
-            time.onclick = function(){
+            time.onclick = function(e){
+                e.preventDefault();
                 alert("Inlägget skapades " + msg.date.toLocaleString());
             }
             
