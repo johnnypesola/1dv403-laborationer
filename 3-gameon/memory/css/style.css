@@ -10,7 +10,7 @@ body {
 }
 
 .card-instance {
-    width: 800px;
+    width: 820px;
 }
 
             .card-instance .new-row {
@@ -21,7 +21,7 @@ body {
             .card-container {
                 display: block;
                 float: left;
-                margin: 0px;
+                margin: 2px;
                 
                 position: relative;
             	perspective: 1000px;
