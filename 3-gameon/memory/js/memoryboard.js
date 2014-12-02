@@ -5,14 +5,11 @@
         
         var _parentContainer,
             _cardTemplateArray,
-            _number,
-            _rows,
-            _cardsOpenNum,
-            _columns;
+            _CARDS_OPEN_TIME = 1000, // In miliseconds
+            _CARDS_FLIP_DURATION = 800, // In miliseconds
+            _MAX_CARDS_OPEN = 2;
+
         this._cards = [];
-        this.CARDS_OPEN_TIME = 1000; // In miliseconds
-        this.CARDS_FLIP_DURATION = 800 // In miliseconds
-        this.MAX_CARDS_OPEN = 2;
         this.cardsLocked = false;
         
     // Properties with Getters and Setters
@@ -54,25 +51,46 @@
                 }
             },
             "cardsOpenNum": {
-                get: function(){ return this._cardsOpenNum || 0 },
-                
-                set: function(value){
-                    var parsedValue = parseFloat(value);
-                    if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value == parsedValue)){
-                        throw new Error("ERROR: cardsOpenNum property must be an integer and at least 0");
-                    }
+                get: function(){
+                    var count;
                     
-                    this._cardsOpenNum = value;
+                    count = 0;
+                    
+                    this._cards.forEach(function(card){
+                        count += (card.isCardOpen ? 1 : 0);
+                    });
+                    
+                    return count;
                 }
+            },
+            "cardsMatchedNum": {
+                get: function(){
+                    var count;
+                    
+                    count = 0;
+                    
+                    this._cards.forEach(function(card){
+                        count += (card.isMatchFound ? 1 : 0);
+                    });
+
+                    return count;
+                }
+            },
+            "CARDS_OPEN_TIME": {
+                get: function(){ return _CARDS_OPEN_TIME }
+            },
+            "CARDS_FLIP_DURATION": {
+                get: function(){ return _CARDS_FLIP_DURATION }
+            },
+            "MAX_CARDS_OPEN": {
+                get: function(){ return _MAX_CARDS_OPEN }
             }
-            
         });
         
     // Assign constructors default values to properties
         this.parentContainer = document.getElementById(parentContainerId);
         this.rows = rows || 2;
         this.columns = columns || 2;
-        this.cardsOpenNum = 0;
 
     // Main app method
         this.run = function(){
@@ -211,22 +229,28 @@
             var that;
             
             that = this;
-
+            
             // Open a card if we are under the max amount
-            if(!this.cardsLocked && this.cardsOpenNum < this.MAX_CARDS_OPEN){
+            if(!this.cardsLocked && (this.cardsOpenNum - this.cardsMatchedNum) < this.MAX_CARDS_OPEN){
                 
                 // Add class which toggles the open animation
                 cardContainer.classList.add("card-open");
+                
+                // Marks the card object as open (in container array)
+                this._cards[CardId].isCardOpen = true;
 
                 // Add info to the card
                 this.addCardInfo(cardContainer, CardId);
                 
-                // Increase cards open count
-                this.cardsOpenNum += 1;
+                // Try to find match for this card
+                if(this.findMatchingCard(CardId)){
+                    console.log("match found!");
+                }
             }
             
             // If we have the max amount of open cards
-            if(!this.cardsLocked && this.cardsOpenNum == this.MAX_CARDS_OPEN){
+            if( !this.cardsLocked &&
+                (this.cardsOpenNum - this.cardsMatchedNum) == this.MAX_CARDS_OPEN){
                 
                 // Lock cards
                 this.cardsLocked = true;
@@ -238,8 +262,47 @@
             }
         },
         
-        findMatch: function(){
+        findMatchingCard: function(CardId){
+            //this._cards[CardId].isEqual()
             
+            var count,
+                cardInArray,
+                that,
+                returnValue;
+            
+            that = this;
+            returnValue = false;
+
+            // Check if the card given in the argument is open
+            if(this._cards[CardId].isCardOpen){
+                
+                // Loop through all cards
+                this._cards.forEach(function(cardInArray){
+                
+                    // See if the cards are equal, but not the same reference
+                    if( cardInArray.isCardOpen && 
+                        cardInArray.isEqualTo(that._cards[CardId]) &&
+                        cardInArray !== that._cards[CardId] ){
+                        
+                        // Mark both cards that they found a match
+                        cardInArray.isMatchFound = true;
+                        that._cards[CardId].isMatchFound = true;
+                        
+                        returnValue = true;
+                    }
+                });
+            }
+            
+            return returnValue;
+        },
+        
+        closeCards: function(){
+            
+            this._cards.forEach(function(cardInArray){
+                if(!cardInArray.isMatchFound){
+                    cardInArray.isCardOpen = false;
+                }
+            });
         },
         
         hideCards: function(){
@@ -249,13 +312,19 @@
                 i;
             
             that = this;
-
+            
+            // Close all card objects in array witch have a match
+            this.closeCards();
+            
             // Get all open card elements.
-            cardElements = this.parentContainer.querySelectorAll(".card-open");
+            cardElements = this.parentContainer.querySelectorAll(".card-container");
             
             // Loop through cards and remove card-open class, make them flip back.
             for(i = 0; i < cardElements.length; ++i){
-                cardElements[i].classList.remove("card-open");
+
+                if(!this._cards[i].isMatchFound){
+                    cardElements[i].classList.remove("card-open");
+                }
             }
             
             // Wait for cards to hide and then clear card elements info.
@@ -264,7 +333,6 @@
                 that.clearCardsInfo();
                 
                 // No cards visible anymore.
-                that.cardsOpenNum = 0;
                 that.cardsLocked = false;
                 
             }, this.CARDS_FLIP_DURATION / 2);
@@ -295,22 +363,25 @@
             var cardTitleElements,
                 i;
             
-            // I cannot get the affected elements 
             cardTitleElements = this.parentContainer.querySelectorAll("span");
             
-            // Loop through game titles and remove them
+            // Loop through all card titles and remove text and background image
             for(i = 0; i < cardTitleElements.length; ++i){
                 
                 var cardTitleParent = cardTitleElements[i];
 
-                // Remove child text nodes, no matter how many.
-                while (cardTitleParent.firstChild){
-                    cardTitleParent.removeChild(cardTitleParent.firstChild);
+                if(!this._cards[i].isMatchFound)
+                {
+                    // Remove child text nodes, no matter how many.
+                    while (cardTitleParent.firstChild){
+                        cardTitleParent.removeChild(cardTitleParent.firstChild);
+                    }
+                    
+                    // Remove css class that has game background image.    
+                    cardTitleParent.parentNode.removeAttribute("class");
                 }
-            
-                // Remove css class that has game background image.    
-                cardTitleParent.parentNode.removeAttribute("class");
+                
+                
             }
         }
-        
     };
