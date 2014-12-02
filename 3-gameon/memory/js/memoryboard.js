@@ -111,6 +111,11 @@
     // Main app method
         this.run = function(){
             
+            // Check that there is an even number of total cards.
+            if(this.rows * this.columns % 2 !== 0){
+                throw new Error("ERROR: Total number of cards is not even (" + this.rows + " rows * " + this.columns + " columns = " + this.rows * this.columns + " cards)");
+            }
+            
             // Generate array to fill with cards
             _cardTemplateArray = this.getPictureArray(rows, columns);
             
@@ -266,18 +271,25 @@
                 // Add info to the card
                 this.addCardInfo(cardContainer, cardId);
                 
-                // Increase user guess count
-                this.userGuessCount += 1;
-                
-                // Try to find match for this card, if found, check if game is finished
-                if(this.findMatchingCard(cardId) && this.isGameFinished()){
-                    alert("Game finished in " + this.userGuessCount + " attempts.");
+                // If match for this card
+                if(this.findMatchingCard(cardId)){
+                    
+                    // Increase user guess count (only if two cards are open)
+                    this.userGuessCount += 1;
+                    
+                    // Is game finished?
+                    if(this.isGameFinished()){
+                        alert("Game finished in " + this.userGuessCount + " attempts.");
+                    }
                 }
             }
             
             // If we have the max amount of open cards
             if( !this.cardsLocked &&
                 (this.cardsOpenNum - this.cardsMatchedNum) == this.MAX_CARDS_OPEN){
+                
+                // Increase user guess count (only if two cards are open)
+                this.userGuessCount += 1;
                 
                 // Lock cards
                 this.cardsLocked = true;

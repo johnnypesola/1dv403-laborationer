@@ -9,34 +9,34 @@
         // Properties with getters and Setters
         Object.defineProperties(this, {
             "cardNum": {
-                get: function(){ return this._cardNum },
+                get: function(){ return _cardNum },
                 set: function(value){
                     var parsedValue = parseFloat(value);
                     if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue % 1 === 0 && value == parsedValue)){
                         throw new Error("ERROR: cardNum property must be an int type.");
                     }
                     
-                    this._cardNum = value;
+                    _cardNum = value;
                 }
             },
             "isCardOpen": {
-                get: function(){ return this._isCardOpen },
+                get: function(){ return _isCardOpen },
                 set: function(value){
                     if(typeof value !== "boolean" ){
                         throw new Error("ERROR: isCardOpen property must be a boolean type.");
                     }
                     
-                    this._isCardOpen = value;
+                    _isCardOpen = value;
                 }
             },
             "isMatchFound": {
-                get: function(){ return this._isMatchFound },
+                get: function(){ return _isMatchFound },
                 set: function(value){
                     if(typeof value !== "boolean" ){
                         throw new Error("ERROR: isMatchFound property must be a boolean type.");
                     }
                     
-                    this._isMatchFound = value;
+                    _isMatchFound = value;
                 }
             }
         });
