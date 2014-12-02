@@ -136,9 +136,10 @@
     	
     	   	var imgPlace = [];
     	
-    	   //Utplacering av bilder i Array
-    	   for(var i=0; i<numberOfImages; i++)
-    		  imgPlace[i] = 0;
+    	    // Place pictures in an Array..
+            for(var i=0; i<numberOfImages; i++){
+                imgPlace[i] = 0;
+            }
     	
     		for(var currentImageNumber=0; currentImageNumber<maxImageNumber; currentImageNumber++)
     		{		
@@ -270,7 +271,7 @@
                 
                 // Try to find match for this card, if found, check if game is finished
                 if(this.findMatchingCard(cardId) && this.isGameFinished()){
-                    alert("Spelet avklarat på " + this.userGuessCount + " försök.");
+                    alert("Game finished in " + this.userGuessCount + " attempts.");
                 }
             }
             
@@ -412,20 +413,14 @@
         },
         
         isGameFinished: function(){
-            var cardsLeft;
-            
-            cardsLeft = 0;
+            var cardsLeft = 0;
             
             this._cards.forEach(function(card){
                 if(!card.isMatchFound){
-                    cardsLeft += 1;
+                    ++cardsLeft;
                 }
             });
             
-            if(cardsLeft === 0){
-                return true;
-            }
-            
-            return false;
+            return cardsLeft === 0;
         }
     };
