@@ -28,7 +28,7 @@
                 }
             },
             "id": {
-                get: function(){ return this._responseObj.id || ""; },
+                get: function(){ return this._responseObj.id || ""; }
             },
             "question": {
                 get: function(){ return this._responseObj.question || ""; },

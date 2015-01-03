@@ -1,0 +1,232 @@
+
+*, *:after, *:before {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+* {margin:0;padding:0;border: 0 none;position: relative;}
+
+html {
+	background: url('../img/wallpaper_background.png') repeat-x #3d3659 fixed; /* fixed is nicer, but slow in chrome */
+	background-size: cover;
+}
+
+body {
+    background: inherit;
+    margin: 0;
+    text-align: center;
+    font-family: 'Dosis', sans-serif, verdana;
+    font-size: 16px;
+    color: #3d3659;
+}
+
+
+h1, h2 {
+    color: #3d3659;
+    font-weight: normal;
+}
+
+input {
+    margin: 10px 0 0 0;
+    height: 24px;
+    width: 100px;
+    border: none;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid #DDDDDD;
+    font-family: 'Dosis', sans-serif, verdana;
+    font-size: 28px;
+    color: #3d3659;
+    resize: none;
+    background: none;
+    float: left;
+    
+    clear both;
+    
+    padding: 30px;
+}
+
+
+div.window {
+	
+	min-width: 150px;
+	
+	background-color: rgba(255, 255, 255, 0.5);
+    float: left;
+    margin: 480px;
+    border-radius: 5px;
+    
+    
+    
+/*	border: 2px solid rgba(255, 255, 255, 0.2); */
+    
+    position: relative;
+    
+	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+div.desktop {
+	position: relative;
+}
+
+div.window:before {
+  content: '';
+  position: absolute;
+  top: 0; left:0; right:0; bottom:0;
+  background: url('../img/wallpaper_background.png') repeat-x #3d3659 fixed;
+  background-size: cover;
+  filter: blur(6px); 
+  -webkit-filter: blur(6px); 
+  -moz-filter: blur(6px);
+  -o-filter: blur(6px);
+  -ms-filter: blur(6px);
+  /*filter: url(#blur); */
+  filter:progid:DXImageTransform.Microsoft.Blur(PixelRadius='6');
+  
+	filter: url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20version%3D%221.1%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22blur%22%3E%3CfeGaussianBlur%20stdDeviation%3D%225%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3C%2Fsvg%3E#blur");  
+
+  
+}
+
+	div.window div.header {
+		text-align: left;
+		padding: 4px 6px 0 6px;
+
+		background: -moz-linear-gradient(top,  rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.5)), color-stop(56%,rgba(255,255,255,0.3)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#00ffffff',GradientType=0 ); /* IE6-9 */
+
+		border-radius: inherit;
+		
+		text-shadow: 1px 1px 0px rgba(255,255,255,0.5); 
+	}
+
+	div.window div.header h2 {
+		font-size: 16px;
+		font-weight: normal; 
+		color: #000000;
+		margin: 0 20px 0 0;
+	}
+
+	div.window .content {
+		text-align: left;
+		margin: 6px;
+		padding: 4px;
+		border: 1px solid rgba(0,0,0,0.2);;
+		background: rgba(255,255,255,0.9);
+		position: relative;
+		border-radius: 2px;
+	}
+
+	div.window a.close {
+		font-size: 14px;
+	    display: block;
+	    position: absolute;
+	    top: 5px;
+	    right: 5px;
+	    
+	    color: #000000;
+	    text-decoration: none;
+
+	    background: rgba(255,255,255,0);
+	    padding: 0 4px 1px 4px;
+	    border-radius: 2px;
+
+	}
+	
+	div.window a.minify {
+		font-size: 14px;
+	    display: block;
+	    position: absolute;
+	    top: 5px;
+	    right: 26px;
+	    	    
+	    color: #000000;
+	    text-decoration: none;
+	    
+	    background: rgba(255,255,255,0);
+	    padding: 3px 4px 0 4px;
+	    border-radius: 2px;
+	}
+
+	    div.window a.close:hover, div.window a.minify:hover {
+	        cursor: pointer;
+		    -webkit-animation:glow 0.1s ease-out forwards;
+		    -moz-animation:glow 0.1s ease-out forwards;
+		    animation:glow 0.1s ease-out forwards;
+	    }
+
+	div.window p {
+	    font-size: 28px;
+	}
+
+
+span.red {
+    background: #EE7777;
+}
+
+span.green {
+    background: #66DD66;
+}
+
+button {
+    line-height: 28px;
+    border-radius: 5px;
+    background: #6D416D;
+    color: #FFFFFF;
+    border: none;
+    font-family: 'Indie Flower', sans-serif, verdana;
+    font-size: 20px;
+    padding: 2px 8px;
+    cursor: pointer;
+    margin: 5px;
+    clear: both;
+    float: left;
+    width: 150px;
+}
+
+/* Animations */
+
+/* Spin */
+
+.spin-animation {
+    -webkit-animation:spin 8s linear infinite;
+    -moz-animation:spin 8s linear infinite;
+    animation:spin 8s linear infinite;
+}
+    
+    @-moz-keyframes spin {
+        100% { -moz-transform: rotateY(360deg); }
+    }
+    @-webkit-keyframes spin {
+        100% { -webkit-transform: rotateY(360deg); }
+    }
+    @keyframes spin {
+        100% { -webkit-transform: Yrotate(360deg); transform:rotateY(360deg); }
+    }
+    
+/* Glow */
+    
+.glow-animation {  
+    -webkit-animation:glow 1s linear;
+    -moz-animation:glow 1s linear;
+    animation:glow 1s linear;
+}
+
+    @-moz-keyframes glow {
+		from { background-color: rgba(255,255,255,0); box-shadow: 0 0 0px rgba(255,255,255,0); }
+		to { background-color: rgba(255,255,255,1); box-shadow: 0 0 18px rgba(255,255,255,1); }
+        
+    }
+    @-webkit-keyframes glow {
+		from { background-color: rgba(255,255,255,0); -webkit-box-shadow: 0 0 0px rgba(255,255,255,0); }
+		to { background-color: rgba(255,255,255,1); -webkit-box-shadow: 0 0 18px rgba(255,255,255,1); }
+    }
+    @keyframes glow {
+		from { background-color: rgba(255,255,255,0); box-shadow: 0 0 0px rgba(255,255,255,0); }
+		to { background-color: rgba(255,255,255,1); box-shadow:  0 0 18px rgba(255,255,255,1); }
+    }
