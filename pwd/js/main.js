@@ -14,7 +14,7 @@
     var PWD = PWD || {};
 
     require(["app/appcontainer"], function(AppContainer){
-        
+
         // Start new appcontainer
         PWD.AppContainer = PWD.AppContainer || new AppContainer();        
                 

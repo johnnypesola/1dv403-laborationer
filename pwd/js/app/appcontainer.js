@@ -1,12 +1,18 @@
+/**
+ * Created by Johnny on 2015-01-03.
+ */
+
 "use strict";
 
-define(["mustache", "app/extensions"], function(Mustache) {
-    
-    return (function (){
+define(["mustache", "app/extensions"], function (Mustache) {
 
-        var Constructor = function(x, y, width, height, zIndex){
-            
-            var _x,
+    return (function () {
+
+        var Constructor = function (desktopObj, UID, x, y, width, height, zIndex) {
+
+            var _desktopObj,
+                _UID,
+                _x,
                 _y,
                 _width,
                 _height,
@@ -18,282 +24,333 @@ define(["mustache", "app/extensions"], function(Mustache) {
                 _headerElement,
                 _contentElement,
                 _isBeingDragged = false;
-            
+
         // Properties with Getters and Setters
             Object.defineProperties(this, {
-                "x": {
-                    get: function(){ return _x || ""; },
-                    
-                    set: function(value){
-                        var parsedValue = parseFloat(value);
-                        if(parsedValue.isInt() && parsedValue >= 0){
-                            _x = parsedValue;
+                "desktopObj": {
+                    get: function () { return _desktopObj || ""; },
+
+                    set: function (obj) {
+                        if (obj !== null && typeof obj === "Object") {
+                            _desktopObj = obj;
+                        } else {
+                            throw new Error("AppContainers 'desktopObj' property must be an object");
                         }
-                        else{
+                    }
+                },
+                "UID": {
+                    get: function () { return _UID || ""; },
+
+                    set: function (value) {
+                        if (this.UID !== "") {
+                            throw new Error("AppContainers 'UID' is already set)");
+                        }
+                        if (value.match(/[0-9a-zA-Z]{8}\-[0-9a-zA-Z]{4}\-[0-9a-zA-Z]{4}\-[0-9a-zA-Z]{4}\-[0-9a-zA-Z]{12}/) === null) {
+                            throw new Error("AppContainers 'UID' property must be an valid UID. (xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx)");
+                        }
+
+                        _UID = value;
+                    }
+                },
+                "x": {
+                    get: function () { return _x || ""; },
+
+                    set: function (value) {
+                        var parsedValue = parseFloat(value);
+                        if (parsedValue.isInt() && parsedValue >= 0) {
+
+                            _x = parsedValue;
+
+                            // Apply this value if this app is rendered
+                            if (this.isRendered) {
+                                this.containerElement.style.left = parsedValue + "px";
+                            }
+
+                        } else {
                             throw new Error("AppContainers 'x' property must be an int.");
                         }
                     }
                 },
                 "y": {
-                    get: function(){ return _y || ""; },
-                    
-                    set: function(value){
+                    get: function () { return _y || ""; },
+
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value === parsedValue){
+                        if (parsedValue.isInt() && parsedValue >= 0) {
                             _y = parsedValue;
-                        }
-                        else{
+
+                            // Apply this value if this app is rendered
+                            if (this.isRendered) {
+                                this.containerElement.style.top = parsedValue + "px";
+                            }
+
+                        } else {
                             throw new Error("AppContainers 'y' property must be an int.");
                         }
                     }
                 },
                 "width": {
-                    get: function(){ return _width || ""; },
-                    
-                    set: function(value){
+                    get: function () { return _width || ""; },
+
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value === parsedValue){
+                        if (parsedValue.isInt() && parsedValue >= 0) {
+
                             _width = parsedValue;
-                        }
-                        else{
+
+                            // Apply this width if this app is rendered
+                            if (this.isRendered) {
+                                this.containerElement.style.width = parsedValue + "px";
+                            }
+
+                        } else {
                             throw new Error("AppContainers 'width' property must be an int.");
                         }
                     }
                 },
                 "height": {
-                    get: function(){ return _height || ""; },
-                    
-                    set: function(value){
+                    get: function () { return _height || ""; },
+
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value === parsedValue){
+                        if (parsedValue.isInt() && parsedValue >= 0) {
                             _height = parsedValue;
-                        }
-                        else{
+
+                            // Apply this height if this app is rendered
+                            if (this.isRendered) {
+                                this.containerElement.style.height = parsedValue + "px";
+                            }
+
+                        } else {
                             throw new Error("AppContainers 'height' property must be an int.");
                         }
                     }
                 },
                 "zIndex": {
-                    get: function(){ return _zIndex || ""; },
-                    
-                    set: function(value){
+                    get: function () { return _zIndex || ""; },
+
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value === parsedValue){
+                        if (parsedValue.isInt() && parsedValue >= 0) {
+
                             _zIndex = parsedValue;
-                        }
-                        else{
+
+                            // Apply this zIndex if this app is rendered
+                            if (this.isRendered) {
+                                this.containerElement.style.zIndex = parsedValue;
+                            }
+
+                        } else {
                             throw new Error("AppContainers 'zIndex' property must be an int.");
                         }
                     }
                 },
                 "closeButton": {
-                    get: function(){ return _closeButton || ""; },
-                    
-                    set: function(element){
-                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                    get: function () { return _closeButton || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
                             _closeButton = element;
-                        }
-                        else{
+                        } else {
                             throw new Error("AppContainers 'closeButton' property must be an element");
                         }
                     }
                 },
                 "minifyButton": {
-                    get: function(){ return _minifyButton || ""; },
-                    
-                    set: function(element){
-                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                    get: function () { return _minifyButton || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
                             _minifyButton = element;
-                        }
-                        else{
+                        } else {
                             throw new Error("AppContainers 'minifyButton' property must be an element");
                         }
                     }
                 },
                 "headerElement": {
-                    get: function(){ return _headerElement || ""; },
-                    
-                    set: function(element){
-                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                    get: function () { return _headerElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
                             _headerElement = element;
-                        }
-                        else{
+                        } else {
                             throw new Error("AppContainers 'headerElement' property must be an element");
                         }
                     }
                 },
                 "contentElement": {
-                    get: function(){ return _contentElement || ""; },
-                    
-                    set: function(element){
-                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                    get: function () { return _contentElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
                             _contentElement = element;
-                        }
-                        else{
+                        } else {
                             throw new Error("AppContainers 'contentElement' property must be an element");
                         }
                     }
                 },
                 "containerElement": {
-                    get: function(){ return _containerElement || ""; },
-                    
-                    set: function(element){
-                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                    get: function () { return _containerElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
                             _containerElement = element;
-                        }
-                        else{
+                        } else {
                             throw new Error("AppContainers 'containerElement' property must be an element");
                         }
                     }
                 },
                 "runningApp": {
-                    get: function(){ return _runningApp || ""; },
-                    
-                    set: function(obj){
-                        console.log(obj);
-                        if(obj !== null && typeof obj === "Object"){
+                    get: function () { return _runningApp || ""; },
+
+                    set: function (obj) {
+                        if (obj !== null && typeof obj === "Object") {
                             _runningApp = obj;
-                        }
-                        else{
+                        } else {
                             throw new Error("AppContainers 'runningApp' property must be an object");
                         }
                     }
                 },
                 "isBeingDragged": {
-                    get: function(){ return _isBeingDragged },
-                    set: function(value){
-                        if(typeof value !== "boolean" ){
+                    get: function () { return _isBeingDragged; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
                             throw new Error("AppContainers 'isBeingDragged' property must be a boolean type.");
                         }
-                        
+
                         _isBeingDragged = value;
                     }
                 },
+                "isRendered": {
+                    get: function () {
+                        return this.containerElement !== "";
+                    }
+                }
             });
-            
+
         // Init values
+            this.desktopObj = desktopObj;
+            this.UID = UID || desktopObj.generateUID();
             this.x = x || 100;
             this.y = y || 100;
             this.width = width || 320;
             this.height = height || 240;
             this.zIndex = zIndex || 1;
         };
-    
+
         Constructor.prototype = {
             constructor: Constructor,
-            
+
             // Render app
-            render: function(appName, content){
-                                                
+            render: function (appName, content) {
+
                 var that = this;
-                                                
+
                 // Create container
                 this.containerElement = document.createElement("div");
                 this.containerElement.classList.add("window");
-                
+
                 // Set container position
                 this.containerElement.style.left = this.x + "px";
                 this.containerElement.style.top = this.y + "px";
-                
+
                 // Set container width
                 this.containerElement.style.width = this.width + "px";
                 this.containerElement.style.height = this.height + "px";
-                
+
                 // Fetch template
-                require(["text!tpl/appcontainer.html"], function(template){
-                    
+                require(["text!tpl/appcontainer.html"], function (template) {
+
                     // Render data in template
-                    that.containerElement.innerHTML = Mustache.render(template, {appName: appName, content: content});    
-                                       
+                    that.containerElement.innerHTML = Mustache.render(template, {appName: appName, content: content});
+
                     // Fetch references.
                     that.closeButton = that.containerElement.querySelector('a.close');
                     that.minifyButton = that.containerElement.querySelector('a.minify');
                     that.headerElement = that.containerElement.querySelector('div.header');
                     that.contentElement = that.containerElement.querySelector('div.content');
-                    
+
                     // Append appContainer to desktop
-                    document.getElementById("desktop").appendChild(that.containerElement);
-                    
+                    that.desktopObj.containerElement.appendChild(that.containerElement);
+
                     // Add events
                     that.addEvents();
-                });                
+                });
             },
-            
-            addEvents: function(){
+
+            addEvents: function () {
                 var that = this,
                     computedStyle,
                     x,
                     y,
                     offset;
-                
-                this.closeButton.addEventListener("click", function(){
-                     
+
+                this.closeButton.addEventListener("click", function () {
+
                      // Remove from DOM
                     that.containerElement.parentNode.removeChild(that.containerElement);
-                    
-                    // !TODO Destroy/Remove this object from nonexisting windowmanager
+
+                    //!TODO Destroy/Remove this object from nonexisting windowmanager
                 });
-                
-                this.minifyButton.addEventListener("click", function(){
-                     
+
+                this.minifyButton.addEventListener("click", function () {
+
                     // !TODO Hide window and add it to minified state in taskbar.
                 });
-                
-                this.headerElement.addEventListener('dragstart',function(e){
-                    
+
+                this.headerElement.addEventListener('dragstart', function (e) {
+
                     that.isBeingDragged = true;
-                    
+
                     // Get current css computed values of containerElement
                     computedStyle = window.getComputedStyle(that.containerElement, null);
-                                        
+
                     // Parse and compute the data which should be passed when the drag is dropped.
-                    x = (parseInt(computedStyle.getPropertyValue("left"),10) - e.clientX);
-                    y = (parseInt(computedStyle.getPropertyValue("top"),10) - e.clientY);
-                                        
+                    x = (parseInt(computedStyle.getPropertyValue("left"), 10) - e.clientX);
+                    y = (parseInt(computedStyle.getPropertyValue("top"), 10) - e.clientY);
+
                     // Set this data to be transferred until drop of element.
                     e.dataTransfer.setData("text", x + "," + y);
-                    
+
                 });
-                
-                document.getElementById("desktop").addEventListener("drop", function(e){
-                   
-                    if(!that.isBeingDragged){
-                        return false
+
+                this.desktopObj.containerElement.addEventListener("drop", function (e) {
+
+                    if (!that.isBeingDragged) {
+                        return false;
                     }
-                   
+
                     // Get Coordinates from drag
                     offset = e.dataTransfer.getData("text").split(',');
-                   
+
                     // Parse cordinates
-                    x = event.clientX + parseInt(offset[0],10);
-                    y = event.clientY + parseInt(offset[1],10);
-                    
+                    x = e.clientX + parseInt(offset[0], 10);
+                    y = e.clientY + parseInt(offset[1], 10);
+
                     // Move appContainer to new location
                     that.moveTo(x, y);
 
-                    e.preventDefault();                   
+                    e.preventDefault();
                     that.isBeingDragged = false;
-                   
+
                     return false;
                 });
-                
-                document.getElementById("desktop").addEventListener("dragover", function(e){
-                    e.preventDefault(); 
-                    return false; 
+
+                this.desktopObj.containerElement.addEventListener("dragover", function (e) {
+                    e.preventDefault();
+                    return false;
                 });
-                
+
             },
-            
-            moveTo: function(newX, newY){
+
+            moveTo: function (newX, newY) {
                 this.containerElement.style.left = newX + "px";
                 this.containerElement.style.top = newY + "px";
-                
-                console.log(newX + " " + newY);
             }
         };
-    
+
         return Constructor;
-    
+
     }());
 });
 
