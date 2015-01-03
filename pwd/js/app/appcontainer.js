@@ -14,7 +14,10 @@ define(["mustache", "app/extensions"], function(Mustache) {
                 _minifyButton,
                 _closeButton,
                 _containerElement,
-                _runningApp;
+                _runningApp,
+                _headerElement,
+                _contentElement,
+                _isBeingDragged = false;
             
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -27,7 +30,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _x = parsedValue;
                         }
                         else{
-                            throw new Error("AppContainers x argument must be an int.");
+                            throw new Error("AppContainers 'x' property must be an int.");
                         }
                     }
                 },
@@ -40,7 +43,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _y = parsedValue;
                         }
                         else{
-                            throw new Error("AppContainers y argument must be an int.");
+                            throw new Error("AppContainers 'y' property must be an int.");
                         }
                     }
                 },
@@ -53,7 +56,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _width = parsedValue;
                         }
                         else{
-                            throw new Error("AppContainers width argument must be an int.");
+                            throw new Error("AppContainers 'width' property must be an int.");
                         }
                     }
                 },
@@ -66,7 +69,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _height = parsedValue;
                         }
                         else{
-                            throw new Error("AppContainers height argument must be an int.");
+                            throw new Error("AppContainers 'height' property must be an int.");
                         }
                     }
                 },
@@ -79,7 +82,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _zIndex = parsedValue;
                         }
                         else{
-                            throw new Error("AppContainers zIndex argument must be an int.");
+                            throw new Error("AppContainers 'zIndex' property must be an int.");
                         }
                     }
                 },
@@ -91,7 +94,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _closeButton = element;
                         }
                         else{
-                            throw new Error("AppContainers closeButton must be an element");
+                            throw new Error("AppContainers 'closeButton' property must be an element");
                         }
                     }
                 },
@@ -103,7 +106,31 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _minifyButton = element;
                         }
                         else{
-                            throw new Error("AppContainers minifyButton must be an element");
+                            throw new Error("AppContainers 'minifyButton' property must be an element");
+                        }
+                    }
+                },
+                "headerElement": {
+                    get: function(){ return _headerElement || ""; },
+                    
+                    set: function(element){
+                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                            _headerElement = element;
+                        }
+                        else{
+                            throw new Error("AppContainers 'headerElement' property must be an element");
+                        }
+                    }
+                },
+                "contentElement": {
+                    get: function(){ return _contentElement || ""; },
+                    
+                    set: function(element){
+                        if(element !== null && typeof(element.nodeName) !== "undefined"){
+                            _contentElement = element;
+                        }
+                        else{
+                            throw new Error("AppContainers 'contentElement' property must be an element");
                         }
                     }
                 },
@@ -115,7 +142,7 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _containerElement = element;
                         }
                         else{
-                            throw new Error("AppContainers containerElement must be an element");
+                            throw new Error("AppContainers 'containerElement' property must be an element");
                         }
                     }
                 },
@@ -128,10 +155,20 @@ define(["mustache", "app/extensions"], function(Mustache) {
                             _runningApp = obj;
                         }
                         else{
-                            throw new Error("AppContainers runningApp must be an object");
+                            throw new Error("AppContainers 'runningApp' property must be an object");
                         }
                     }
-                }
+                },
+                "isBeingDragged": {
+                    get: function(){ return _isBeingDragged },
+                    set: function(value){
+                        if(typeof value !== "boolean" ){
+                            throw new Error("AppContainers 'isBeingDragged' property must be a boolean type.");
+                        }
+                        
+                        _isBeingDragged = value;
+                    }
+                },
             });
             
         // Init values
@@ -152,9 +189,16 @@ define(["mustache", "app/extensions"], function(Mustache) {
                                                 
                 // Create container
                 this.containerElement = document.createElement("div");
-                this.containerElement.setAttribute("draggable", "true");
                 this.containerElement.classList.add("window");
-                            
+                
+                // Set container position
+                this.containerElement.style.left = this.x + "px";
+                this.containerElement.style.top = this.y + "px";
+                
+                // Set container width
+                this.containerElement.style.width = this.width + "px";
+                this.containerElement.style.height = this.height + "px";
+                
                 // Fetch template
                 require(["text!tpl/appcontainer.html"], function(template){
                     
@@ -164,6 +208,8 @@ define(["mustache", "app/extensions"], function(Mustache) {
                     // Fetch references.
                     that.closeButton = that.containerElement.querySelector('a.close');
                     that.minifyButton = that.containerElement.querySelector('a.minify');
+                    that.headerElement = that.containerElement.querySelector('div.header');
+                    that.contentElement = that.containerElement.querySelector('div.content');
                     
                     // Append appContainer to desktop
                     document.getElementById("desktop").appendChild(that.containerElement);
@@ -177,7 +223,8 @@ define(["mustache", "app/extensions"], function(Mustache) {
                 var that = this,
                     computedStyle,
                     x,
-                    y;
+                    y,
+                    offset;
                 
                 this.closeButton.addEventListener("click", function(){
                      
@@ -192,32 +239,56 @@ define(["mustache", "app/extensions"], function(Mustache) {
                     // !TODO Hide window and add it to minified state in taskbar.
                 });
                 
-                this.containerElement.addEventListener('dragstart',function(e){
-                                        
-                    // Get current css computed values of element that triggered the drag.
-                    computedStyle = window.getComputedStyle(e.target, null);
+                this.headerElement.addEventListener('dragstart',function(e){
                     
+                    that.isBeingDragged = true;
+                    
+                    // Get current css computed values of containerElement
+                    computedStyle = window.getComputedStyle(that.containerElement, null);
+                                        
                     // Parse and compute the data which should be passed when the drag is dropped.
                     x = (parseInt(computedStyle.getPropertyValue("left"),10) - e.clientX);
                     y = (parseInt(computedStyle.getPropertyValue("top"),10) - e.clientY);
-                    
+                                        
                     // Set this data to be transferred until drop of element.
                     e.dataTransfer.setData("text", x + "," + y);
-                }); 
+                    
+                });
                 
                 document.getElementById("desktop").addEventListener("drop", function(e){
-                    var offset = event.dataTransfer.getData("text/plain").split(',');
-                    var dm = document.getElementById('dragme');
-                    dm.style.left = (event.clientX + parseInt(offset[0],10)) + 'px';
-                    dm.style.top = (event.clientY + parseInt(offset[1],10)) + 'px';
-                    event.preventDefault();
+                   
+                    if(!that.isBeingDragged){
+                        return false
+                    }
+                   
+                    // Get Coordinates from drag
+                    offset = e.dataTransfer.getData("text").split(',');
+                   
+                    // Parse cordinates
+                    x = event.clientX + parseInt(offset[0],10);
+                    y = event.clientY + parseInt(offset[1],10);
+                    
+                    // Move appContainer to new location
+                    that.moveTo(x, y);
+
+                    e.preventDefault();                   
+                    that.isBeingDragged = false;
+                   
                     return false;
                 });
+                
+                document.getElementById("desktop").addEventListener("dragover", function(e){
+                    e.preventDefault(); 
+                    return false; 
+                });
+                
             },
             
             moveTo: function(newX, newY){
                 this.containerElement.style.left = newX + "px";
                 this.containerElement.style.top = newY + "px";
+                
+                console.log(newX + " " + newY);
             }
         };
     

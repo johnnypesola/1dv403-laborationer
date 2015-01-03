@@ -17,7 +17,12 @@
         
         // Start new appcontainer
         PWD.AppContainer = PWD.AppContainer || new AppContainer();        
+                
+        PWD.AppContainer.render("Men inte såhär", "Kalle Anka är bäst!");
         
-        PWD.AppContainer.render("Min fina app", "Kalle Anka är bäst!");
+        
+        PWD.AppContainer2 = PWD.AppContainer2 || new AppContainer(50, 50);
+        
+        PWD.AppContainer2.render("Min fina app2", "Kalle Anka är bäst igen!");
         
     });
