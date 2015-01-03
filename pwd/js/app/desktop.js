@@ -27,7 +27,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                         return _startMenu || "";
                     },
                     set: function (obj) {
-                        if (obj !== null && typeof obj === "Object") {
+                        if (obj !== null && typeof obj === "object") {
                             _startMenu = obj;
                         } else {
                             throw new Error("Desktops 'startMenu' property must be an object");
@@ -50,7 +50,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
 
                     set: function (obj) {
 
-                        if (obj !== null && typeof obj === "Object") {
+                        if (obj !== null && typeof obj === "object") {
                             _lastAppStartPos = obj;
                         } else {
                             throw new Error("Desktops 'lastAppStartPos' property must be an object, i.e. {x: 20, y: 20}");
@@ -72,23 +72,43 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
             // Render app
             startApp: function (appName, width, height) {
 
-                var x,
-                    y,
-                    zIndex;
+                var appStartPos,
+                    zIndex,
+                    newApp;
 
                 // Figure out Zindex from array.
                 zIndex = this.runningApps.length + 2;
 
-                // Figure out x and y from array.
+                // Get app startposition
+                appStartPos = this.getNextAppStartPos(width, height);
 
-                this.runningApps.push(new AppContainer(this, this.generateUID(), x, y, (width || 200), (height || 200), zIndex));
+                // Start App
+                newApp = new AppContainer(this, appName, this.generateUID(), appStartPos.x, appStartPos.y, (width || 200), (height || 200), zIndex)
+
+                newApp.render("This is the content for now");
+
+                // Add new appa to array with running apps
+                this.runningApps.push(newApp);
+
+                // Set new lastAppStartPos
+                this.lastAppStartPos = appStartPos;
             },
 
-            nextAppStartPos: function(width, height) {
-                if(this.lastAppStartPos + width > this.containerElement.width)
+            getNextAppStartPos: function (width, height) {
+                var x = this.lastAppStartPos.x += 20,
+                    y = this.lastAppStartPos.y += 20;
+
+                if (x + width > this.contentElement.offsetWidth) {
+                    x = 20;
+                }
+                if (y + height > this.contentElement.offsetHeight) {
+                    y = 20;
+                }
+
+                return  {x: x, y: y};
             },
 
-            moveApp: function(appContainer) {
+            moveApp: function (appContainer) {
 
             },
 
@@ -106,5 +126,8 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                 });
             }
         };
+
+        return Constructor;
+
     }());
 });

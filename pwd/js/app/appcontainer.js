@@ -8,9 +8,10 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, UID, x, y, width, height, zIndex) {
+        var Constructor = function (desktopObj, appName, UID, x, y, width, height, zIndex) {
 
             var _desktopObj,
+                _appName,
                 _UID,
                 _x,
                 _y,
@@ -31,10 +32,21 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () { return _desktopObj || ""; },
 
                     set: function (obj) {
-                        if (obj !== null && typeof obj === "Object") {
+                        if (obj !== null && typeof obj === "object") {
                             _desktopObj = obj;
                         } else {
                             throw new Error("AppContainers 'desktopObj' property must be an object");
+                        }
+                    }
+                },
+                "appName": {
+                    get: function () { return _appName || ""; },
+
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+                            _appName = value;
+                        } else {
+                            throw new Error("AppContainers 'appName' property must be a string.");
                         }
                     }
                 },
@@ -230,6 +242,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
         // Init values
             this.desktopObj = desktopObj;
+            this.appName = appName || "";
             this.UID = UID || desktopObj.generateUID();
             this.x = x || 100;
             this.y = y || 100;
@@ -242,7 +255,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             constructor: Constructor,
 
             // Render app
-            render: function (appName, content) {
+            render: function (content) {
 
                 var that = this;
 
@@ -262,7 +275,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 require(["text!tpl/appcontainer.html"], function (template) {
 
                     // Render data in template
-                    that.containerElement.innerHTML = Mustache.render(template, {appName: appName, content: content});
+                    that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content});
 
                     // Fetch references.
                     that.closeButton = that.containerElement.querySelector('a.close');
@@ -271,7 +284,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     that.contentElement = that.containerElement.querySelector('div.content');
 
                     // Append appContainer to desktop
-                    that.desktopObj.containerElement.appendChild(that.containerElement);
+
+                    that.desktopObj.contentElement.appendChild(that.containerElement);
 
                     // Add events
                     that.addEvents();
@@ -314,7 +328,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 });
 
-                this.desktopObj.containerElement.addEventListener("drop", function (e) {
+                this.desktopObj.contentElement.addEventListener("drop", function (e) {
 
                     if (!that.isBeingDragged) {
                         return false;
@@ -336,7 +350,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     return false;
                 });
 
-                this.desktopObj.containerElement.addEventListener("dragover", function (e) {
+                this.desktopObj.contentElement.addEventListener("dragover", function (e) {
                     e.preventDefault();
                     return false;
                 });
