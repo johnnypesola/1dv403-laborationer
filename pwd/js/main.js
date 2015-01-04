@@ -19,7 +19,7 @@
 
         PWD.Desktop = PWD.Desktop || new Desktop(document.getElementById("desktop"));
 
-        PWD.Desktop.startApp("Hallojsan!", 100, 100);
+        PWD.Desktop.startApp("Hallojsan!", 100, 100, false);
 
 
         document.addEventListener("keydown", function (e) {

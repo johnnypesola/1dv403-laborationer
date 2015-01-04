@@ -112,7 +112,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
             constructor: Constructor,
 
             // Render app
-            startApp: function (appName, width, height) {
+            startApp: function (appName, width, height, isResizeable) {
 
                 var appStartPos,
                     zIndex,
@@ -125,7 +125,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                 appStartPos = this.getNextAppStartPos(width, height);
 
                 // Start App
-                newApp = new AppContainer(this, appName, this.generateUID(), appStartPos.x, appStartPos.y, (width || 200), (height || 200), zIndex)
+                newApp = new AppContainer(this, appName, this.generateUID(), appStartPos.x, appStartPos.y, (width || 200), (height || 200), zIndex, isResizeable)
 
                 newApp.render("This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. ");
 

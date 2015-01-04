@@ -8,7 +8,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, appName, UID, x, y, width, height, zIndex) {
+        var Constructor = function (desktopObj, appName, UID, x, y, width, height, zIndex, isResizeable) {
 
             var _desktopObj,
                 _appName,
@@ -26,8 +26,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _headerElement,
                 _contentElement,
                 _isBeingDragged = false,
-                _isBeingResized = false;
-
+                _isBeingResized = false,
+                _isResizeable;
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -306,6 +306,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                     }
                 },
+                "isResizeable": {
+                    get: function () { return _isResizeable; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("AppContainers 'isResizeable' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _isResizeable = value;
+                    }
+                },
                 "isRendered": {
                     get: function () {
                         return this.containerElement !== "";
@@ -322,6 +333,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.width = width || 320;
             this.height = height || 240;
             this.zIndex = zIndex || 1;
+            this.isResizeable = (typeof isResizeable === "boolean" ? isResizeable : true);
         };
 
         Constructor.prototype = {
@@ -445,34 +457,37 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 var that = this,
                     offset;
 
+                // Declare function to bind to mousemove eventhandlers
                 function resizeFunction (e) {
-
                     that.resizeTo(e.pageX - offset.x, e.pageY - offset.y);
-
-                    console.log(that.containerElement.offsetHeight);
-
-                    //y: e.pageY - that.containerElement.offsetTop
-
                 }
 
-                this.resizeElement.addEventListener('mousedown', function (e) {
+                // Only make resizable if exists in config
+                if (this.isResizeable) {
 
-                    offset = {
-                        x: e.pageX - that.containerElement.offsetWidth,
-                        y: e.pageY - that.containerElement.offsetHeight
-                    };
+                    this.resizeElement.addEventListener('mousedown', function (e) {
 
-                    that.desktopObj.contentElement.addEventListener('mousemove', resizeFunction);
+                        offset = {
+                            x: e.pageX - that.containerElement.offsetWidth,
+                            y: e.pageY - that.containerElement.offsetHeight
+                        };
 
-                    that.isBeingResized = true;
-                });
+                        that.desktopObj.contentElement.addEventListener('mousemove', resizeFunction);
 
-                this.desktopObj.contentElement.addEventListener('mouseup', function (e) {
-                    that.desktopObj.contentElement.removeEventListener('mousemove', resizeFunction);
+                        that.isBeingResized = true;
+                    });
 
-                    that.isBeingResized = false;
-                });
+                    this.desktopObj.contentElement.addEventListener('mouseup', function (e) {
+                        that.desktopObj.contentElement.removeEventListener('mousemove', resizeFunction);
 
+                        that.isBeingResized = false;
+                    });
+                } else {
+                    // Hide resize element
+                    this.resizeElement.classList.add("hidden");
+                }
+
+                // Prevent default drag behaviour
                 this.resizeElement.addEventListener('dragstart', function (e) {
                     e.preventDefault();
                     return false;
