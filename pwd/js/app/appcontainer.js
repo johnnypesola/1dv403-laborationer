@@ -20,11 +20,14 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _zIndex,
                 _minifyButton,
                 _closeButton,
+                _resizeElement,
                 _containerElement,
                 _runningApp,
                 _headerElement,
                 _contentElement,
-                _isBeingDragged = false;
+                _isBeingDragged = false,
+                _isBeingResized = false;
+
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -68,14 +71,24 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () { return _x || ""; },
 
                     set: function (value) {
-                        var parsedValue = parseFloat(value);
-                        if (parsedValue.isInt() && parsedValue >= 0) {
+                        var parsedValue = parseFloat(value),
+                            actualWidth;
 
-                            _x = parsedValue;
+                        if (parsedValue.isInt()) {
 
-                            // Apply this value if this app is rendered
+                            // Try to get calculated css width
+                            if (_x) {
+                                actualWidth = parseInt(window.getComputedStyle(this.containerElement, null).getPropertyValue("width"), 10);
+                            }
+
+                            // Don't let the window outside boundaries.
+                            if (!(parsedValue < 0 || (actualWidth && parsedValue + actualWidth > this.desktopObj.contentElement.offsetWidth))) {
+                                _x = parsedValue;
+                            }
+
+                            // Apply this value to html if this app is rendered
                             if (this.isRendered) {
-                                this.containerElement.style.left = parsedValue + "px";
+                                this.containerElement.style.left = _x + "px";
                             }
 
                         } else {
@@ -87,13 +100,24 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () { return _y || ""; },
 
                     set: function (value) {
-                        var parsedValue = parseFloat(value);
+                        var parsedValue = parseFloat(value),
+                            actualHeight;
+
                         if (parsedValue.isInt() && parsedValue >= 0) {
-                            _y = parsedValue;
+
+                            // Try to get calculated css width
+                            if (_y) {
+                                actualHeight = parseInt(window.getComputedStyle(this.containerElement, null).getPropertyValue("height"), 10);
+                            }
+
+                            // Don't let the window outside boundaries.
+                            if (!(parsedValue < 0 || (actualHeight && parsedValue + actualHeight > this.desktopObj.contentElement.offsetHeight))) {
+                                _y = parsedValue;
+                            }
 
                             // Apply this value if this app is rendered
                             if (this.isRendered) {
-                                this.containerElement.style.top = parsedValue + "px";
+                                this.containerElement.style.top = _y + "px";
                             }
 
                         } else {
@@ -126,11 +150,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     set: function (value) {
                         var parsedValue = parseFloat(value);
                         if (parsedValue.isInt() && parsedValue >= 0) {
+
                             _height = parsedValue;
 
                             // Apply this height if this app is rendered
                             if (this.isRendered) {
-                                this.contentElement.style.height = parsedValue + "px";
+                                this.containerElement.style.height = parsedValue + "px";
                             }
 
                         } else {
@@ -179,6 +204,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
+                "resizeElement": {
+                    get: function () { return _resizeElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _resizeElement = element;
+                        } else {
+                            throw new Error("AppContainers 'resizeElement' property must be an element");
+                        }
+                    }
+                },
                 "headerElement": {
                     get: function () { return _headerElement || ""; },
 
@@ -207,6 +243,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     set: function (element) {
                         if (element !== null && element.nodeName !== "undefined") {
                             _containerElement = element;
+
+                            // Set position of contentElement
+                            this.containerElement.style.left = this.x + "px";
+                            this.containerElement.style.top = this.y + "px";
+
                         } else {
                             throw new Error("AppContainers 'containerElement' property must be an element");
                         }
@@ -230,7 +271,39 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             throw new Error("AppContainers 'isBeingDragged' property must be a boolean type.");
                         }
 
+                        // Set value
                         _isBeingDragged = value;
+
+                        // Add or remove CSS class on this containerElement and also Desktop
+                        if (value) {
+                            this.desktopObj.appIsBeingDragged = true;
+                            this.containerElement.classList.add("being-dragged");
+                        } else {
+                            this.desktopObj.appIsBeingDragged = false;
+                            this.containerElement.classList.remove("being-dragged");
+                        }
+
+                    }
+                },
+                "isBeingResized": {
+                    get: function () { return _isBeingDragged; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("AppContainers 'isBeingResized' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _isBeingResized = value;
+
+                        // Add or remove CSS class on this containerElement and also Desktop
+                        if (value) {
+                            this.desktopObj.appIsBeingResized = true;
+                            this.containerElement.classList.add("being-resized");
+                        } else {
+                            this.desktopObj.appIsBeingResized = false;
+                            this.containerElement.classList.remove("being-resized");
+                        }
+
                     }
                 },
                 "isRendered": {
@@ -263,10 +336,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.containerElement = document.createElement("div");
                 this.containerElement.classList.add("window");
 
-                // Set container position
-                this.containerElement.style.left = this.x + "px";
-                this.containerElement.style.top = this.y + "px";
-
                 // Fetch template
                 require(["text!tpl/appcontainer.html"], function (template) {
 
@@ -278,13 +347,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     that.minifyButton = that.containerElement.querySelector('a.minify');
                     that.headerElement = that.containerElement.querySelector('div.header');
                     that.contentElement = that.containerElement.querySelector('div.content');
+                    that.resizeElement = that.containerElement.querySelector('img.resize');
 
-                    // Set content width
-                    that.contentElement.style.width = that.width + "px";
-                    that.contentElement.style.height = that.height + "px";
+                    // Set size
+                    that.resizeTo(that.width, that.height);
 
                     // Append appContainer to desktop
-
                     that.desktopObj.contentElement.appendChild(that.containerElement);
 
                     // Add events
@@ -293,75 +361,133 @@ define(["mustache", "app/extensions"], function (Mustache) {
             },
 
             addEvents: function () {
-                var that = this,
-                    computedStyle,
-                    x,
-                    y,
-                    offset,
-                    dataTransferString;
+                var that = this;
 
-                this.containerElement.addEventListener("click", function () {
+                this.addDragAppEvent();
+
+                this.addCloseAppEvent();
+
+                this.addResizeAppEvent();
+
+                this.addMinifyAppEvent();
+
+                // Focus whole app on mousedown
+                this.containerElement.addEventListener('mousedown', function (e) {
                     that.desktopObj.focusApp(that);
                 });
+            },
 
-                this.closeButton.addEventListener("click", function () {
+            addCloseAppEvent: function () {
+                var that = this;
+
+                this.closeButton.addEventListener('mousedown', function (e) {
+                    e.stopPropagation();
+
+
+                });
+
+                this.closeButton.addEventListener('click', function (e) {
 
                     // Remove from DOM
                     that.containerElement.parentNode.removeChild(that.containerElement);
 
-                    //!TODO Destroy/Remove this object from nonexisting windowmanager
+                    //Destroy/Remove this object from Desktop
+                    that.desktopObj.closeApp(that);
+
+                });
+            },
+
+            addMinifyAppEvent: function () {
+                this.minifyButton.addEventListener("click", function () {
+                    console.log("not implemented yet");
+                });
+            },
+
+            addDragAppEvent: function () {
+
+                var that = this,
+                    offset;
+
+                function moveFunction (e) {
+                    that.moveTo(e.pageX - offset.x, e.pageY - offset.y);
+                }
+
+                this.headerElement.addEventListener('mousedown', function (e) {
+
+                    offset = {
+                        x: e.pageX - that.containerElement.offsetLeft,
+                        y: e.pageY - that.containerElement.offsetTop
+                    };
+
+                    that.desktopObj.contentElement.addEventListener('mousemove', moveFunction);
+                    that.isBeingDragged = true;
+
                 });
 
-                this.minifyButton.addEventListener("click", function () {
+                this.desktopObj.contentElement.addEventListener('mouseup', function (e) {
+                    that.desktopObj.contentElement.removeEventListener('mousemove', moveFunction);
 
-                    // !TODO Hide window and add it to minified state in taskbar.
+                    that.isBeingDragged = false;
                 });
 
                 this.headerElement.addEventListener('dragstart', function (e) {
-
-                    // Calculate offset for dragimage
-                    offset = {
-                                x: e.pageX - that.containerElement.offsetLeft,
-                                y: e.pageY - that.containerElement.offsetTop
-                    };
-
-                    // Set dragimage with offset
-                    // e.dataTransfer.setDragImage(that.containerElement, offset.x, offset.y); DOES NOT WORK IN IE
-
-                    // Set container opacity during drag.
-                    that.containerElement.classList.add("being-dragged");
-
-                    that.isBeingDragged = true;
-
-                    // Get current css computed values of containerElement
-                    computedStyle = window.getComputedStyle(that.containerElement, null);
-
-                    // Parse and compute the data which should be passed when the drag is dropped.
-                    x = (parseInt(computedStyle.getPropertyValue("left"), 10) - e.clientX);
-                    y = (parseInt(computedStyle.getPropertyValue("top"), 10) - e.clientY);
-
-                    // Format data transfer string.
-                    dataTransferString = [that.UID, x, y].join(",");
-
-                    // Set this data to be transferred until drop of element.
-                    e.dataTransfer.setData("text", dataTransferString);
-
+                    e.preventDefault();
+                    return false;
                 });
 
-                this.headerElement.addEventListener('dragend', function (e) {
-                    that.containerElement.classList.remove("being-dragged");
-                }),
-
                 this.desktopObj.contentElement.addEventListener("dragover", function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            },
+
+            addResizeAppEvent: function () {
+                var that = this,
+                    offset;
+
+                function resizeFunction (e) {
+
+                    that.resizeTo(e.pageX - offset.x, e.pageY - offset.y);
+
+                    console.log(that.containerElement.offsetHeight);
+
+                    //y: e.pageY - that.containerElement.offsetTop
+
+                }
+
+                this.resizeElement.addEventListener('mousedown', function (e) {
+
+                    offset = {
+                        x: e.pageX - that.containerElement.offsetWidth,
+                        y: e.pageY - that.containerElement.offsetHeight
+                    };
+
+                    that.desktopObj.contentElement.addEventListener('mousemove', resizeFunction);
+
+                    that.isBeingResized = true;
+                });
+
+                this.desktopObj.contentElement.addEventListener('mouseup', function (e) {
+                    that.desktopObj.contentElement.removeEventListener('mousemove', resizeFunction);
+
+                    that.isBeingResized = false;
+                });
+
+                this.resizeElement.addEventListener('dragstart', function (e) {
                     e.preventDefault();
                     return false;
                 });
 
             },
 
+            resizeTo: function (newWidth, newHeight) {
+                this.width = newWidth;
+                this.height = newHeight;
+            },
+
             moveTo: function (newX, newY) {
-                this.containerElement.style.left = newX + "px";
-                this.containerElement.style.top = newY + "px";
+                this.x = newX;
+                this.y = newY;
             }
         };
 

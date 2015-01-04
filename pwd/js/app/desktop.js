@@ -13,6 +13,8 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
             var _runningApps = [],
                 _startMenu,
                 _contentElement,
+                _appIsBeingDragged,
+                _appIsBeingResized,
                 _lastAppStartPos = {x: 20, y: 20};
 
             // Properties with Getters and Setters
@@ -55,6 +57,44 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                         } else {
                             throw new Error("Desktops 'lastAppStartPos' property must be an object, i.e. {x: 20, y: 20}");
                         }
+                    }
+                },
+                "appIsBeingDragged": {
+                    get: function () { return _appIsBeingDragged; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("Desktops 'appIsBeingDragged' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _appIsBeingDragged = value;
+
+                        // Add or remove CSS class on containerElement and change cursor
+                        if (value) {
+                            this.contentElement.classList.add("app-is-being-dragged");
+                        } else {
+                            this.contentElement.classList.remove("app-is-being-dragged");
+                        }
+
+                    }
+                },
+                "appIsBeingResized": {
+                    get: function () { return _appIsBeingResized; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("Desktops 'appIsBeingResized' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _appIsBeingResized = value;
+
+                        // Add or remove CSS class on containerElement and change cursor
+                        if (value) {
+                            this.contentElement.classList.add("app-is-being-resized");
+                        } else {
+                            this.contentElement.classList.remove("app-is-being-resized");
+                        }
+
                     }
                 }
             });
@@ -177,6 +217,18 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
 
                 // Move appContainer to new location
                 targetAppObj.moveTo(x, y);
+            },
+
+            closeApp: function (targetAppObj) {
+                var i;
+
+                // Search for app in array and remove it.
+                for (i = 0; i < this.runningApps.length; i++) {
+                    if (this.runningApps[i].UID === targetAppObj.UID) {
+                        this.runningApps.splice(i, 1);
+                        break;
+                    }
+                }
             },
 
             getAppByUID: function (targetUID) {

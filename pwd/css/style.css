@@ -55,8 +55,8 @@ div#desktop {
 
 div.window {
 
-
 	min-width: 150px;
+	min-height: 150px;
 	
 	background-color: rgba(255, 255, 255, 0.5);
     border-radius: 5px;
@@ -66,7 +66,9 @@ div.window {
     
     top: 200px;
     left: 200px;
-    
+
+	padding-top: 36px;
+
 	box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -90,6 +92,9 @@ div.window:before {
 }
 
 	div.window div.header {
+		position: relative;
+		bottom: 36px;
+
 		text-align: left;
 		padding: 4px 6px 0 6px;
 
@@ -116,7 +121,9 @@ div.window:before {
 	}
 
 	div.window .content {
-		min-width: 150px;
+		position: relative;
+		bottom: 36px;
+
 		text-align: left;
 		margin: 6px;
 		padding: 4px;
@@ -125,6 +132,7 @@ div.window:before {
 		position: relative;
 		border-radius: 2px;
 		overflow: auto;
+		height: 100%;
 	}
 
 	div.window a.close {
@@ -140,7 +148,10 @@ div.window:before {
 	    background: rgba(255,255,255,0);
 	    padding: 0 4px 1px 4px;
 	    border-radius: 2px;
+	}
 
+	div.window a.close:active {
+		background: #FFEEEE;
 	}
 
 	div.window .resize {
@@ -207,10 +218,27 @@ button {
 }
 
 .being-dragged {
-	transition: all 0.1s ease-in-out;
 	transform: scale(0.98);
 	opacity: 0.5;
+	cursor: move !important;
 }
+
+	div.being-dragged div.header {
+		cursor: move !important;
+	}
+
+	.app-is-being-dragged {
+		cursor: move !important;
+	}
+
+.being-resized {
+	opacity: 0.9;
+	cursor: se-resize !important;
+}
+
+	.app-is-being-resized {
+		cursor: se-resize !important;
+	}
 
 /* Animations */
 
