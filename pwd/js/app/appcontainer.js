@@ -130,7 +130,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                             // Apply this height if this app is rendered
                             if (this.isRendered) {
-                                this.containerElement.style.height = parsedValue + "px";
+                                this.contentElement.style.height = parsedValue + "px";
                             }
 
                         } else {
@@ -267,10 +267,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.containerElement.style.left = this.x + "px";
                 this.containerElement.style.top = this.y + "px";
 
-                // Set container width
-                this.containerElement.style.width = this.width + "px";
-                this.containerElement.style.height = this.height + "px";
-
                 // Fetch template
                 require(["text!tpl/appcontainer.html"], function (template) {
 
@@ -282,6 +278,10 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     that.minifyButton = that.containerElement.querySelector('a.minify');
                     that.headerElement = that.containerElement.querySelector('div.header');
                     that.contentElement = that.containerElement.querySelector('div.content');
+
+                    // Set content width
+                    that.contentElement.style.width = that.width + "px";
+                    that.contentElement.style.height = that.height + "px";
 
                     // Append appContainer to desktop
 
@@ -297,11 +297,16 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     computedStyle,
                     x,
                     y,
-                    offset;
+                    offset,
+                    dataTransferString;
+
+                this.containerElement.addEventListener("click", function () {
+                    that.desktopObj.focusApp(that);
+                });
 
                 this.closeButton.addEventListener("click", function () {
 
-                     // Remove from DOM
+                    // Remove from DOM
                     that.containerElement.parentNode.removeChild(that.containerElement);
 
                     //!TODO Destroy/Remove this object from nonexisting windowmanager
@@ -323,31 +328,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     x = (parseInt(computedStyle.getPropertyValue("left"), 10) - e.clientX);
                     y = (parseInt(computedStyle.getPropertyValue("top"), 10) - e.clientY);
 
+                    // Format data transfer string.
+                    dataTransferString = [that.UID, x, y].join(",");
+
                     // Set this data to be transferred until drop of element.
-                    e.dataTransfer.setData("text", x + "," + y);
+                    e.dataTransfer.setData("text", dataTransferString);
 
-                });
-
-                this.desktopObj.contentElement.addEventListener("drop", function (e) {
-
-                    if (!that.isBeingDragged) {
-                        return false;
-                    }
-
-                    // Get Coordinates from drag
-                    offset = e.dataTransfer.getData("text").split(',');
-
-                    // Parse cordinates
-                    x = e.clientX + parseInt(offset[0], 10);
-                    y = e.clientY + parseInt(offset[1], 10);
-
-                    // Move appContainer to new location
-                    that.moveTo(x, y);
-
-                    e.preventDefault();
-                    that.isBeingDragged = false;
-
-                    return false;
                 });
 
                 this.desktopObj.contentElement.addEventListener("dragover", function (e) {

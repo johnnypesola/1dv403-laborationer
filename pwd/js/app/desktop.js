@@ -64,6 +64,8 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
             this.startMenu = {};
             this.contentElement = contentElement || document.body;
 
+            this.addDropEventListener();
+
         };
 
         Constructor.prototype = {
@@ -85,7 +87,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                 // Start App
                 newApp = new AppContainer(this, appName, this.generateUID(), appStartPos.x, appStartPos.y, (width || 200), (height || 200), zIndex)
 
-                newApp.render("This is the content for now");
+                newApp.render("This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. ");
 
                 // Add new appa to array with running apps
                 this.runningApps.push(newApp);
@@ -108,15 +110,87 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                 return  {x: x, y: y};
             },
 
-            moveApp: function (appContainer) {
-
-            },
-
             zIndexOrderApps: function () {
                 var i
                 for (i = 0; i < this.runningApps.length; i++) {
                     this.runningApps[i].zIndex = i+1;
                 }
+            },
+
+            addDropEventListener: function () {
+                var data,
+                    x,
+                    y,
+                    targetAppObj,
+                    that = this;
+
+                this.contentElement.addEventListener("drop", function (e) {
+
+                    console.log("dropped: " + e.dataTransfer.getData("text") );
+
+                    // Get data from drag
+                    data = e.dataTransfer.getData("text").split(',');
+
+
+                    // Find out target App from received data.
+                    targetAppObj = that.getAppByUID(data[0]);
+
+                    if (!targetAppObj.isBeingDragged) {
+                        return false;
+                    }
+
+                    // Parse cordinates
+                    x = e.clientX + parseInt(data[1], 10);
+                    y = e.clientY + parseInt(data[2], 10);
+
+                    e.preventDefault();
+                    that.isBeingDragged = false;
+
+                    // Move app
+                    that.moveApp(targetAppObj, x, y);
+
+                    return false;
+                });
+            },
+
+            focusApp: function (targetAppObj) {
+
+                var i;
+
+                // Move target app to last position in array.
+                for (i = 0; i < this.runningApps.length; i++) {
+                    if (this.runningApps[i].UID === targetAppObj.UID) {
+                        this.runningApps.move(i, this.runningApps.length - 1);
+                    }
+                }
+
+                // Update zIndexes
+                for (i = 0; i < this.runningApps.length; i++) {
+                    this.runningApps[i].zIndex = i;
+                }
+            },
+
+            moveApp: function (targetAppObj, x, y) {
+
+                // Focus targetApp, bring it o front.
+                this.focusApp(targetAppObj);
+
+                // Move appContainer to new location
+                targetAppObj.moveTo(x, y);
+            },
+
+            getAppByUID: function (targetUID) {
+                var returnValue = false,
+                    i;
+
+                for (i = 0; i < this.runningApps.length; i++) {
+                    if (this.runningApps[i].UID === targetUID) {
+                        returnValue = this.runningApps[i];
+                        break;
+                    }
+                }
+
+                return returnValue;
             },
 
             generateUID: function () {
