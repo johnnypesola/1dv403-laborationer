@@ -188,12 +188,20 @@ div.window:before {
 		cursor: pointer;
 	}
 
-	div.window div.header h2 {
-		font-size: 16px;
-		font-weight: normal; 
-		color: #000000;
-		margin: 0 20px 0 0;
-	}
+		div.window div.header h2 {
+			font-size: 16px;
+			font-weight: normal;
+			color: #000000;
+			margin: 0 20px 0 0;
+		}
+
+			div.window div.header h2 img {
+				max-width: 15px;
+				max-height: 15px;
+				margin: 0 5px 0 2px;
+				position: relative;
+				top: 2px;
+			}
 
 	div.window .content {
 		position: relative;

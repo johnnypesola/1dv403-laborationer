@@ -19,12 +19,11 @@
 
         PWD.Desktop = PWD.Desktop || new Desktop(document.getElementById("desktop"));
 
-        PWD.Desktop.startApp("Hallojsan!", 100, 100, false);
-
+        PWD.Desktop.startApp(PWD.Desktop.availableApps[0]);
 
         document.addEventListener("keydown", function (e) {
             if (e.keyCode === 13) {
-                PWD.Desktop.startApp("Test", 300, 100);
+                PWD.Desktop.startApp(PWD.Desktop.availableApps[PWD.Desktop.runningApps.length]);
 
                 console.log(PWD.Desktop.runningApps[PWD.Desktop.runningApps.length - 1].UID);
             }

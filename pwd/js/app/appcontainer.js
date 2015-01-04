@@ -8,11 +8,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, appName, UID, x, y, width, height, zIndex, isResizeable) {
+        var Constructor = function (desktopObj, appName, UID, icon, x, y, width, height, zIndex, isResizeable) {
 
             var _desktopObj,
                 _appName,
                 _UID,
+                _icon,
                 _x,
                 _y,
                 _width,
@@ -24,6 +25,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _containerElement,
                 _runningApp,
                 _headerElement,
+                _headerTextElement,
                 _contentElement,
                 _isBeingDragged = false,
                 _isBeingResized = false,
@@ -65,6 +67,24 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
 
                         _UID = value;
+                    }
+                },
+                "icon": {
+                    get: function () { return _icon || ""; },
+
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+
+                            _icon = value;
+
+                            // Display icon on app header.
+                            if (this.isRendered) {
+                                this.headerElement.style.backgroundImage = value;
+                            }
+
+                        } else {
+                            throw new Error("AppContainers 'icon' property must be a string.");
+                        }
                     }
                 },
                 "x": {
@@ -226,6 +246,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
+                "headerTextElement": {
+                    get: function () { return _headerTextElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _headerTextElement = element;
+                        } else {
+                            throw new Error("AppContainers 'headerTextElement' property must be an element");
+                        }
+                    }
+                },
                 "contentElement": {
                     get: function () { return _contentElement || ""; },
 
@@ -327,6 +358,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
         // Init values
             this.desktopObj = desktopObj;
             this.appName = appName || "";
+            this.icon = icon || "";
             this.UID = UID || desktopObj.generateUID();
             this.x = x || 100;
             this.y = y || 100;
@@ -334,6 +366,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.height = height || 240;
             this.zIndex = zIndex || 1;
             this.isResizeable = (typeof isResizeable === "boolean" ? isResizeable : true);
+
         };
 
         Constructor.prototype = {
@@ -352,17 +385,23 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 require(["text!tpl/appcontainer.html"], function (template) {
 
                     // Render data in template
-                    that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content});
+                    that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content, icon: that.icon});
 
                     // Fetch references.
                     that.closeButton = that.containerElement.querySelector('a.close');
                     that.minifyButton = that.containerElement.querySelector('a.minify');
                     that.headerElement = that.containerElement.querySelector('div.header');
+                    that.headerTextElement = that.containerElement.querySelector('div.header h2');
                     that.contentElement = that.containerElement.querySelector('div.content');
                     that.resizeElement = that.containerElement.querySelector('img.resize');
 
+                    console.log(that.headerTextElement);
+
                     // Set size
                     that.resizeTo(that.width, that.height);
+
+                    // Set icon, (will actually render the icon to app header)
+                    that.icon = that.icon;
 
                     // Append appContainer to desktop
                     that.desktopObj.contentElement.appendChild(that.containerElement);

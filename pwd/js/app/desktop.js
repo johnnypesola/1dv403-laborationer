@@ -10,7 +10,37 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
 
         var Constructor = function (contentElement) {
 
-            var _runningApps = [],
+            var _availableApps = [
+                {
+                    name: "Labby Mezzage",
+                    icon: "img/icon/labby_mezzage.svg",
+                    width: 200,
+                    height: 200,
+                    resizable: true
+                },
+                {
+                    name: "RSS Reader",
+                    icon: "img/icon/rss.svg",
+                    width: 200,
+                    height: 200,
+                    resizable: true
+                },
+                {
+                    name: "Memory",
+                    icon: "img/icon/memory.svg",
+                    width: 200,
+                    height: 200,
+                    resizable: true
+                },
+                {
+                    name: "Image Manager",
+                    icon: "img/icon/image_manager.svg",
+                    width: 200,
+                    height: 200,
+                    resizable: true
+                }
+            ],
+                _runningApps = [],
                 _startMenu,
                 _contentElement,
                 _appIsBeingDragged,
@@ -19,6 +49,18 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
 
             // Properties with Getters and Setters
             Object.defineProperties(this, {
+                "availableApps": {
+                    get: function () { return _availableApps || ""; },
+
+                    set: function (obj) {
+
+                        if (obj !== null && typeof obj === "object") {
+                            _availableApps = obj;
+                        } else {
+                            throw new Error("Desktops 'availableApps' property must be an object.");
+                        }
+                    }
+                },
                 "runningApps": {
                     get: function () {
                         return _runningApps || "";
@@ -111,8 +153,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
         Constructor.prototype = {
             constructor: Constructor,
 
-            // Render app
-            startApp: function (appName, width, height, isResizeable) {
+            startApp: function (appInfoObj) {
 
                 var appStartPos,
                     zIndex,
@@ -122,10 +163,21 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                 zIndex = this.runningApps.length + 2;
 
                 // Get app startposition
-                appStartPos = this.getNextAppStartPos(width, height);
+                appStartPos = this.getNextAppStartPos(appInfoObj.width, appInfoObj.height);
 
                 // Start App
-                newApp = new AppContainer(this, appName, this.generateUID(), appStartPos.x, appStartPos.y, (width || 200), (height || 200), zIndex, isResizeable)
+                newApp = new AppContainer(
+                    this,
+                    appInfoObj.name,
+                    this.generateUID(),
+                    appInfoObj.icon,
+                    appStartPos.x,
+                    appStartPos.y,
+                    (appInfoObj.width || 200),
+                    (appInfoObj.height || 200),
+                    zIndex,
+                    (appInfoObj.isResizeable || true)
+                );
 
                 newApp.render("This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. ");
 
@@ -158,37 +210,7 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
             },
 
             addDropEventListener: function () {
-                var data,
-                    x,
-                    y,
-                    targetAppObj,
-                    that = this;
-
                 this.contentElement.addEventListener("drop", function (e) {
-
-                    console.log("dropped: " + e.dataTransfer.getData("text") );
-
-                    // Get data from drag
-                    data = e.dataTransfer.getData("text").split(',');
-
-
-                    // Find out target App from received data.
-                    targetAppObj = that.getAppByUID(data[0]);
-
-                    if (!targetAppObj.isBeingDragged) {
-                        return false;
-                    }
-
-                    // Parse cordinates
-                    x = e.clientX + parseInt(data[1], 10);
-                    y = e.clientY + parseInt(data[2], 10);
-
-                    e.preventDefault();
-                    that.isBeingDragged = false;
-
-                    // Move app
-                    that.moveApp(targetAppObj, x, y);
-
                     return false;
                 });
             },
