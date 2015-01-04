@@ -319,6 +319,18 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 this.headerElement.addEventListener('dragstart', function (e) {
 
+                    // Calculate offset for dragimage
+                    offset = {
+                                x: e.pageX - that.containerElement.offsetLeft,
+                                y: e.pageY - that.containerElement.offsetTop
+                    };
+
+                    // Set dragimage with offset
+                    // e.dataTransfer.setDragImage(that.containerElement, offset.x, offset.y); DOES NOT WORK IN IE
+
+                    // Set container opacity during drag.
+                    that.containerElement.classList.add("being-dragged");
+
                     that.isBeingDragged = true;
 
                     // Get current css computed values of containerElement
@@ -335,6 +347,10 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     e.dataTransfer.setData("text", dataTransferString);
 
                 });
+
+                this.headerElement.addEventListener('dragend', function (e) {
+                    that.containerElement.classList.remove("being-dragged");
+                }),
 
                 this.desktopObj.contentElement.addEventListener("dragover", function (e) {
                     e.preventDefault();
