@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["mustache", "app/desktop", "app/extensions"], function(Mustache, AppContainer) {
+define(["app/extensions"], function () {
 
     return (function () {
 

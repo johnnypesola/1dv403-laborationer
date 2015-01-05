@@ -8,12 +8,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, appName, UID, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
+        var Constructor = function (desktopObj, appName, UID, exec, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
 
             var _desktopObj,
                 _appName,
                 _UID,
                 _icon,
+                _exec,
                 _x,
                 _y,
                 _width,
@@ -70,6 +71,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
 
                         _UID = value;
+                    }
+                },
+                "exec": {
+                    get: function () { return _exec || ""; },
+
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+                            _exec = value;
+                        } else {
+                            throw new Error("AppContainers 'exec' property must be a string.");
+                        }
                     }
                 },
                 "icon": {
@@ -328,7 +340,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () { return _runningApp || ""; },
 
                     set: function (obj) {
-                        if (obj !== null && typeof obj === "Object") {
+                        if (obj !== null && typeof obj === "object") {
                             _runningApp = obj;
                         } else {
                             throw new Error("AppContainers 'runningApp' property must be an object");
@@ -411,8 +423,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
         // Init values
             this.desktopObj = desktopObj;
             this.appName = appName || "";
-            this.icon = icon || "";
             this.UID = UID || desktopObj.generateUID();
+            this.exec = exec || "";
+            this.icon = icon || "";
             this.x = x || 100;
             this.y = y || 100;
             this.width = width || 320;
@@ -461,7 +474,23 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                     // Add events
                     that.addEvents();
+
+                    // App is rendered, run it.
+                    that.runApp();
                 });
+            },
+
+            runApp: function() {
+                var that = this;
+
+                // Execute app.
+                if (this.exec !== "") {
+                    require([this.exec], function (appToRun) {
+
+                        that.runningApp = new appToRun(that);
+
+                    });
+                }
             },
 
             addEvents: function () {
@@ -595,6 +624,10 @@ define(["mustache", "app/extensions"], function (Mustache) {
             moveTo: function (newX, newY) {
                 this.x = newX;
                 this.y = newY;
+            },
+
+            clearContent: function () {
+                this.contentElement.innerText = "";
             }
         };
 

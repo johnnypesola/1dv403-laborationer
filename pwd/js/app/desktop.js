@@ -14,6 +14,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 {
                     name: "Labby Mezzage",
                     icon: "img/icon/labby_mezzage.svg",
+                    cssClass: "labby-message",
                     width: 200,
                     height: 200,
                     isResizable: true,
@@ -23,6 +24,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 {
                     name: "RSS Reader",
                     icon: "img/icon/rss.svg",
+                    cssClass: "rss-reader",
                     width: 200,
                     height: 200,
                     isResizable: true,
@@ -31,20 +33,24 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 {
                     name: "Memory",
                     icon: "img/icon/memory.svg",
-                    width: 200,
-                    height: 200,
+                    cssClass: "memory",
+                    width: 400,
+                    height: 700,
                     isResizable: false,
                     hasStatusBar: false
                 },
                 {
                     name: "Image Manager",
+                    exec: "app/imagemanager",
+                    cssClass: "image-manager",
                     icon: "img/icon/image_manager.svg",
-                    width: 200,
-                    height: 200,
+                    width: 500,
+                    height: 500,
                     isResizable: true,
                     hasStatusBar: true
                 }
             ],
+                _APP_LOADER_IMG = '<img class="ajax-loader" src="img/ajax-loader.gif">',
                 _runningApps = [],
                 _startMenu,
                 _contentElement,
@@ -69,6 +75,11 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 "runningApps": {
                     get: function () {
                         return _runningApps || "";
+                    }
+                },
+                "APP_LOADER_IMG": {
+                    get: function () {
+                        return _APP_LOADER_IMG || "";
                     }
                 },
                 "startMenu": {
@@ -176,6 +187,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     this,
                     appInfoObj.name,
                     this.generateUID(),
+                    appInfoObj.exec,
                     appInfoObj.icon,
                     appStartPos.x,
                     appStartPos.y,
@@ -187,9 +199,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     appInfoObj.statusBarText
                 );
 
-                console.log(appInfoObj.isResizable);
-
-                newApp.render("This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. ");
+                newApp.render(this.APP_LOADER_IMG);
 
                 // Add new app to array with running apps
                 this.runningApps.push(newApp);
@@ -201,7 +211,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 this.focusApp(newApp);
             },
 
-            addStartmenu: function() {
+            addStartmenu: function () {
 
                 this.startMenu = new StartMenu(this);
 
@@ -219,18 +229,18 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     y = 20;
                 }
 
-                return  {x: x, y: y};
+                return {x: x, y: y};
             },
 
             zIndexOrderApps: function () {
-                var i
+                var i;
                 for (i = 0; i < this.runningApps.length; i++) {
-                    this.runningApps[i].zIndex = i+1;
+                    this.runningApps[i].zIndex = i + 1;
                 }
             },
 
             addDropEventListener: function () {
-                this.contentElement.addEventListener("drop", function (e) {
+                this.contentElement.addEventListener("drop", function () {
                     return false;
                 });
             },
@@ -288,10 +298,44 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             },
 
             generateUID: function () {
-                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = Math.random() * 16|0, v = c == 'x' ? r : (r&0x3|0x8);
                     return v.toString(16);
                 });
+            },
+
+            ajaxCall: function (method, url, callBackFunction, parametersObj) {
+
+                var httpRequest,
+                    parameters;
+
+                // Format parameters, if any
+                parameters = (parametersObj ? JSON.stringify(parametersObj) : null);
+
+                // Modern browsers
+                if (window.XMLHttpRequest) {
+                    httpRequest = new XMLHttpRequest();
+                } else {
+                    throw new Error("Browser does not support XMLHttpRequest");
+                }
+
+                // How to process the server response
+                httpRequest.onreadystatechange = function () {
+                    if (httpRequest.readyState === 4) {
+                        callBackFunction(httpRequest);
+                    }
+                };
+
+                // Open request
+                httpRequest.open(method, url);
+
+                // Optional parameters
+                if (method === "POST") {
+                    httpRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                }
+
+                // Send parameters
+                httpRequest.send(parameters);
             }
         };
 
