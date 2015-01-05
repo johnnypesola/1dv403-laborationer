@@ -1,5 +1,5 @@
 /**
- * Created by Johnny on 2015-01-05.
+ * Created by Johnny on 2015-01-06.
  */
 
 
@@ -9,10 +9,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (appContainerObj) {
+        var ImageManager = function (appContainerObj) {
 
-            var _appContainerObj,
-                _that = this;
+
+            var _REMOTE_SOURCE_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/imgviewer/",
+                _appContainerObj,
+                _imagesDataArray;
 
             // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -26,29 +28,49 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         if (obj !== null && typeof obj === "object") {
                             _appContainerObj = obj;
                         } else {
-                            throw new Error("Popups 'appContainerObj' property must be an object");
+                            throw new Error("ImageManagers 'appContainerObj' property must be an object");
+                        }
+                    }
+                },
+
+                "imagesDataArray": {
+                    get: function () {
+                        return _imagesDataArray || "";
+                    },
+
+                    set: function (array) {
+                        if (array !== null && array instanceof Array) {
+
+                            // Only allow to be set once.
+                            if (_imagesDataArray) {
+                                throw new Error("ImageManagers 'imagesDataArray' can only be set once.");
+                            }
+
+                            _imagesDataArray = array;
+
+                        } else {
+                            throw new Error("ImageManagers 'imagesDataArray' property must be an array");
                         }
                     }
                 }
-
             });
 
             // Init values
             this.appContainerObj = appContainerObj;
 
-            // Private init function
-            (function () {
-
+            // Main app method
+            this.run = function(){
+                var that = this;
                 // Fetch remote data and fill imagesDataArray, done in private.
-                _that.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_SOURCE_URL, function (httpRequest) {
+                this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_SOURCE_URL, function (httpRequest) {
 
-                    _that.handleAjaxResponse(httpRequest);
+                    that.handleAjaxResponse(httpRequest);
                 });
-            }());
+            };
         };
 
-        Constructor.prototype = {
-            constructor: Constructor,
+        ImageManager.prototype = {
+            constructor: ImageManager,
 
             handleAjaxResponse: function (httpRequest) {
 
@@ -108,8 +130,45 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     this.appContainerObj.contentElement.appendChild(containerElement);
                 }
 
-//                this.appContainerObj.contentElement.innerHTML = this.imagesDataArray[0].URL;
+                this.addThumbnailEvents();
 
+            },
+
+            addThumbnailEvents: function () {
+                var i,
+                    thumbnails;
+
+                thumbnails = this.appContainerObj.contentElement.querySelectorAll(".thumbnail");
+
+                // Loop through all thumbnails
+                for (i = 0; i < thumbnails.length; i++) {
+
+                    this.addThumbnailEvent(thumbnails[i], i);
+                }
+
+            },
+
+            addThumbnailEvent: function (thumbnail, index) {
+                var that = this;
+
+                // Add click event to thumbnail element
+                thumbnail.addEventListener("click", function () {
+
+                    // Popup a window
+                    that.appContainerObj.desktopObj.startApp(
+                        {
+                            name: "Image Manager (Popup)",
+                            cssClass: "image-manager",
+                            icon: "img/icon/image_manager.svg",
+                            width: that.imagesDataArray[index].width + 40,
+                            height: that.imagesDataArray[index].height + 70,
+                            isResizable: false,
+                            hasStatusBar: true,
+                            statusBarText: that.imagesDataArray[index].URL
+                        },
+                        '<img src="' + that.imagesDataArray[index].URL + '">'
+                    );
+                });
             },
 
             getMaxThumbnailSize: function () {
@@ -130,7 +189,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
         };
 
 
-        return Constructor;
+        return ImageManager;
 
     }());
 

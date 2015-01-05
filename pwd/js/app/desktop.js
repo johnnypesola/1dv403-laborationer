@@ -8,7 +8,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
 
     return (function () {
 
-        var Constructor = function (contentElement) {
+        var Desktop = function (contentElement) {
 
             var _availableApps = [
                 {
@@ -23,6 +23,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 },
                 {
                     name: "RSS Reader",
+                    exec: "app/rssreader",
                     icon: "img/icon/rss.svg",
                     cssClass: "rss-reader",
                     width: 200,
@@ -31,13 +32,14 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     hasStatusBar: false
                 },
                 {
-                    name: "Memory",
-                    icon: "img/icon/memory.svg",
+                    name: "In Memory Of Amiga Games",
+                    exec: "app/memoryboard",
                     cssClass: "memory",
-                    width: 400,
-                    height: 700,
-                    isResizable: false,
-                    hasStatusBar: false
+                    icon: "img/icon/memory.svg",
+                    width: 700,
+                    height: 640,
+                    isResizable: true,
+                    hasStatusBar: true
                 },
                 {
                     name: "Image Manager",
@@ -167,8 +169,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             this.addDropEventListener();
         };
 
-        Constructor.prototype = {
-            constructor: Constructor,
+        Desktop.prototype = {
+            constructor: Desktop,
 
             startApp: function (appInfoObj, content) {
 
@@ -264,15 +266,6 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 }
             },
 
-            moveApp: function (targetAppObj, x, y) {
-
-                // Focus targetApp, bring it o front.
-                this.focusApp(targetAppObj);
-
-                // Move appContainer to new location
-                targetAppObj.moveTo(x, y);
-            },
-
             closeApp: function (targetAppObj) {
                 var i;
 
@@ -344,7 +337,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             }
         };
 
-        return Constructor;
+        return Desktop;
 
     }());
 });

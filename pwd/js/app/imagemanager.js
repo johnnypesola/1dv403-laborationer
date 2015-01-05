@@ -9,15 +9,14 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (appContainerObj) {
+        var ImageManager = function (appContainerObj) {
 
 
             var _REMOTE_SOURCE_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/imgviewer/",
                 _appContainerObj,
-                _imagesDataArray,
-                _that = this;
+                _imagesDataArray;
 
-            // Properties with Getters and Setters
+        // Properties with Getters and Setters
             Object.defineProperties(this, {
 
                 "appContainerObj": {
@@ -56,22 +55,22 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 }
             });
 
-            // Init values
+        // Init values
             this.appContainerObj = appContainerObj;
 
-            // Private init function
-            (function () {
-
+        // Main app method
+            this.run = function(){
+                var that = this;
                 // Fetch remote data and fill imagesDataArray, done in private.
-                _that.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_SOURCE_URL, function (httpRequest) {
+                this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_SOURCE_URL, function (httpRequest) {
 
-                    _that.handleAjaxResponse(httpRequest);
+                    that.handleAjaxResponse(httpRequest);
                 });
-            }());
+            };
         };
 
-        Constructor.prototype = {
-            constructor: Constructor,
+        ImageManager.prototype = {
+            constructor: ImageManager,
 
             handleAjaxResponse: function (httpRequest) {
 
@@ -190,7 +189,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
         };
 
 
-        return Constructor;
+        return ImageManager;
 
     }());
 

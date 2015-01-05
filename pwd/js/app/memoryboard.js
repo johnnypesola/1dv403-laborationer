@@ -5,10 +5,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-    /* Constructor function */
-        function MemoryBoard(rows, columns, parentContainerId){
+        var MemoryBoard = function (appContainerObj) {
 
-            var _parentContainer,
+            var _appContainerObj,
                 _rows,
                 _columns,
                 _userGuessCount,
@@ -22,24 +21,25 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
-                "parentContainer": {
-                    get: function(){ return this._parentContainer || ""; },
+                "appContainerObj": {
+                    get: function () {
+                        return _appContainerObj || "";
+                    },
 
-                    set: function(element){
-                        if(element !== null && typeof(element.nodeName) !== "undefined"){
-                            this._parentContainer = element;
-                        }
-                        else{
-                            throw new Error("ERROR: MemoryBoard:s parent container must be an element");
+                    set: function (obj) {
+                        if (obj !== null && typeof obj === "object") {
+                            _appContainerObj = obj;
+                        } else {
+                            throw new Error("ImageManagers 'appContainerObj' property must be an object");
                         }
                     }
                 },
                 "userGuessCount": {
-                    get: function(){ return _userGuessCount },
+                    get: function () { return _userGuessCount; },
 
-                    set: function(value){
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value == parsedValue)){
+                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value == parsedValue)) {
                             throw new Error("ERROR: userGuessCount property must be an integer and at least 0");
                         }
 
@@ -47,11 +47,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 },
                 "rows": {
-                    get: function(){ return _rows },
+                    get: function () { return _rows; },
 
-                    set: function(value){
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)){
+                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)){
                             throw new Error("ERROR: rows property must be an integer and at least 1");
                         }
 
@@ -59,11 +59,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 },
                 "columns": {
-                    get: function(){ return _columns },
+                    get: function () { return _columns; },
 
-                    set: function(value){
+                    set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if(!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)){
+                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)){
                             throw new Error("ERROR: columns property must be an integer and at least 1");
                         }
 
@@ -71,12 +71,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 },
                 "cardsOpenNum": {
-                    get: function(){
+                    get: function () {
                         var count;
 
                         count = 0;
 
-                        this._cardObjArray.forEach(function(card){
+                        this._cardObjArray.forEach(function (card) {
                             count += (card.isCardOpen ? 1 : 0);
                         });
 
@@ -84,12 +84,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 },
                 "cardsMatchedNum": {
-                    get: function(){
+                    get: function () {
                         var count;
 
                         count = 0;
 
-                        this._cardObjArray.forEach(function(card){
+                        this._cardObjArray.forEach(function (card) {
                             count += (card.isMatchFound ? 1 : 0);
                         });
 
@@ -97,9 +97,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 },
                 "cardsLocked": {
-                    get: function(){ return _cardsLocked },
-                    set: function(value){
-                        if(typeof value !== "boolean" ){
+                    get: function () {return _cardsLocked; },
+                    set: function (value) {
+                        if (typeof value !== "boolean" ) {
                             throw new Error("ERROR: cardsLocked property must be a boolean type.");
                         }
 
@@ -118,14 +118,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
             });
 
         // Assign constructors default values to properties
-            this.parentContainer = document.getElementById(parentContainerId);
-            this.rows = rows || 2;
-            this.columns = columns || 2;
+            this.appContainerObj = appContainerObj;
+            this.rows = 2;
+            this.columns = 3;
             this.userGuessCount = 0;
             this.cardsLocked = false;
 
         // Main app method
             this.run = function(){
+
+                // Clear container content
+                this.appContainerObj.clearContent();
 
                 // Check that there is an even number of total cards.
                 if(this.rows * this.columns % 2 !== 0){
@@ -133,18 +136,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 }
 
                 // Generate array to fill with cards
-                _cardTemplateArray = this.getPictureArray(rows, columns);
+                this._cardTemplateArray = this.getPictureArray(this.rows, this.columns);
 
                 // Create cards from template array
-                this.createCards(_cardTemplateArray);
+                this.createCards(this._cardTemplateArray);
 
-                // Throw error if sum of rows and columns exceed total card type count
-                if(this._cardObjArray[0].titleArray.length * 2 < _cardTemplateArray.length){
-                    throw new Error("ERROR: Current total card limit is " + this._cardObjArray[0].titleArray.length * 2 + " due to number of cardtypes available, the sum of rows * colums is " + _cardTemplateArray.length);
-                }
-
-                // Render cards to html
-                this.renderCards();
             };
         }
 
@@ -200,12 +196,26 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
             createCards: function(templateArray){
 
-                var i;
+                var i,
+                    that = this;
+
+                // Require Memorycard object.
+                require(["app/memorycard"], function (MemoryCard) {
 
                 // Generate card for each entry in templateArray
-                for(i = 0; i < templateArray.length; i++){
-                    this._cardObjArray.push(new MemoryCard(templateArray[i]))
-                }
+                    for(i = 0; i < templateArray.length; i++){
+                        that._cardObjArray.push(new MemoryCard(templateArray[i]))
+                    }
+
+                    // Throw error if sum of rows and columns exceed total card type count
+                    if (that._cardObjArray[0].titleArray.length * 2 < that._cardTemplateArray.length) {
+                        throw new Error("ERROR: Current total card limit is " + that._cardObjArray[0].titleArray.length * 2 + " due to number of cardtypes available, the sum of rows * colums is " + _cardTemplateArray.length);
+                    }
+
+                    // Render cards to html
+                    that.renderCards();
+
+                });
             },
 
             renderCard: function(cardId){
@@ -260,7 +270,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
 
                 // Append to parent container
-                    this.parentContainer.appendChild(cardContainer);
+                    this.appContainerObj.contentElement.appendChild(cardContainer);
             },
 
             renderCards: function(){
@@ -298,7 +308,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                         // Is game finished?
                         if(this.isGameFinished()){
-                            alert("Game finished in " + this.userGuessCount + " attempts.");
+                            this.appContainerObj.statusBarText = "Well done! Game finished in " + this.userGuessCount + " attempts.";
                         }
                     }
                 }
@@ -367,7 +377,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.closeCardObjecs();
 
                 // Get all open card elements.
-                cardElements = this.parentContainer.querySelectorAll(".card-container");
+                cardElements = this.appContainerObj.contentElement.querySelectorAll(".card-container");
 
                 // Loop through cards and remove card-open class, make them flip back.
                 for(i = 0; i < cardElements.length; ++i){
@@ -414,7 +424,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 var cardTitleElements,
                     i;
 
-                cardTitleElements = this.parentContainer.querySelectorAll("span");
+                cardTitleElements = this.appContainerObj.contentElement.querySelectorAll("span");
 
                 // Loop through all card titles and remove text and background image
                 for(i = 0; i < cardTitleElements.length; ++i){
@@ -449,8 +459,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             }
         };
 
-
-        return Constructor;
+        return MemoryBoard;
 
     }());
 

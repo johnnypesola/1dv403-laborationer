@@ -8,7 +8,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
+        var AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
 
             var _desktopObj,
                 _appName,
@@ -157,7 +157,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         var parsedValue = parseFloat(value),
                             actualHeight;
 
-                        if (parsedValue.isInt() && parsedValue >= 0) {
+                        if (parsedValue.isInt()) {
 
                             // Try to get calculated css width
                             if (_y) {
@@ -326,7 +326,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             _statusBarElement = element;
 
                             // Hide status bar element if necessary
-                            if (!this.hasStatusBar){
+                            if (!this.hasStatusBar) {
                                 this.statusBarElement.classList.add("hidden");
                             }
                         } else {
@@ -347,7 +347,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                                 // Set text on statusbar.
                                 if (this.isRendered) {
-                                    this.statusBarElement.innerText(value);
+                                    this.statusBarElement.innerText = value;
                                 }
                             }
                         } else {
@@ -388,7 +388,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 },
                 "isBeingResized": {
-                    get: function () { return _isBeingDragged; },
+                    get: function () { return _isBeingResized; },
                     set: function (value) {
                         if (typeof value !== "boolean") {
                             throw new Error("AppContainers 'isBeingResized' property must be a boolean type.");
@@ -459,8 +459,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.statusBarText = statusBarText || "";
         };
 
-        Constructor.prototype = {
-            constructor: Constructor,
+        AppContainer.prototype = {
+            constructor: AppContainer,
 
             // Render app
             render: function (content) {
@@ -513,14 +513,16 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.statusBarElement = this.containerElement.querySelector('div.status');
             },
 
-            runApp: function() {
+            runApp: function () {
                 var that = this;
 
                 // Execute app.
                 if (this.exec !== "") {
-                    require([this.exec], function (appToRun) {
+                    require([this.exec], function (AppToRun) {
 
-                        that.runningApp = new appToRun(that);
+                        that.runningApp = new AppToRun(that);
+
+                        that.runningApp.run();
 
                     });
                 }
@@ -538,7 +540,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.addMinifyAppEvent();
 
                 // Focus whole app on mousedown
-                this.containerElement.addEventListener('mousedown', function (e) {
+                this.containerElement.addEventListener('mousedown', function () {
                     that.desktopObj.focusApp(that);
                 });
             },
@@ -552,7 +554,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 });
 
-                this.closeButton.addEventListener('click', function (e) {
+                this.closeButton.addEventListener('click', function () {
 
                     // Remove from DOM
                     that.containerElement.parentNode.removeChild(that.containerElement);
@@ -574,7 +576,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 var that = this,
                     offset;
 
-                function moveFunction (e) {
+                function moveFunction(e) {
                     that.moveTo(e.pageX - offset.x, e.pageY - offset.y);
                 }
 
@@ -590,7 +592,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 });
 
-                this.desktopObj.contentElement.addEventListener('mouseup', function (e) {
+                this.desktopObj.contentElement.addEventListener('mouseup', function () {
                     that.desktopObj.contentElement.removeEventListener('mousemove', moveFunction);
 
                     that.isBeingDragged = false;
@@ -612,7 +614,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     offset;
 
                 // Declare function to bind to mousemove eventhandlers
-                function resizeFunction (e) {
+                function resizeFunction(e) {
                     that.resizeTo(e.pageX - offset.x, e.pageY - offset.y);
                 }
 
@@ -631,7 +633,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         that.isBeingResized = true;
                     });
 
-                    this.desktopObj.contentElement.addEventListener('mouseup', function (e) {
+                    this.desktopObj.contentElement.addEventListener('mouseup', function () {
+
                         that.desktopObj.contentElement.removeEventListener('mousemove', resizeFunction);
 
                         that.isBeingResized = false;
@@ -664,7 +667,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             }
         };
 
-        return Constructor;
+        return AppContainer;
 
     }());
 });
