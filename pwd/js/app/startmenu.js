@@ -2,6 +2,8 @@
  * Created by Johnny on 2015-01-03.
  */
 
+"use strict";
+
 define(["mustache", "app/desktop", "app/extensions"], function(Mustache, AppContainer) {
 
     return (function () {
@@ -20,7 +22,7 @@ define(["mustache", "app/desktop", "app/extensions"], function(Mustache, AppCont
                         if (obj !== null && typeof obj === "object") {
                             _desktopObj = obj;
                         } else {
-                            throw new Error("Startmenus 'desktopObj' property must be an object");
+                            throw new Error("StartMenus 'desktopObj' property must be an object");
                         }
                     }
                 },
@@ -31,7 +33,7 @@ define(["mustache", "app/desktop", "app/extensions"], function(Mustache, AppCont
                         if (element !== null && element.nodeName !== "undefined") {
                             _contentElement = element;
                         } else {
-                            throw new Error("Startmenus 'contentElement' property must be an element");
+                            throw new Error("StartMenus 'contentElement' property must be an element");
                         }
                     }
                 }
@@ -47,34 +49,34 @@ define(["mustache", "app/desktop", "app/extensions"], function(Mustache, AppCont
             // Render app
             render: function (content) {
 
-                var that = this;
+                var that = this,
+                    i,
+                    img;
 
                 // Create container
                 this.containerElement = document.createElement("div");
-                this.containerElement.classList.add("window");
+                this.containerElement.setAttribute("id", "startmenu");
 
-                // Fetch template
-                require(["text!tpl/appcontainer.html"], function (template) {
+                // Add available apps to startmenu
+                for(i = 0; i < this.desktopObj.availableApps.length; i++) {
 
-                    // Render data in template
-                    that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content});
+                    // Create image element
+                    img = document.createElement("img");
+                    img.setAttribute("src", this.desktopObj.availableApps[i].icon);
 
-                    // Fetch references.
-                    that.closeButton = that.containerElement.querySelector('a.close');
-                    that.minifyButton = that.containerElement.querySelector('a.minify');
-                    that.headerElement = that.containerElement.querySelector('div.header');
-                    that.contentElement = that.containerElement.querySelector('div.content');
-                    that.resizeElement = that.containerElement.querySelector('img.resize');
+                    // Add event for image element
+                    this.addStartAppEvent(img, this.desktopObj.availableApps[i]);
 
-                    // Set size
-                    that.resizeTo(that.width, that.height);
+                    // Add image to menu
+                    this.containerElement.appendChild(img);
+                }
 
-                    // Append appContainer to desktop
-                    that.desktopObj.contentElement.appendChild(that.containerElement);
+                // Add startmenu element to desktop
+                this.desktopObj.contentElement.appendChild(this.containerElement);
 
-                    // Add events
-                    that.addEvents();
-                });
+                // Add events
+//                this.addEvents();
+
             },
 
             addEvents: function () {
@@ -91,6 +93,14 @@ define(["mustache", "app/desktop", "app/extensions"], function(Mustache, AppCont
                 // Focus whole app on mousedown
                 this.containerElement.addEventListener('mousedown', function (e) {
                     that.desktopObj.focusApp(that);
+                });
+            },
+
+            addStartAppEvent: function (element, appInfoObj) {
+                var that = this;
+
+                element.addEventListener("click", function (e) {
+                    that.desktopObj.startApp(appInfoObj);
                 });
             }
         };

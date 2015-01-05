@@ -8,7 +8,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, appName, UID, icon, x, y, width, height, zIndex, isResizeable) {
+        var Constructor = function (desktopObj, appName, UID, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
 
             var _desktopObj,
                 _appName,
@@ -27,9 +27,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _headerElement,
                 _headerTextElement,
                 _contentElement,
+                _statusBarElement,
+                _statusBarText,
                 _isBeingDragged = false,
                 _isBeingResized = false,
-                _isResizeable;
+                _isResizable,
+                _hasStatusBar;
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -284,6 +287,43 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
+                "statusBarElement": {
+                    get: function () { return _statusBarElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _statusBarElement = element;
+
+                            // Hide status bar element if necessary
+                            if (!this.hasStatusBar){
+                                this.statusBarElement.classList.add("hidden");
+                            }
+                        } else {
+                            throw new Error("AppContainers 'statusBarElement' property must be an element");
+                        }
+                    }
+                },
+                "statusBarText": {
+                    get: function () { return _statusBarText || ""; },
+
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+
+                            // Check if this App even has a status bar.
+                            if (this.hasStatusBar) {
+                                // Set internal textvalue
+                                _statusBarText = value;
+
+                                // Set text on statusbar.
+                                if (this.isRendered) {
+                                    this.statusBarElement.innerText(value);
+                                }
+                            }
+                        } else {
+                            throw new Error("AppContainers 'statusBarText' property must be a string.");
+                        }
+                    }
+                },
                 "runningApp": {
                     get: function () { return _runningApp || ""; },
 
@@ -337,15 +377,26 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                     }
                 },
-                "isResizeable": {
-                    get: function () { return _isResizeable; },
+                "isResizable": {
+                    get: function () { return _isResizable; },
                     set: function (value) {
                         if (typeof value !== "boolean") {
-                            throw new Error("AppContainers 'isResizeable' property must be a boolean type.");
+                            throw new Error("AppContainers 'isResizable' property must be a boolean type.");
                         }
 
                         // Set value
-                        _isResizeable = value;
+                        _isResizable = value;
+                    }
+                },
+                "hasStatusBar": {
+                    get: function () { return _hasStatusBar; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("AppContainers 'hasStatusBar' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _hasStatusBar = value;
                     }
                 },
                 "isRendered": {
@@ -354,6 +405,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     }
                 }
             });
+
+            console.log(isResizable);
 
         // Init values
             this.desktopObj = desktopObj;
@@ -365,8 +418,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.width = width || 320;
             this.height = height || 240;
             this.zIndex = zIndex || 1;
-            this.isResizeable = (typeof isResizeable === "boolean" ? isResizeable : true);
-
+            this.isResizable = (typeof isResizable === "boolean" ? isResizable : true);
+            this.hasStatusBar = (typeof hasStatusBar === "boolean" ? hasStatusBar : false);
+            this.statusBarText = statusBarText || "";
         };
 
         Constructor.prototype = {
@@ -385,7 +439,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 require(["text!tpl/appcontainer.html"], function (template) {
 
                     // Render data in template
-                    that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content, icon: that.icon});
+                    that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content, icon: that.icon, status: that.statusBarText});
 
                     // Fetch references.
                     that.closeButton = that.containerElement.querySelector('a.close');
@@ -394,8 +448,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     that.headerTextElement = that.containerElement.querySelector('div.header h2');
                     that.contentElement = that.containerElement.querySelector('div.content');
                     that.resizeElement = that.containerElement.querySelector('img.resize');
-
-                    console.log(that.headerTextElement);
+                    that.statusBarElement = that.containerElement.querySelector('div.status');
 
                     // Set size
                     that.resizeTo(that.width, that.height);
@@ -502,7 +555,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 }
 
                 // Only make resizable if exists in config
-                if (this.isResizeable) {
+                if (this.isResizable) {
 
                     this.resizeElement.addEventListener('mousedown', function (e) {
 

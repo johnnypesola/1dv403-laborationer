@@ -19,7 +19,7 @@
 
         PWD.Desktop = PWD.Desktop || new Desktop(document.getElementById("desktop"));
 
-        PWD.Desktop.startApp(PWD.Desktop.availableApps[0]);
+
 
         document.addEventListener("keydown", function (e) {
             if (e.keyCode === 13) {

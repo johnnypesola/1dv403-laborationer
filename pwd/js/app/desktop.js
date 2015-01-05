@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, AppContainer) {
+define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], function(Mustache, AppContainer, StartMenu) {
 
     return (function () {
 
@@ -16,28 +16,33 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                     icon: "img/icon/labby_mezzage.svg",
                     width: 200,
                     height: 200,
-                    resizable: true
+                    isResizable: true,
+                    hasStatusBar: true,
+                    statusBarText: "Welcome to Labby Mezzage"
                 },
                 {
                     name: "RSS Reader",
                     icon: "img/icon/rss.svg",
                     width: 200,
                     height: 200,
-                    resizable: true
+                    isResizable: true,
+                    hasStatusBar: false
                 },
                 {
                     name: "Memory",
                     icon: "img/icon/memory.svg",
                     width: 200,
                     height: 200,
-                    resizable: true
+                    isResizable: false,
+                    hasStatusBar: false
                 },
                 {
                     name: "Image Manager",
                     icon: "img/icon/image_manager.svg",
                     width: 200,
                     height: 200,
-                    resizable: true
+                    isResizable: true,
+                    hasStatusBar: true
                 }
             ],
                 _runningApps = [],
@@ -146,8 +151,9 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
             this.startMenu = {};
             this.contentElement = contentElement || document.body;
 
-            this.addDropEventListener();
 
+            this.addStartmenu();
+            this.addDropEventListener();
         };
 
         Constructor.prototype = {
@@ -176,16 +182,30 @@ define(["mustache", "app/appcontainer", "app/extensions"], function(Mustache, Ap
                     (appInfoObj.width || 200),
                     (appInfoObj.height || 200),
                     zIndex,
-                    (appInfoObj.isResizeable || true)
+                    (typeof appInfoObj.isResizable === "boolean" ? appInfoObj.isResizable : true),
+                    (typeof appInfoObj.hasStatusBar === "boolean" ? appInfoObj.hasStatusBar : false),
+                    appInfoObj.statusBarText
                 );
+
+                console.log(appInfoObj.isResizable);
 
                 newApp.render("This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. This is the content for now. Yeah it is. ");
 
-                // Add new appa to array with running apps
+                // Add new app to array with running apps
                 this.runningApps.push(newApp);
 
                 // Set new lastAppStartPos
                 this.lastAppStartPos = appStartPos;
+
+                // Focus this new app.
+                this.focusApp(newApp);
+            },
+
+            addStartmenu: function() {
+
+                this.startMenu = new StartMenu(this);
+
+                this.startMenu.render();
             },
 
             getNextAppStartPos: function (width, height) {
