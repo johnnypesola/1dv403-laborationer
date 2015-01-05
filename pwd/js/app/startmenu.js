@@ -58,17 +58,21 @@ define(["app/extensions"], function () {
                 this.containerElement.setAttribute("id", "startmenu");
 
                 // Add available apps to startmenu
-                for(i = 0; i < this.desktopObj.availableApps.length; i++) {
+                for (i = 0; i < this.desktopObj.availableApps.length; i++) {
 
-                    // Create image element
-                    img = document.createElement("img");
-                    img.setAttribute("src", this.desktopObj.availableApps[i].icon);
+                    // Add icon for only visible apps
+                    if (!this.desktopObj.availableApps[i].ishiddenFromStartMenu) {
 
-                    // Add event for image element
-                    this.addStartAppEvent(img, this.desktopObj.availableApps[i]);
+                        // Create image element
+                        img = document.createElement("img");
+                        img.setAttribute("src", this.desktopObj.availableApps[i].icon);
 
-                    // Add image to menu
-                    this.containerElement.appendChild(img);
+                        // Add event for image element
+                        this.addStartAppEvent(img, this.desktopObj.availableApps[i]);
+
+                        // Add image to menu
+                        this.containerElement.appendChild(img);
+                    }
                 }
 
                 // Add startmenu element to desktop
@@ -77,23 +81,6 @@ define(["app/extensions"], function () {
                 // Add events
 //                this.addEvents();
 
-            },
-
-            addEvents: function () {
-                var that = this;
-
-                this.addDragAppEvent();
-
-                this.addCloseAppEvent();
-
-                this.addResizeAppEvent();
-
-                this.addMinifyAppEvent();
-
-                // Focus whole app on mousedown
-                this.containerElement.addEventListener('mousedown', function (e) {
-                    that.desktopObj.focusApp(that);
-                });
             },
 
             addStartAppEvent: function (element, appInfoObj) {

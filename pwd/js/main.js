@@ -5,8 +5,9 @@
         baseUrl: 'js/lib',
         paths: {
             app: '../app',
-            tpl: '../tpl'            
-        }
+            tpl: '../tpl'
+        },
+        urlArgs: "preventCaching=" + (new Date()).getTime()
     });
 
 

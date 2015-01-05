@@ -170,7 +170,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
         Constructor.prototype = {
             constructor: Constructor,
 
-            startApp: function (appInfoObj) {
+            startApp: function (appInfoObj, content) {
 
                 var appStartPos,
                     zIndex,
@@ -188,6 +188,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     appInfoObj.name,
                     this.generateUID(),
                     appInfoObj.exec,
+                    appInfoObj.cssClass,
                     appInfoObj.icon,
                     appStartPos.x,
                     appStartPos.y,
@@ -199,7 +200,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     appInfoObj.statusBarText
                 );
 
-                newApp.render(this.APP_LOADER_IMG);
+                // Render app for user
+                newApp.render(content || this.APP_LOADER_IMG);
 
                 // Add new app to array with running apps
                 this.runningApps.push(newApp);
@@ -278,6 +280,9 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 for (i = 0; i < this.runningApps.length; i++) {
                     if (this.runningApps[i].UID === targetAppObj.UID) {
                         this.runningApps.splice(i, 1);
+
+                        console.log("closed " + targetAppObj.UID);
+
                         break;
                     }
                 }

@@ -8,12 +8,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Constructor = function (desktopObj, appName, UID, exec, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
+        var Constructor = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
 
             var _desktopObj,
                 _appName,
                 _UID,
                 _icon,
+                _cssClass,
                 _exec,
                 _x,
                 _y,
@@ -81,6 +82,24 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             _exec = value;
                         } else {
                             throw new Error("AppContainers 'exec' property must be a string.");
+                        }
+                    }
+                },
+                "cssClass": {
+                    get: function () { return _cssClass || ""; },
+
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+
+                            _cssClass = value;
+
+                            // Set contentElement class.
+                            if (this.isRendered) {
+                                this.contentElement.classList.add(value);
+                            }
+
+                        } else {
+                            throw new Error("AppContainers 'cssClass' property must be a string.");
                         }
                     }
                 },
@@ -415,16 +434,20 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () {
                         return this.containerElement !== "";
                     }
+                },
+                "isRunnable": {
+                    get: function () {
+                        return this.exec !== "";
+                    }
                 }
             });
-
-            console.log(isResizable);
 
         // Init values
             this.desktopObj = desktopObj;
             this.appName = appName || "";
             this.UID = UID || desktopObj.generateUID();
             this.exec = exec || "";
+            this.cssClass = cssClass || "";
             this.icon = icon || "";
             this.x = x || 100;
             this.y = y || 100;
@@ -454,20 +477,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     // Render data in template
                     that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content, icon: that.icon, status: that.statusBarText});
 
-                    // Fetch references.
-                    that.closeButton = that.containerElement.querySelector('a.close');
-                    that.minifyButton = that.containerElement.querySelector('a.minify');
-                    that.headerElement = that.containerElement.querySelector('div.header');
-                    that.headerTextElement = that.containerElement.querySelector('div.header h2');
-                    that.contentElement = that.containerElement.querySelector('div.content');
-                    that.resizeElement = that.containerElement.querySelector('img.resize');
-                    that.statusBarElement = that.containerElement.querySelector('div.status');
+                    // Get references from containerElement object
+                    that.getContainerElementReferences();
 
                     // Set size
                     that.resizeTo(that.width, that.height);
 
                     // Set icon, (will actually render the icon to app header)
                     that.icon = that.icon;
+
+                    // Set css class, (will actually set class on contentElement)
+                    that.cssClass = that.cssClass;
 
                     // Append appContainer to desktop
                     that.desktopObj.contentElement.appendChild(that.containerElement);
@@ -476,8 +496,21 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     that.addEvents();
 
                     // App is rendered, run it.
-                    that.runApp();
+                    if (that.isRunnable) {
+                        that.runApp();
+                    }
                 });
+            },
+
+            getContainerElementReferences: function () {
+                // Fetch references.
+                this.closeButton = this.containerElement.querySelector('a.close');
+                this.minifyButton = this.containerElement.querySelector('a.minify');
+                this.headerElement = this.containerElement.querySelector('div.header');
+                this.headerTextElement = this.containerElement.querySelector('div.header h2');
+                this.contentElement = this.containerElement.querySelector('div.content');
+                this.resizeElement = this.containerElement.querySelector('img.resize');
+                this.statusBarElement = this.containerElement.querySelector('div.status');
             },
 
             runApp: function() {

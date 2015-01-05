@@ -124,6 +124,12 @@ div#startmenu {
 
 img.ajax-loader {
 	margin: 10px;
+
+	-webkit-animation: fadein 5s;
+	-moz-animation: fadein 5s;
+	-ms-animation: fadein 5s;
+	-o-animation: fadein 5s;
+	animation: fadein 5s;
 }
 
 div#desktop {
@@ -240,7 +246,7 @@ div.window:before {
 		height: 20px;
 		margin: 0 24px 0 7px;
 
-		color: #888888;
+		color: #666666;
 
 		font-size: 13px;
 		text-align: left;
@@ -352,6 +358,44 @@ button {
 		cursor: se-resize !important;
 	}
 
+/* Application specific*/
+
+	/* Image Manager */
+	.image-manager {
+
+	}
+
+		.image-manager .thumbnail {
+			float: left;
+			background: #EEEEEE;
+			text-align: center;
+			margin: 15px;
+			padding: 0px;
+
+			border-radius: 3px;
+
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: flex;
+
+			justify-content: center; /* align horizontal */
+			align-items: center; /* align vertical */
+
+			box-shadow: 1px 1px 1px 0px rgba(50, 50, 50, 0.3);
+		}
+
+		.image-manager .thumbnail:hover {
+			transform: scale(1.05);
+		}
+
+			.image-manager .thumbnail img {
+				border-radius: inherit;
+				cursor: pointer;
+			}
+
+
 /* Animations */
 
 /* Spin */
@@ -383,7 +427,7 @@ button {
     @-moz-keyframes glow {
 		from { background-color: rgba(255,255,255,0); box-shadow: 0 0 0px rgba(255,255,255,0); }
 		to { background-color: rgba(255,255,255,1); box-shadow: 0 0 18px rgba(255,255,255,1); }
-        
+
     }
     @-webkit-keyframes glow {
 		from { background-color: rgba(255,255,255,0); -webkit-box-shadow: 0 0 0px rgba(255,255,255,0); }
@@ -393,3 +437,29 @@ button {
 		from { background-color: rgba(255,255,255,0); box-shadow: 0 0 0px rgba(255,255,255,0); }
 		to { background-color: rgba(255,255,255,1); box-shadow:  0 0 18px rgba(255,255,255,1); }
     }
+
+/* Fade In */
+
+	/* Firefox < 16 */
+	@-moz-keyframes fadein {
+		from { opacity: 0; }
+		to   { opacity: 1; }
+	}
+
+	/* Safari, Chrome and Opera > 12.1 */
+	@-webkit-keyframes fadein {
+		from { opacity: 0; }
+		to   { opacity: 1; }
+	}
+
+	/* Internet Explorer */
+	@-ms-keyframes fadein {
+		from { opacity: 0; }
+		to   { opacity: 1; }
+	}
+
+	/* Opera < 12.1 */
+	@-o-keyframes fadein {
+		from { opacity: 0; }
+		to   { opacity: 1; }
+	}
