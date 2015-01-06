@@ -67,14 +67,36 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
             // Main app method
             this.run = function () {
-                var that = this;
+                var that = this,
+                    contextMenuInfoObj,
+                    contextMenuElementObj;
+
+
+                // Define settings for contextMenu
+                contextMenuInfoObj = {
+                    "Inställningar": ["Inställning 1", "Inställning 2", "Inställning 3"],
+                    "Fler inställningar": ["Inställning 4", "Inställning 5", "Inställning 6"]
+                };
+
+                contextMenuInfoObj = {
+                    "Inställningar": {
+                        "Inställning 1": function () {console.log(1); },
+                        "Inställning 2": function () {console.log(2); },
+                        "Inställning 3": function () {console.log(3); }
+                    },
+                    "Fler inställningar": {
+                        "Inställning 4": function () {console.log(4); },
+                        "Inställning 5": function () {console.log(5); },
+                        "Inställning 6": function () {console.log(6); }
+                    }
+                };
+
+                // Add contextMenu and return element references.
+                contextMenuElementObj = this.appContainerObj.contextMenuObj.addMenuContent(contextMenuInfoObj);
 
                 // Fetch remote data and fill imagesDataArray, done in private.
                 this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_PROXY_URL + this.rssFeedSourceURL, function (httpRequest) {
-
-
                     that.handleAjaxResponse(httpRequest);
-
                 });
 
             };

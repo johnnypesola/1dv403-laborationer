@@ -8,7 +8,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasStatusBar, statusBarText) {
+        var AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasContextMenu, hasStatusBar, statusBarText) {
 
             var _desktopObj,
                 _appName,
@@ -25,7 +25,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _closeButton,
                 _resizeElement,
                 _containerElement,
-                _runningApp,
+                _runningAppObj,
+                _contextMenuObj,
                 _headerElement,
                 _headerTextElement,
                 _contentElement,
@@ -33,6 +34,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _statusBarText,
                 _isBeingDragged = false,
                 _isBeingResized = false,
+                _hasContextMenu,
                 _isResizable,
                 _hasStatusBar;
 
@@ -355,14 +357,38 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
-                "runningApp": {
-                    get: function () { return _runningApp || ""; },
+                "runningAppObj": {
+                    get: function () { return _runningAppObj || ""; },
 
                     set: function (obj) {
                         if (obj !== null && typeof obj === "object") {
-                            _runningApp = obj;
+
+                            // Only allow to be set once
+                            if (_runningAppObj) {
+                                throw new Error("AppContainers 'runningAppObj' can only be set once");
+                            }
+                            _runningAppObj = obj;
+
                         } else {
-                            throw new Error("AppContainers 'runningApp' property must be an object");
+                            throw new Error("AppContainers 'runningAppObj' property must be an object");
+                        }
+                    }
+                },
+                "contextMenuObj": {
+                    get: function () { return _contextMenuObj || ""; },
+
+                    set: function (obj) {
+                        if (obj !== null && typeof obj === "object") {
+
+                            // Only allow to be set once
+                            if (_contextMenuObj) {
+                                throw new Error("AppContainers 'contextMenuObj' can only be set once");
+                            }
+
+                            _contextMenuObj = obj;
+
+                        } else {
+                            throw new Error("AppContainers 'contextMenuObj' property must be an object");
                         }
                     }
                 },
@@ -419,6 +445,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         _isResizable = value;
                     }
                 },
+                "hasContextMenu": {
+                    get: function () { return _hasContextMenu; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("AppContainers 'hasContextMenu' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _hasContextMenu = value;
+                    }
+                },
                 "hasStatusBar": {
                     get: function () { return _hasStatusBar; },
                     set: function (value) {
@@ -455,6 +492,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.height = height || 240;
             this.zIndex = zIndex || 1;
             this.isResizable = (typeof isResizable === "boolean" ? isResizable : true);
+            this.hasContextMenu = (typeof hasContextMenu === "boolean" ? hasContextMenu : true);
             this.hasStatusBar = (typeof hasStatusBar === "boolean" ? hasStatusBar : false);
             this.statusBarText = statusBarText || "";
         };
@@ -495,6 +533,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     // Add events
                     that.addEvents();
 
+                    // Add ContextMenu
+                    that.addContextMenu();
+
                     // App is rendered, run it.
                     if (that.isRunnable) {
                         that.runApp();
@@ -520,10 +561,24 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 if (this.exec !== "") {
                     require([this.exec], function (AppToRun) {
 
-                        that.runningApp = new AppToRun(that);
+                        that.runningAppObj = new AppToRun(that);
 
-                        that.runningApp.run();
+                        that.runningAppObj.run();
 
+                    });
+                }
+            },
+
+            addContextMenu: function () {
+                var that = this;
+
+                // Only add contextmenu if exists in config
+                if (this.hasContextMenu) {
+                    // Require contextmenu
+                    require(["app/contextmenu"], function (ContextMenuObj) {
+
+                        // Add Contextmenu object to this AppContainer
+                        that.contextMenuObj = new ContextMenuObj(that);
                     });
                 }
             },

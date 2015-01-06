@@ -22,7 +22,7 @@ body {
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 h1, h2 {
@@ -359,7 +359,7 @@ div.window:before {
 				background: #EEEEEE;
 				border: 1px solid #AAAAAA;
 				position: absolute;
-				top: 0px;
+				top: -1px;
 				left: 0px;
 				z-index: 2;
 			}

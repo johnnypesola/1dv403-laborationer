@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], function(Mustache, AppContainer, StartMenu) {
+define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], function (Mustache, AppContainer, StartMenu) {
 
     return (function () {
 
@@ -29,7 +29,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     width: 450,
                     height: 500,
                     isResizable: true,
-                    hasStatusBar: false
+                    hasStatusBar: false,
+                    hasContextMenu: true
                 },
                 {
                     name: "In Memory Of Amiga Games",
@@ -198,6 +199,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     (appInfoObj.height || 200),
                     zIndex,
                     (typeof appInfoObj.isResizable === "boolean" ? appInfoObj.isResizable : true),
+                    (typeof appInfoObj.hasContextMenu === "boolean" ? appInfoObj.hasContextMenu : false),
                     (typeof appInfoObj.hasStatusBar === "boolean" ? appInfoObj.hasStatusBar : false),
                     appInfoObj.statusBarText
                 );
