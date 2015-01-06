@@ -370,9 +370,9 @@ button {
 		.rss-reader a:first-of-type {
 			background: #444444 !important;
 			color: #EEEEEE;
-			font-size: 15px !important;
+			font-size: 14px !important;
 			margin: 0;
-			padding: 12px 5px 30px 5px;
+			padding: 15px 5px 30px 10px;
 			display: block;
 			position: inherit;
 			width: 100%;
@@ -386,7 +386,7 @@ button {
 		}
 
 		.rss-reader a:first-of-type:hover {
-			color: #EE7777;
+			background: #555555 !important;
 		}
 
 		.rss-reader h2 {
@@ -400,6 +400,22 @@ button {
 			background: #FFFFFF;
 		}
 
+		.rss-reader h2:first-of-type {
+			border-top: 5px #000000 solid !important;
+		}
+
+		.rss-reader h2:nth-child(3n) {
+			border-top: 5px #66BB66 solid;
+		}
+
+		.rss-reader h2:nth-child(3n+1) {
+			border-top: 5px #FF6666 solid;
+		}
+
+		.rss-reader h2:nth-child(3n+2) {
+			border-top: 5px #6666DD solid;
+		}
+
 		.rss-reader a {
 			font-size: 17px !important;
 			line-height: 20px !important;
@@ -408,7 +424,12 @@ button {
 			bottom: 20px;
 			left: 15px;
 			display: block;
+			transition: all 0.1s;
 		}
+
+			.rss-reader a:hover {
+				color: #EE7777;
+			}
 		
 		.rss-reader img {
 			border-radius: 4px;
