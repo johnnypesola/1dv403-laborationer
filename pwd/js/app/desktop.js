@@ -26,8 +26,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     exec: "app/rssreader",
                     icon: "img/icon/rss.svg",
                     cssClass: "rss-reader",
-                    width: 200,
-                    height: 200,
+                    width: 450,
+                    height: 500,
                     isResizable: true,
                     hasStatusBar: false
                 },

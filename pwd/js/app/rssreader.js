@@ -103,39 +103,18 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     // If the HTTP result code was successful
                     else if (httpRequest.status === 200) {
 
-                        // Parse and store image data.
-                        console.log(httpRequest.responseText);
-
-                        // Render Thumbnails
-                        this.renderRssFlow();
+                        // Render RSS flow
+                        this.renderRssFlow(httpRequest.responseText);
 
                     } else {
-                        throw new Error('Image manager: There was a problem with the ajax request.');
+                        throw new Error('RssReader: There was a problem with the ajax request.');
                     }
                 }
             },
 
-            renderRssFlow: function () {
+            renderRssFlow: function (content) {
 
-                var containerElement,
-                    i;
-
-                // Clear container content
-/*                this.appContainerObj.clearContent();
-
-                for (i = 0; i < this.rssDataArray.length; i++) {
-
-                    // Create container
-                    containerElement = document.createElement("div");
-                    containerElement.classList.add("entry");
-
-                    console.log(containerElement);
-
-                    // this.appContainerObj.contentElement.appendChild(containerElement);
-                }
- */
-                //this.addThumbnailEvents();
-
+                this.appContainerObj.contentElement.innerHTML = content;
             },
 
             addThumbnailEvents: function () {
