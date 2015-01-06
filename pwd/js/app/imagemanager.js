@@ -77,15 +77,15 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 // When request is completed
                 if (httpRequest.readyState === 4 && httpRequest.responseText.length > 0) {
 
-                    // If the HTTP result code was "Bad request", also means wrong answer to question.
+                    // If the HTTP result code was "Bad request"
                     if (httpRequest.status === 400) {
                         throw new Error('Image manager: Ajax request returned 400 Bad Request');
                     }
-                    // If the HTTP result code was "Not found", the question does not exist.
+                    // If the HTTP result code was "Not found"
                     else if (httpRequest.status === 404) {
                         throw new Error('Image manager: Ajax request returned 404 Not Found');
                     }
-                    // If the HTTP result code was successful, could mean correct answer to question.
+                    // If the HTTP result code was successful
                     else if (httpRequest.status === 200) {
 
                         // Parse and store image data.

@@ -9,12 +9,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var ImageManager = function (appContainerObj) {
+        var RssReader = function (appContainerObj) {
 
 
-            var _REMOTE_SOURCE_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/imgviewer/",
-                _appContainerObj,
-                _imagesDataArray;
+            var _REMOTE_PROXY_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/rssproxy/?url=",
+                _rssFeedSourceURL,
+                _rssDataArray,
+                _appContainerObj;
 
             // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -28,28 +29,33 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         if (obj !== null && typeof obj === "object") {
                             _appContainerObj = obj;
                         } else {
-                            throw new Error("ImageManagers 'appContainerObj' property must be an object");
+                            throw new Error("RssReaders 'appContainerObj' property must be an object");
                         }
                     }
                 },
+                "rssFeedSourceURL": {
+                    get: function () { return _rssFeedSourceURL || ""; },
 
-                "imagesDataArray": {
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+                            _rssFeedSourceURL = value;
+                        } else {
+                            throw new Error("RssReaders 'rssFeedSourceURL' property must be a string.");
+                        }
+                    }
+                },
+                "rssDataArray": {
                     get: function () {
-                        return _imagesDataArray || "";
+                        return _rssDataArray || "";
                     },
 
                     set: function (array) {
                         if (array !== null && array instanceof Array) {
 
-                            // Only allow to be set once.
-                            if (_imagesDataArray) {
-                                throw new Error("ImageManagers 'imagesDataArray' can only be set once.");
-                            }
-
-                            _imagesDataArray = array;
+                            _rssDataArray = array;
 
                         } else {
-                            throw new Error("ImageManagers 'imagesDataArray' property must be an array");
+                            throw new Error("RssReaders 'rssDataArray' property must be an array");
                         }
                     }
                 }
@@ -57,42 +63,51 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
             // Init values
             this.appContainerObj = appContainerObj;
+            this.rssFeedSourceURL = encodeURI("http://www.dn.se/m/rss/senaste-nytt");
 
             // Main app method
-            this.run = function(){
+            this.run = function () {
                 var that = this;
+
                 // Fetch remote data and fill imagesDataArray, done in private.
-                this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_SOURCE_URL, function (httpRequest) {
+                this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_PROXY_URL + this.rssFeedSourceURL, function (httpRequest) {
+
 
                     that.handleAjaxResponse(httpRequest);
+
                 });
+
             };
         };
 
-        ImageManager.prototype = {
-            constructor: ImageManager,
+        RssReader.prototype = {
+            constructor: RssReader,
+
+            fetchRssFeed: function (RssFeedSourceURL) {
+
+            },
 
             handleAjaxResponse: function (httpRequest) {
 
                 // When request is completed
                 if (httpRequest.readyState === 4 && httpRequest.responseText.length > 0) {
 
-                    // If the HTTP result code was "Bad request", also means wrong answer to question.
+                    // If the HTTP result code was "Bad request"
                     if (httpRequest.status === 400) {
-                        throw new Error('Image manager: Ajax request returned 400 Bad Request');
+                        throw new Error('RssReader: Ajax request returned 400 Bad Request');
                     }
-                    // If the HTTP result code was "Not found", the question does not exist.
+                    // If the HTTP result code was "Not found"
                     else if (httpRequest.status === 404) {
-                        throw new Error('Image manager: Ajax request returned 404 Not Found');
+                        throw new Error('RssReader: Ajax request returned 404 Not Found');
                     }
-                    // If the HTTP result code was successful, could mean correct answer to question.
+                    // If the HTTP result code was successful
                     else if (httpRequest.status === 200) {
 
                         // Parse and store image data.
-                        this.imagesDataArray = JSON.parse(httpRequest.responseText);
+                        console.log(httpRequest.responseText);
 
                         // Render Thumbnails
-                        this.renderThumbnails();
+                        this.renderRssFlow();
 
                     } else {
                         throw new Error('Image manager: There was a problem with the ajax request.');
@@ -100,37 +115,26 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 }
             },
 
-            renderThumbnails: function () {
+            renderRssFlow: function () {
 
-                var maxThumbnailSize,
-                    thumbnailElement,
-                    containerElement,
+                var containerElement,
                     i;
 
-                // Get max thumbnail size
-                maxThumbnailSize = this.getMaxThumbnailSize();
-
                 // Clear container content
-                this.appContainerObj.clearContent();
+/*                this.appContainerObj.clearContent();
 
-                for (i = 0; i < this.imagesDataArray.length; i++) {
+                for (i = 0; i < this.rssDataArray.length; i++) {
 
                     // Create container
                     containerElement = document.createElement("div");
-                    containerElement.classList.add("thumbnail");
-                    containerElement.style.minWidth = maxThumbnailSize.width + "px";
-                    containerElement.style.minHeight = maxThumbnailSize.height + "px";
-                    containerElement.style.lineHeight = maxThumbnailSize.height + "px";
+                    containerElement.classList.add("entry");
 
-                    // Create thumbnail
-                    thumbnailElement = document.createElement("img");
-                    thumbnailElement.setAttribute("src", this.imagesDataArray[i].thumbURL);
+                    console.log(containerElement);
 
-                    containerElement.appendChild(thumbnailElement);
-                    this.appContainerObj.contentElement.appendChild(containerElement);
+                    // this.appContainerObj.contentElement.appendChild(containerElement);
                 }
-
-                this.addThumbnailEvents();
+ */
+                //this.addThumbnailEvents();
 
             },
 
@@ -188,8 +192,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             }
         };
 
-
-        return ImageManager;
+        return RssReader;
 
     }());
 

@@ -347,7 +347,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                                 // Set text on statusbar.
                                 if (this.isRendered) {
-                                    this.statusBarElement.innerText = value;
+                                    this.statusBarElement.innerHTML = value;
                                 }
                             }
                         } else {
@@ -663,7 +663,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             },
 
             clearContent: function () {
-                this.contentElement.innerText = "";
+                this.contentElement.innerHTML = "";
             }
         };
 
