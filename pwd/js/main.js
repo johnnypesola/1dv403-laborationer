@@ -1,44 +1,26 @@
+/**
+ * Created by Johnny on 2015-01-03.
+ */
+
 'use strict';
 
-    // Settings
-    requirejs.config({
-        baseUrl: 'js/lib',
-        paths: {
-            app: '../app',
-            tpl: '../tpl'
-        },
-        urlArgs: "preventCaching=" + (new Date()).getTime()
-    });
+// Settings
+requirejs.config({
+    baseUrl: 'js/lib',
+    paths: {
+        app: '../app',
+        tpl: '../tpl'
+    },
+    urlArgs: "preventCaching=" + (new Date()).getTime()
+});
 
 
-    // Start the application
+// Require desktop js file
+require(["app/desktop"], function(Desktop){
+
+    // Set up namespace
     var PWD = PWD || {};
 
-    require(["app/desktop"], function(Desktop){
-
-        // Start new appcontainer
-
-        PWD.Desktop = PWD.Desktop || new Desktop(document.getElementById("desktop"));
-
-
-
-        document.addEventListener("keydown", function (e) {
-            if (e.keyCode === 13) {
-                PWD.Desktop.startApp(PWD.Desktop.availableApps[PWD.Desktop.runningApps.length]);
-
-                console.log(PWD.Desktop.runningApps[PWD.Desktop.runningApps.length - 1].UID);
-            }
-        }, false);
-
-/*
-
-        PWD.AppContainer.render("Men inte såhär", "Kalle Anka är bäst!");
-
-        PWD.AppContainer2 = PWD.AppContainer2 || new AppContainer(50, 50);
-
-        PWD.AppContainer2.render("Min fina app2", "Kalle Anka är bäst igen!");
-
-
-
-*/
-    });
+    // Start new Desktop application
+    PWD.Desktop = PWD.Desktop || new Desktop(document.getElementById("desktop"));
+});
