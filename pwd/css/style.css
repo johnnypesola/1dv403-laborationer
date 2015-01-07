@@ -313,11 +313,34 @@ div.window:before {
 	}
 
 	div.window .popup {
-		background: #FFFFFF;
+		background: #EEEEEE;
+		border: 1px solid #DDDDDD;
 		width: 300px;
-		height: 100px;
 		border-radius: 5px;
+
+		position: absolute;
+		top: 200px;
+		left: 10%;
+		top: 30%;
+
+		box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.6);
 	}
+
+		div.window .popup .header {
+			bottom: 0;
+			cursor: default;
+		}
+
+			div.window .popup .header h2 {
+				text-align: center;
+			}
+
+		div.window .popup .content {
+			bottom: 0;
+			background: none;
+			overflow: auto;
+			border: none;
+		}
 
 	div.window .context-menu {
 		color: #000000;

@@ -5,7 +5,7 @@
 
 "use strict";
 
-define(["mustache", "app/popup", "app/extensions"], function (Mustache, PopUp) {
+define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
     return (function () {
 
@@ -93,13 +93,13 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, PopUp) {
                 var that = this,
                     contextMenuInfoObj;
 
-//                console.log(PopUp);
+                var myPopup = new Popup(this.appContainerObj, "Hello", document.createElement("div"));
 
                 // Setup settings for this appContainers contextMenu.
                 contextMenuInfoObj = {
                     "Inställningar": {
                         "Uppdateringsintervall": function () {
-//                            var temp = PopUp(that.appContainerObj, "form", '<input type="text">');
+//                            var temp = Popup(that.appContainerObj, "form", '<input type="text">');
                         },
                         "Välj källa": function () {console.log(2); },
                         "Uppdatera nu": function () {that.update(); }

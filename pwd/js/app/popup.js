@@ -9,12 +9,14 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var PopUp = function (appContainerObj, type, content) {
+        var Popup = function (appContainerObj, header, content) {
 
             var _appContainerObj,
                 _containerElement,
-                _type,
-                _content;
+                _contentElement,
+                _header,
+                _content,
+                _closeButton;
 
             // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -42,29 +44,50 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
-                "type": {
-                    get: function () { return _type || ""; },
+                "contentElement": {
+                    get: function () { return _contentElement || ""; },
 
-                    set: function (value) {
-                        if (value !== null && typeof value === "string") {
-
-                            _type = value;
-
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _contentElement = element;
                         } else {
-                            throw new Error("Popups 'type' property must be a string.");
+                            throw new Error("Popups 'contentElement' property must be an element");
                         }
                     }
                 },
-                "content": {
-                    get: function () { return _content || ""; },
+                "header": {
+                    get: function () { return _header || ""; },
 
                     set: function (value) {
                         if (value !== null && typeof value === "string") {
 
-                            _content = value;
+                            _header = value;
 
                         } else {
-                            throw new Error("Popups 'content' property must be a string.");
+                            throw new Error("Popups 'header' property must be a string.");
+                        }
+                    }
+                },
+
+                "content": {
+                    get: function () { return _content || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _content = element;
+                        } else {
+                            throw new Error("Popups 'content' property must be an element");
+                        }
+                    }
+                },
+                "closeButton": {
+                    get: function () { return _closeButton || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _closeButton = element;
+                        } else {
+                            throw new Error("Popups 'closeButton' property must be an element");
                         }
                     }
                 }
@@ -72,43 +95,52 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
             // Init values
             this.appContainerObj = appContainerObj;
+            this.header = header;
             this.content = content;
             this.create();
         };
 
-        PopUp.prototype = {
-            constructor: PopUp,
+        Popup.prototype = {
+            constructor: Popup,
 
+            // Create and render Popup (without data) on AppContainer
             create: function () {
+                var that = this;
 
-                // Create and render Popup (without data) on AppContainer
+                console.log("popup created");
+
+                // Create container element
                 this.containerElement = document.createElement("div");
                 this.containerElement.classList.add("popup");
 
-                // Add Popup to AppContainers content.
-                this.appContainerObj.containerElement.appendChild(this.containerElement);
-            },
+                // Fetch template
+                require(["text!tpl/popup.html"], function (template) {
 
-            addMenuContent: function (menuContentInfoObj) {
-                var that = this;
+                    // Render data in template
+                    that.containerElement.innerHTML = Mustache.render(template, {header: that.header});
 
-                // Get Menu Content Info Object from a App, and store it locally.
-                //this.contextMenuInfoObj = menuContentInfoObj;
+                    // Get references
+                    that.contentElement = that.containerElement.querySelector('.content');
+                    that.closeButtonElement = that.containerElement.querySelector('a.close');
 
-                // Loop through hmenus
-                Object.keys(menuContentInfoObj).forEach(function (hmenu) {
+                    // Add content to Popup
+                    that.contentElement.appendChild(that.content);
 
-                    // Loop through umenus
-                    Object.keys(menuContentInfoObj[hmenu]).forEach(function (umenu) {
+                    // Add click event to close button
+                    that.closeButtonElement.addEventListener("click", function () {
 
+                        // Remove from DOM
+                        that.containerElement.parentNode.removeChild(that.containerElement);
                     });
+
+                    // Add Popup to AppContainers content.
+                    that.appContainerObj.containerElement.appendChild(that.containerElement);
 
                 });
             }
-
         };
 
-        return PopUp;
+        return Popup;
 
     }());
 });

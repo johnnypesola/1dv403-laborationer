@@ -144,6 +144,15 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.createCards(this._cardTemplateArray);
 
 
+                /* Skicka med innerHTML och låta onsubmit i popuppen anropa en funktion i detta objekt ?
+                *
+                *  ELLER
+                *
+                *  Skicka med skapade element med event handlers. som anropar en funktion i detta objekt? <<------ Bäst
+                *
+                * */
+
+
                 // Setup settings for this appContainers contextMenu.
                 contextMenuInfoObj = {
                     "Redigera": {
