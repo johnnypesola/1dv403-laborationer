@@ -30,6 +30,7 @@ h1, h2 {
     font-weight: normal;
 }
 
+/*
 input {
     margin: 10px 0 0 0;
     height: 24px;
@@ -47,6 +48,13 @@ input {
     clear: both;
     
     padding: 30px;
+}
+*/
+
+input[type="radio"] {
+	position: relative;
+	right: 3px;
+	top: 3px;
 }
 
 div#startmenu {
@@ -340,6 +348,22 @@ div.window:before {
 			background: none;
 			overflow: auto;
 			border: none;
+			font-family: verdana;
+			font-size: 11px;
+		}
+
+		div.window .popup input[type="text"] {
+			border: 1px solid #CCCCCC;
+			padding: 5px;
+			margin: 5px 0;
+		}
+
+		div.window .popup .submitbutton {
+			border: 1px solid #AAAAAA;
+			position: absolute;
+			right: 0px;
+			bottom: 0px;
+			padding: 5px;
 		}
 
 	div.window .context-menu {
@@ -438,36 +462,17 @@ div.window:before {
 		padding: 0 !important;;
 	}
 
-		.rss-reader a:first-of-type {
-			background: #444444 !important;
-			color: #EEEEEE;
-			font-size: 14px !important;
-			margin: 0;
-			padding: 15px 5px 30px 10px;
-			display: block;
-			position: inherit;
-			width: 100%;
-			bottom: 0;
-			left: 0;
-		}
-
-		.rss-reader a:first-of-type:before {
-			text-decoration: none;
-			content: 'Källa: ';
-		}
-
-		.rss-reader a:first-of-type:hover {
-			background: #555555 !important;
+		.rss-reader {
+			padding-top: 20px !important;
 		}
 
 		.rss-reader h2 {
 			font-size: 24px !important;
-			padding: 10px 5px 0 10px;
+			padding: 10px 5px 10px 10px;
 			border-top: 1px solid #E8E8E8;
 			border-top-right-radius: 15px;
 
 			position: relative;
-			bottom: 33px;
 			background: #FFFFFF;
 		}
 
@@ -490,12 +495,13 @@ div.window:before {
 		.rss-reader a {
 			font-size: 17px !important;
 			line-height: 20px !important;
-			width: 60%;
+
 			position: relative;
-			bottom: 20px;
+			bottom: 0;
 			left: 15px;
 			display: block;
 			transition: all 0.1s;
+			padding: 0 5px 10px 10px;
 		}
 
 			.rss-reader a:hover {
@@ -509,19 +515,10 @@ div.window:before {
 		.rss-reader p {
 			font-size: 17px !important;
 			line-height: 20px !important;
-			padding: 0 5px 50px 10px;
-
-			background: rgb(255,255,255); /* Old browsers */
-			background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(239,239,239,1) 100%); /* FF3.6+ */
-			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(239,239,239,1))); /* Chrome,Safari4+ */
-			background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(239,239,239,1) 100%); /* Chrome10+,Safari5.1+ */
-			background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(239,239,239,1) 100%); /* Opera 11.10+ */
-			background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(239,239,239,1) 100%); /* IE10+ */
-			background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(239,239,239,1) 100%); /* W3C */
-			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#efefef',GradientType=0 ); /* IE6-9 */
+			padding: 0 5px 10px 10px;
 
 			position: relative;
-			bottom: 20px;
+			bottom: 0px;
 		}
 
 	/* Image Manager */

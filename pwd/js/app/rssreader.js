@@ -13,10 +13,26 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
 
             var _REMOTE_PROXY_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/rssproxy/?url=",
+                _MAX_UPDATE_INTERVAL = 10,
+                _AVAILABLE_RSS_SOURCES = [
+                    {
+                        name: "DN.se",
+                        src: "http://www.dn.se/m/rss/senaste-nytt"
+                    },
+                    {
+                        name: "Aftonbladet.se",
+                        src: "http://www.aftonbladet.se/rss.xml"
+                    },
+                    {
+                        name: "Expressen.se",
+                        src: "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss"
+                    }
+                ],
                 _rssFeedSourceURL,
                 _rssDataArray,
                 _appContainerObj,
-                _updateInterval;
+                _updateInterval,
+                _updateIntervalID;
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -64,14 +80,29 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     get: function () { return _updateInterval || ""; },
 
                     set: function (value) {
-                        var parsedValue = parseFloat(value);
+                        var parsedValue = parseFloat(value),
+                            that = this;
+
                         if (parsedValue.isInt() && parsedValue >= 0) {
-                            var that = this;
+
+                            if (parsedValue > this.MAX_UPDATE_INTERVAL) {
+                                throw new Error("Rss Readers 'updateInterval' cannot be higher than " + this.MAX_UPDATE_INTERVAL);
+                            }
+
+                            // Store update interval value
+                            _updateInterval = parsedValue;
 
                             // Calculate minutes in ms
                             parsedValue = parsedValue * 1000 * 60;
 
-                            _updateInterval = window.setInterval(function () {
+                            // Try to clear old interval
+                            if (this.updateIntervalID) {
+                                window.clearInterval(this.updateIntervalID);
+                                console.log("cleared");
+                            }
+
+                            // Set interval and store ID
+                            this.updateIntervalID = window.setInterval(function () {
                                 that.update();
                             }, parsedValue);
 
@@ -79,61 +110,71 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                             throw new Error("Rss Readers 'updateInterval' property must be an positive int.");
                         }
                     }
+                },
+                "updateIntervalID": {
+                    get: function () { return _updateIntervalID || false; },
+
+                    set: function (value) {
+
+                        if (value.isInt() && value >= 0) {
+
+                            _updateIntervalID = value;
+
+                        } else {
+                            throw new Error("Rss Readers 'updateIntervalID' property must be an int.");
+                        }
+                    }
+                },
+                "MAX_UPDATE_INTERVAL": {
+                    get: function () { return _MAX_UPDATE_INTERVAL }
+                },
+                "AVAILABLE_RSS_SOURCES": {
+                    get: function () { return _AVAILABLE_RSS_SOURCES }
+                },
+                "REMOTE_PROXY_URL": {
+                    get: function () { return _REMOTE_PROXY_URL}
                 }
             });
 
         // Init values
             this.appContainerObj = appContainerObj;
-            this.rssFeedSourceURL = encodeURI("http://www.dn.se/m/rss/senaste-nytt");
+            this.rssFeedSourceURL = encodeURI(this.AVAILABLE_RSS_SOURCES[0].src);
             this.updateInterval = 1;
 
         // Private methods
             // Main app method
             this.run = function () {
-                var that = this,
-                    contextMenuInfoObj;
+                var that = this;
 
-                var myPopup = new Popup(this.appContainerObj, "Hello", document.createElement("div"));
-
-                // Setup settings for this appContainers contextMenu.
-                contextMenuInfoObj = {
-                    "Inställningar": {
-                        "Uppdateringsintervall": function () {
-//                            var temp = Popup(that.appContainerObj, "form", '<input type="text">');
-                        },
-                        "Välj källa": function () {console.log(2); },
-                        "Uppdatera nu": function () {that.update(); }
-                    }
-                };
-
-                // Add contextMenu and return element references.
-                this.appContainerObj.contextMenuObj.addMenuContent(contextMenuInfoObj);
+                // Add contextMenu
+                this.appContainerObj.contextMenuObj.addMenuContent(this.defineContextMenuSettings());
 
                 // Update RRS feed
                 this.update();
 
-                // Make sure interval is cleared when application is closed
+                // Make sure interval is stopped when application is closed
                 this.appContainerObj.onClose = function () {
-                    window.clearInterval(that.updateInterval);
+                    window.clearInterval(that.updateIntervalID);
                 };
             };
 
-            // Update Rss feed.
-            this.update = function () {
-                var that = this;
 
-                // Fetch remote data and fill imagesDataArray, done in private.
-                this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_PROXY_URL + this.rssFeedSourceURL, function (httpRequest) {
-                    that.handleAjaxResponse(httpRequest);
-                });
-            };
         };
 
         RssReader.prototype = {
             constructor: RssReader,
 
-            fetchRssFeed: function (RssFeedSourceURL) {
+            // Update Rss feed.
+            update: function () {
+                var that = this;
 
+                // Set loading image in app.
+                this.appContainerObj.renderAsLoading();
+
+                // Fetch remote data and fill imagesDataArray, done in private.
+                this.appContainerObj.desktopObj.ajaxCall("GET", this.REMOTE_PROXY_URL + this.rssFeedSourceURL, function (httpRequest) {
+                    that.handleAjaxResponse(httpRequest);
+                });
             },
 
             handleAjaxResponse: function (httpRequest) {
@@ -176,60 +217,184 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 this.appContainerObj.contentElement.innerHTML = content;
 
                 // Render statusbar text
-                this.appContainerObj.statusBarText = "Last updated: " + hours + ":" + minutes + ":" + seconds;
+                this.appContainerObj.statusBarText = "Senast uppdaterad: " + hours + ":" + minutes + ":" + seconds;
             },
 
-            addThumbnailEvents: function () {
-                var i,
-                    thumbnails;
+            defineContextMenuSettings: function () {
+                var that = this,
+                    contextMenuInfoObj;
 
-                thumbnails = this.appContainerObj.contentElement.querySelectorAll(".thumbnail");
+                // Setup settings for this appContainers contextMenu.
+                contextMenuInfoObj = {
+                    "Inställningar": {
+                        "Uppdateringsintervall": function () {
+                            that.popupUpdateIntervalOptions();
 
-                // Loop through all thumbnails
-                for (i = 0; i < thumbnails.length; i++) {
-
-                    this.addThumbnailEvent(thumbnails[i], i);
-                }
-
-            },
-
-            addThumbnailEvent: function (thumbnail, index) {
-                var that = this;
-
-                // Add click event to thumbnail element
-                thumbnail.addEventListener("click", function () {
-
-                    // Popup a window
-                    that.appContainerObj.desktopObj.startApp(
-                        {
-                            name: "Image Manager (Popup)",
-                            cssClass: "image-manager",
-                            icon: "img/icon/image_manager.svg",
-                            width: that.imagesDataArray[index].width + 40,
-                            height: that.imagesDataArray[index].height + 70,
-                            isResizable: false,
-                            hasStatusBar: true,
-                            statusBarText: that.imagesDataArray[index].URL
                         },
-                        '<img src="' + that.imagesDataArray[index].URL + '">'
-                    );
-                });
+                        "Välj källa": function () {
+                            that.popupSelectSourceOptions();
+                        },
+                        "Uppdatera nu": function () {that.update(); }
+                    }
+                };
+
+                return contextMenuInfoObj;
             },
 
-            getMaxThumbnailSize: function () {
-                var i,
-                    maxSize = {width: 0, height: 0};
+            popupUpdateIntervalOptions: function () {
+                var updateIntervalContent,
+                    popup;
 
-                for (i = 0; i < this.imagesDataArray.length; i++) {
-                    if (maxSize.width < this.imagesDataArray[i].thumbWidth) {
-                        maxSize.width = this.imagesDataArray[i].thumbWidth;
+                // Get content for Update Interval popup
+                updateIntervalContent = this.createUpdateIntervalPopupContent();
+                popup = new Popup(this.appContainerObj, "Välj uppdateringsintervall", updateIntervalContent);
+
+            },
+
+            popupSelectSourceOptions: function () {
+                var selectSourceContent,
+                    popup;
+
+                // GET content for Select Source popup
+                selectSourceContent = this.createSelectSourcePopupContent();
+                popup = new Popup(this.appContainerObj, "Välj källa", selectSourceContent);
+            },
+
+            createUpdateIntervalPopupContent: function () {
+
+                var containerElement,
+                    selectElement,
+                    optionElement,
+                    i,
+                    that = this;
+
+                // Create container element
+                containerElement = document.createElement("div");
+
+                containerElement.innerHTML = "Uppdatera flödet: "
+
+                // Create select element
+                selectElement = document.createElement("select");
+
+                // Create option elements
+                for (i = 1; i <= this.MAX_UPDATE_INTERVAL; i++) {
+                    optionElement = document.createElement("option");
+                    optionElement.setAttribute("value", i);
+
+                    // Different option text formatting depending on value
+                    if(i === 1) {
+                        optionElement.innerHTML = "Varje minut";
+                    } else if(i === 2) {
+                        optionElement.innerHTML = "Varannan minut";
+                    } else {
+                        optionElement.innerHTML = "Var " + i + ":e minut";
                     }
-                    if (maxSize.height < this.imagesDataArray[i].thumbHeight) {
-                        maxSize.height = this.imagesDataArray[i].thumbHeight;
+
+                    // Check if this option should be selected
+                    if (this.updateInterval === i) {
+                       optionElement.setAttribute("selected", "selected");
                     }
+
+                    // Add option to select
+                    selectElement.appendChild(optionElement);
+
                 }
 
-                return maxSize;
+                // Action on select change
+                selectElement.addEventListener("change", function () {
+                    that.updateInterval = this.value;
+                    that.appContainerObj.statusBarText = "Flödet uppdateras nu: " + selectElement.options[selectElement.selectedIndex].innerText;
+                    that.appContainerObj.closePopups();
+                });
+
+                // Add select to container element
+                containerElement.appendChild(selectElement);
+
+                // Return containerElement
+                return containerElement;
+            },
+
+            createSelectSourcePopupContent: function () {
+                var containerElement,
+                    radioElement,
+                    radioElements,
+                    i,
+                    submitElement,
+                    inputElement,
+                    textElement,
+                    that = this;
+
+                // Create container element
+                containerElement = document.createElement("div");
+
+                // this.rssFeedSourceURL = encodeURI(this.AVAILABLE_RSS_SOURCES[0]);
+
+                // Create radiobuttons
+                for (i = 0; i < this.AVAILABLE_RSS_SOURCES.length; i++) {
+                    // Radiobutton
+                    radioElement = document.createElement("input");
+                    radioElement.setAttribute("type", "radio");
+                    radioElement.setAttribute("name", "rss-source");
+                    radioElement.setAttribute("value", this.AVAILABLE_RSS_SOURCES[i].src);
+
+                    if (this.rssFeedSourceURL === this.AVAILABLE_RSS_SOURCES[i].src) {
+                        radioElement.checked = true;
+                    }
+
+                    containerElement.appendChild(radioElement);
+
+                    // Text after button
+                    textElement = document.createElement("span");
+                    textElement.innerHTML = this.AVAILABLE_RSS_SOURCES[i].name + "<br>";
+                    containerElement.appendChild(textElement);
+                }
+
+                // Add another option for user input
+                radioElement = document.createElement("input");
+                radioElement.setAttribute("value", "custom");
+                radioElement.setAttribute("type", "radio");
+                radioElement.setAttribute("name", "rss-source");
+                radioElement.addEventListener("mousedown", function () {
+                    inputElement.classList.remove("hidden");
+                });
+                containerElement.appendChild(radioElement);
+
+                textElement = document.createElement("span");
+                textElement.innerHTML = "Egen källa<br>";
+                containerElement.appendChild(textElement);
+
+                // Create input element
+                inputElement = document.createElement("input");
+                inputElement.setAttribute("type", "text");
+                inputElement.classList.add("hidden");
+                containerElement.appendChild(inputElement);
+
+                // Create submit element
+                submitElement = document.createElement("button");
+                submitElement.innerHTML = "Verkställ";
+                submitElement.classList.add("submitbutton");
+                containerElement.appendChild(submitElement);
+
+                // Action on submit
+                submitElement.addEventListener("click", function () {
+                    that.appContainerObj.closePopups();
+
+                    // Get checked radiobutton
+                    radioElement = containerElement.querySelector('input[name = "rss-source"]:checked');
+
+                    // If custom source is selected
+                    if (radioElement.getAttribute("value") === "custom") {
+                        that.rssFeedSourceURL = inputElement.value;
+                    } else {
+                        that.rssFeedSourceURL = radioElement.value;
+                    }
+
+                    // Update Rss reader
+                    that.update();
+                });
+
+                // Return containerElement
+                return containerElement;
             }
         };
 

@@ -38,7 +38,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     cssClass: "memory",
                     icon: "img/icon/memory.svg",
                     width: 700,
-                    height: 640,
+                    height: 655,
                     isResizable: true,
                     hasStatusBar: true,
                     hasContextMenu: true

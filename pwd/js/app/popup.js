@@ -14,6 +14,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             var _appContainerObj,
                 _containerElement,
                 _contentElement,
+                _headerElement,
                 _header,
                 _content,
                 _closeButton;
@@ -44,6 +45,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
+                "headerElement": {
+                    get: function () { return _headerElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _headerElement = element;
+                        } else {
+                            throw new Error("Popups 'headerElement' property must be an element");
+                        }
+                    }
+                },
                 "contentElement": {
                     get: function () { return _contentElement || ""; },
 
@@ -68,7 +80,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
-
                 "content": {
                     get: function () { return _content || ""; },
 
@@ -107,8 +118,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
             create: function () {
                 var that = this;
 
-                console.log("popup created");
-
                 // Create container element
                 this.containerElement = document.createElement("div");
                 this.containerElement.classList.add("popup");
@@ -120,6 +129,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     that.containerElement.innerHTML = Mustache.render(template, {header: that.header});
 
                     // Get references
+                    that.headerElement = that.containerElement.querySelector('.header');
                     that.contentElement = that.containerElement.querySelector('.content');
                     that.closeButtonElement = that.containerElement.querySelector('a.close');
 
@@ -133,9 +143,18 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         that.containerElement.parentNode.removeChild(that.containerElement);
                     });
 
+                    // Prevent drag of closebutton.
+                    that.closeButtonElement.addEventListener("dragstart", function (e) {
+                        e.preventDefault();
+                    });
+
+                    // Prevent selection of header element.
+                    that.headerElement.addEventListener("dragstart", function (e) {
+                        e.preventDefault();
+                    });
+
                     // Add Popup to AppContainers content.
                     that.appContainerObj.containerElement.appendChild(that.containerElement);
-
                 });
             }
         };

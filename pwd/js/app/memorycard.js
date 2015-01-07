@@ -17,7 +17,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     set: function (value) {
                         var parsedValue = parseFloat(value);
                         if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue % 1 === 0 && value === parsedValue)) {
-                            throw new Error("ERROR: cardNum property must be an int type.");
+                            throw new Error("MemoryBoards 'cardNum' property must be an int type.");
                         }
 
                         _cardNum = value;
@@ -27,7 +27,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () { return _isCardOpen; },
                     set: function (value) {
                         if (typeof value !== "boolean") {
-                            throw new Error("ERROR: isCardOpen property must be a boolean type.");
+                            throw new Error("MemoryBoards 'isCardOpen' property must be a boolean type.");
                         }
 
                         _isCardOpen = value;
@@ -37,7 +37,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () { return _isMatchFound; },
                     set: function (value) {
                         if (typeof value !== "boolean") {
-                            throw new Error("ERROR: isMatchFound property must be a boolean type.");
+                            throw new Error("MemoryBoards 'isMatchFound' property must be a boolean type.");
                         }
 
                         _isMatchFound = value;

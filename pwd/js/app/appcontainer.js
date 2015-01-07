@@ -470,7 +470,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 },
                 "isRendered": {
                     get: function () {
-                        return this.containerElement !== "";
+                        return (this.containerElement !== "" && this.containerElement !== this.desktopObj.APP_LOADER_IMG);
                     }
                 },
                 "isRunnable": {
@@ -733,6 +733,26 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
             clearContent: function () {
                 this.contentElement.innerHTML = "";
+            },
+
+            renderAsLoading: function () {
+                // Render App loader image in app, if its not rendered allready.
+                if (this.contentElement.innerHTML !== this.desktopObj.APP_LOADER_IMG) {
+                    this.contentElement.innerHTML = this.desktopObj.APP_LOADER_IMG;
+                }
+            },
+
+            closePopups: function () {
+                var i;
+
+                // Iterate only through the first children of container element
+                for (i = 0; i < this.containerElement.childNodes.length; i++) {
+                    if (this.containerElement.childNodes[i].className === "popup") {
+
+                        // Remove Popup element from DOM
+                        this.containerElement.removeChild(this.containerElement.childNodes[i]);
+                    }
+                }
             }
         };
 
