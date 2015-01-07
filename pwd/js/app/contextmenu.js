@@ -80,121 +80,95 @@ define(["mustache", "app/extensions"], function (Mustache) {
             },
 
             addMenuContent: function (menuContentInfoObj) {
-                var hMenuElement,
-                    that = this;
+                var that = this,
+                    callbackFunction,
+                    hmenuUlElement,
+                    hmenuLiHeaderElement,
+                    hmenuLiContainerElement,
+                    umenuUlElement,
+                    umenuLiElement;
 
+                // Check that ContextMenu isn't allready added.
+                if (this.containerElement.innerHTML.length > 0) {
+                    return false;
+                }
+
+                // Get Menu Content Info Object from a App, and store it locally.
                 this.contextMenuInfoObj = menuContentInfoObj;
 
-                // Fetch template
-                require(["text!tpl/contextmenu.html"], function (template) {
-                    var i,
-                        j,
-                        content = "",
-                        callbackFunction,
-                        hmenuUlElement,
-                        hmenuLiHeaderElement,
-                        hmenuLiContainerElement,
-                        umenuUlElement,
-                        umenuLiElement;
+                // Loop through hmenus
+                Object.keys(menuContentInfoObj).forEach(function (hmenu) {
 
-                    // Loop through hmenus
-                    Object.keys(menuContentInfoObj).forEach(function (hmenu) {
+                    // Create elements
+                    hmenuUlElement = document.createElement("ul");
+                    hmenuLiHeaderElement = document.createElement("li");
+                    umenuUlElement = document.createElement("ul");
+
+                    // Create and hide umenu container
+                    hmenuLiContainerElement = document.createElement("li");
+                    hmenuLiContainerElement.classList.add("hidden");
+
+                    // Show umenu on mousedown, Keep object reference with closure
+                    (function () {
+                        var HeaderReference = hmenuLiHeaderElement,
+                            ContainerReference = hmenuLiContainerElement;
+
+                        HeaderReference.addEventListener("mousedown", function () {
+                            ContainerReference.classList.remove("hidden");
+                        });
+                    }());
+
+                    // Set text
+                    hmenuLiHeaderElement.textContent = hmenu;
+
+                    // Build hmenu
+                    hmenuUlElement.appendChild(hmenuLiHeaderElement);
+                    hmenuUlElement.appendChild(hmenuLiContainerElement);
+                    hmenuLiContainerElement.appendChild(umenuUlElement);
+
+                    // Loop through umenus
+                    Object.keys(menuContentInfoObj[hmenu]).forEach(function (umenu) {
+
+                        // Get CallbackFunction from menu info object
+                        callbackFunction = menuContentInfoObj[hmenu][umenu];
 
                         // Create elements
-                        hmenuUlElement = document.createElement("ul");
-                        hmenuLiHeaderElement = document.createElement("li");
-                        umenuUlElement = document.createElement("ul");
+                        umenuLiElement = document.createElement("li");
 
-                        // Create and hide umenu container
-                        hmenuLiContainerElement = document.createElement("li");
-                        hmenuLiContainerElement.classList.add("hidden");
+                        // Set text
+                        umenuLiElement.textContent = umenu;
 
-                        // Keep object reference through closure
+                        // Attach umenu mouse actions. Keep object reference with closure
                         (function () {
-                            var HeaderReference = hmenuLiHeaderElement,
-                                ContainerReference = hmenuLiContainerElement;
+                            var WholeMenuReference = hmenuUlElement,
+                                ContainerReference = hmenuLiContainerElement,
+                                callbackReference = callbackFunction;
 
-                            // Show umenu on mouseover
-                            HeaderReference.addEventListener("click", function (e) {
-                                ContainerReference.classList.remove("hidden");
+                            // Hide and run callback on mousedown
+                            umenuLiElement.addEventListener("mousedown", function () {
+
+                                // Hide whole menu on click
+                                ContainerReference.classList.add("hidden");
+
+                                // Run callback function
+                                callbackReference();
+                            });
+
+                            // Hide umenu on mouseleave
+                            WholeMenuReference.addEventListener("mouseleave", function () {
+                                ContainerReference.classList.add("hidden");
                             });
                         }());
 
-                        // Set text
-                        hmenuLiHeaderElement.textContent = hmenu;
-
-                        // Build hmenu
-                        hmenuUlElement.appendChild(hmenuLiHeaderElement);
-                        hmenuUlElement.appendChild(hmenuLiContainerElement);
-                        hmenuLiContainerElement.appendChild(umenuUlElement);
-
-                        // Loop through umenus
-                        Object.keys(menuContentInfoObj[hmenu]).forEach(function (umenu) {
-
-                            // Get CallbackFunction from menu info object
-                            callbackFunction = menuContentInfoObj[hmenu][umenu];
-
-                            // Create elements
-                            umenuLiElement = document.createElement("li");
-
-                            // Set text
-                            umenuLiElement.textContent = umenu;
-
-                            // Keep object reference through closure
-                            (function () {
-                                var WholeMenuReference = hmenuUlElement,
-                                    ContainerReference = hmenuLiContainerElement,
-                                    callbackReference = callbackFunction;
-
-                                umenuLiElement.addEventListener("click", function(){
-
-                                    // Hide whole menu on click
-                                    ContainerReference.classList.add("hidden");
-
-                                    // Run callback function
-                                    callbackReference();
-                                });
-
-                                // Hide umenu on mouseover
-                                WholeMenuReference.addEventListener("mouseleave", function (e) {
-                                    ContainerReference.classList.add("hidden");
-                                });
-                            }());
-
-                            // Append to hmenu
-                            umenuUlElement.appendChild(umenuLiElement);
-                        });
-
-                        // Append hmenu to contextMenu container
-                        that.containerElement.appendChild(hmenuUlElement);
+                        // Append to hmenu
+                        umenuUlElement.appendChild(umenuLiElement);
                     });
 
-                    // Returnera referenser
-
-
-                    /*
-                     this.containerElement.innerHTML = "" +
-                     "<ul>" +
-                     "   <li>Inställningar</li>" +
-                     "   <li>" +
-                     "       <ul>" +
-                     "           <li>Uppdateringsintervall</li>" +
-                     "           <li>Avancerat</li>" +
-                     "       </ul>" +
-                     "   </li>" +
-                     "</ul>" +
-                     "<ul>" +
-                     "   <li>Fler Inställningar</li>" +
-                     "   <li>" +
-                     "       <ul>" +
-                     "           <li>Uppdateringsintervall</li>" +
-                     "           <li>Avancerat</li>" +
-                     "       </ul>" +
-                     "   </li>" +
-                     "</ul>";
-                     */
+                    // Append hmenu to contextMenu container
+                    that.containerElement.appendChild(hmenuUlElement);
                 });
             }
+
         };
 
         return ContextMenu;

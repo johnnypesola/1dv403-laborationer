@@ -5,7 +5,7 @@
 
 "use strict";
 
-define(["mustache", "app/extensions"], function (Mustache) {
+define(["mustache", "app/popup", "app/extensions"], function (Mustache, PopUp) {
 
     return (function () {
 
@@ -15,9 +15,10 @@ define(["mustache", "app/extensions"], function (Mustache) {
             var _REMOTE_PROXY_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/rssproxy/?url=",
                 _rssFeedSourceURL,
                 _rssDataArray,
-                _appContainerObj;
+                _appContainerObj,
+                _updateInterval;
 
-            // Properties with Getters and Setters
+        // Properties with Getters and Setters
             Object.defineProperties(this, {
 
                 "appContainerObj": {
@@ -58,47 +59,73 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             throw new Error("RssReaders 'rssDataArray' property must be an array");
                         }
                     }
+                },
+                "updateInterval": {
+                    get: function () { return _updateInterval || ""; },
+
+                    set: function (value) {
+                        var parsedValue = parseFloat(value);
+                        if (parsedValue.isInt() && parsedValue >= 0) {
+                            var that = this;
+
+                            // Calculate minutes in ms
+                            parsedValue = parsedValue * 1000 * 60;
+
+                            _updateInterval = window.setInterval(function () {
+                                that.update();
+                            }, parsedValue);
+
+                        } else {
+                            throw new Error("Rss Readers 'updateInterval' property must be an positive int.");
+                        }
+                    }
                 }
             });
 
-            // Init values
+        // Init values
             this.appContainerObj = appContainerObj;
             this.rssFeedSourceURL = encodeURI("http://www.dn.se/m/rss/senaste-nytt");
+            this.updateInterval = 1;
 
+        // Private methods
             // Main app method
             this.run = function () {
                 var that = this,
-                    contextMenuInfoObj,
-                    contextMenuElementObj;
+                    contextMenuInfoObj;
 
+//                console.log(PopUp);
 
-                // Define settings for contextMenu
-                contextMenuInfoObj = {
-                    "Inställningar": ["Inställning 1", "Inställning 2", "Inställning 3"],
-                    "Fler inställningar": ["Inställning 4", "Inställning 5", "Inställning 6"]
-                };
-
+                // Setup settings for this appContainers contextMenu.
                 contextMenuInfoObj = {
                     "Inställningar": {
-                        "Inställning 1": function () {console.log(1); },
-                        "Inställning 2": function () {console.log(2); },
-                        "Inställning 3": function () {console.log(3); }
-                    },
-                    "Fler inställningar": {
-                        "Inställning 4": function () {console.log(4); },
-                        "Inställning 5": function () {console.log(5); },
-                        "Inställning 6": function () {console.log(6); }
+                        "Uppdateringsintervall": function () {
+//                            var temp = PopUp(that.appContainerObj, "form", '<input type="text">');
+                        },
+                        "Välj källa": function () {console.log(2); },
+                        "Uppdatera nu": function () {that.update(); }
                     }
                 };
 
                 // Add contextMenu and return element references.
-                contextMenuElementObj = this.appContainerObj.contextMenuObj.addMenuContent(contextMenuInfoObj);
+                this.appContainerObj.contextMenuObj.addMenuContent(contextMenuInfoObj);
+
+                // Update RRS feed
+                this.update();
+
+                // Make sure interval is cleared when application is closed
+                this.appContainerObj.onClose = function () {
+                    window.clearInterval(that.updateInterval);
+                };
+            };
+
+            // Update Rss feed.
+            this.update = function () {
+                var that = this;
 
                 // Fetch remote data and fill imagesDataArray, done in private.
                 this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_PROXY_URL + this.rssFeedSourceURL, function (httpRequest) {
                     that.handleAjaxResponse(httpRequest);
                 });
-
             };
         };
 
@@ -135,8 +162,21 @@ define(["mustache", "app/extensions"], function (Mustache) {
             },
 
             renderRssFlow: function (content) {
+                var dateNow,
+                    minutes,
+                    hours,
+                    seconds;
 
+                dateNow = new Date();
+                minutes = ('0' + dateNow.getMinutes()).slice(-2);
+                hours = ('0' + dateNow.getHours()).slice(-2);
+                seconds = ('0' + dateNow.getSeconds()).slice(-2);
+
+                // Render content
                 this.appContainerObj.contentElement.innerHTML = content;
+
+                // Render statusbar text
+                this.appContainerObj.statusBarText = "Last updated: " + hours + ":" + minutes + ":" + seconds;
             },
 
             addThumbnailEvents: function () {

@@ -36,7 +36,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _isBeingResized = false,
                 _hasContextMenu,
                 _isResizable,
-                _hasStatusBar;
+                _hasStatusBar,
+                _onClose;
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -476,6 +477,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     get: function () {
                         return this.exec !== "";
                     }
+                },
+                "onClose": {
+                    get: function () { return _onClose || false; },
+                    set: function (value) {
+                        if (typeof value !== "function") {
+                            throw new Error("AppContainers 'onClose' property must be a function.");
+                        }
+
+                        // Set value
+                        _onClose = value;
+                    }
                 }
             });
 
@@ -605,8 +617,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 this.closeButton.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
-
-
                 });
 
                 this.closeButton.addEventListener('click', function () {
@@ -614,9 +624,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
                     // Remove from DOM
                     that.containerElement.parentNode.removeChild(that.containerElement);
 
-                    //Destroy/Remove this object from Desktop
+                    // Destroy/Remove this object from Desktop
                     that.desktopObj.closeApp(that);
 
+                    // Run onClose function, if defined.
+                    if (typeof that.onClose === "function") {
+                        that.onClose();
+                    }
                 });
             },
 

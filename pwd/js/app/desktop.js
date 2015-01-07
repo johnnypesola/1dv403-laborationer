@@ -29,7 +29,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     width: 450,
                     height: 500,
                     isResizable: true,
-                    hasStatusBar: false,
+                    hasStatusBar: true,
                     hasContextMenu: true
                 },
                 {
@@ -40,7 +40,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     width: 700,
                     height: 640,
                     isResizable: true,
-                    hasStatusBar: true
+                    hasStatusBar: true,
+                    hasContextMenu: true
                 },
                 {
                     name: "Image Manager",

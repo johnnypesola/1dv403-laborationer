@@ -125,13 +125,15 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.cardsLocked = false;
 
         // Main app method
-            this.run = function(){
+            this.run = function () {
+                var contextMenuInfoObj,
+                    that = this;
 
                 // Clear container content
                 this.appContainerObj.clearContent();
 
                 // Check that there is an even number of total cards.
-                if(this.rows * this.columns % 2 !== 0){
+                if (this.rows * this.columns % 2 !== 0){
                     throw new Error("ERROR: Total number of cards is not even (" + this.rows + " rows * " + this.columns + " columns = " + this.rows * this.columns + " cards)");
                 }
 
@@ -140,6 +142,18 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 // Create cards from template array
                 this.createCards(this._cardTemplateArray);
+
+
+                // Setup settings for this appContainers contextMenu.
+                contextMenuInfoObj = {
+                    "Redigera": {
+                        "Starta om": function () {that.resetGame(); },
+                        "Inställningar": function () {}
+                    }
+                };
+
+                // Add contextMenu and return element references.
+                this.appContainerObj.contextMenuObj.addMenuContent(contextMenuInfoObj);
 
             };
         }
@@ -456,6 +470,18 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 });
 
                 return cardsLeft === 0;
+            },
+
+            resetGame: function () {
+
+                this.userGuessCount = 0;
+                this.cardsLocked = false;
+                this._cardObjArray = [];
+
+                this.appContainerObj.statusBarText = "";
+
+                this.run();
+
             }
         };
 
