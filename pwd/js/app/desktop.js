@@ -13,6 +13,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             var _availableApps = [
                 {
                     name: "Labby Mezzage",
+                    exec: "app/messageboard",
                     icon: "img/icon/labby_mezzage.svg",
                     cssClass: "labby-message",
                     width: 200,
@@ -41,6 +42,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     height: 655,
                     isResizable: true,
                     hasStatusBar: true,
+                    statusBarText: "Välkommen till Amigaspelsmemory. Gamla spel tillsammans i ett nytt.",
                     hasContextMenu: true
                 },
                 {
