@@ -7,92 +7,105 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
         var MessageBoard = function (appContainerObj) {
 
-            var _appContainerObj,
+            var _WRITE_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/setMessage.php",
+                _READ_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/getMessage.php",
+                _appContainerObj,
                 _parentContainer,
                 _msgContainer,
                 _newMsgContainer,
                 _msgCountContainer,
-                _submitMsgButton;
-            this._messages = [];
+                _submitMsgButton,
+                _messagesToGet,
+                _messagesArray = [];
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
                 "appContainerObj": {
-                    get: function () {
-                        return _appContainerObj || "";
-                    },
-
+                    get: function () { return _appContainerObj || ""; },
                     set: function (obj) {
                         if (obj !== null && typeof obj === "object") {
                             _appContainerObj = obj;
                         } else {
-                            throw new Error("RssReaders 'appContainerObj' property must be an object");
+                            throw new Error("MessageBoards 'appContainerObj' property must be an object");
                         }
                     }
                 },
                 "parentContainer": {
-                    get: function () {
-                        return _parentContainer || "";
-                    },
-
+                    get: function () { return _parentContainer || ""; },
                     set: function (element) {
                         if (element !== null && element.nodeName !== "undefined") {
                             _parentContainer = element;
                         } else {
-                            throw new Error("ERROR: MessageBoard:s container must be an element");
+                            throw new Error("MessageBoards 'parentContainer' must be an element");
                         }
                     }
                 },
                 "msgContainer": {
-                    get: function () {
-                        return _msgContainer || "";
-                    },
-
+                    get: function () { return _msgContainer || ""; },
                     set: function (element) {
                         if (element !== null && element.nodeName !== "undefined") {
                             _msgContainer = element;
                         } else {
-                            throw new Error("ERROR: msgContainer must be an element");
+                            throw new Error("MessageBoards 'msgContainer' must be an element");
                         }
                     }
                 },
                 "newMsgContainer": {
-                    get: function () {
-                        return _newMsgContainer || "";
-                    },
-
+                    get: function () { return _newMsgContainer || ""; },
                     set: function (element) {
-                        if (element !== null && typeof(element.nodeName) !== "undefined" && element.nodeName.toLowerCase() === "textarea") {
+                        if (element !== null && element.nodeName !== "undefined" && element.nodeName.toLowerCase() === "textarea") {
                             _newMsgContainer = element;
-                        }
-                        else {
-                            throw new Error("ERROR: newMsgContainer property can only contain an textarea element");
+                        } else {
+                            throw new Error("MessageBoards 'newMsgContainer' property can only contain an textarea element");
                         }
                     }
                 },
                 "msgCountContainer": {
-                    get: function () {
-                        return _msgCountContainer || "";
-                    },
-
+                    get: function () { return _msgCountContainer || ""; },
                     set: function (element) {
                         if (element !== null && typeof(element.nodeName) !== "undefined") {
                             _msgCountContainer = element;
                         } else {
-                            throw new Error("ERROR: msgCountContainer must be an element");
+                            throw new Error("MessageBoards 'msgCountContainer' must be an element");
                         }
                     }
                 },
                 "submitMsgButton": {
-                    get: function () {
-                        return _submitMsgButton || "";
-                    },
+                    get: function () { return _submitMsgButton || ""; },
                     set: function (element) {
                         if (element.nodeName !== "undefined" && element.nodeName.toLowerCase() === "button") {
                             _submitMsgButton = element;
                         } else {
-                            throw new Error("ERROR: submitMsgButton property can only contain an button element");
+                            throw new Error("MessageBoards 'submitMsgButton' property can only contain an button element");
                         }
+                    }
+                },
+                "WRITE_SERVER_URL": {
+                    get: function () { return _WRITE_SERVER_URL; }
+                },
+                "READ_SERVER_URL": {
+                    get: function () {return _READ_SERVER_URL; }
+                },
+                "messagesToGet": {
+                    get: function () { return _messagesToGet; },
+                    set: function (value) {
+                        var parsedValue = parseFloat(value);
+
+                        if (!parsedValue.isInt() || parsedValue < 0) {
+                            throw new Error("MessageBoards 'messagesToGet' property must be an integer and at least 0");
+                        }
+
+                        _messagesToGet = value;
+                    }
+                },
+                "messagesArray": {
+                    get: function () { return _messagesArray; },
+                    set: function (value) {
+                        if (!(value instanceof Array)) {
+                            throw new Error("Messageboards 'messagesArray' property must be an Array.");
+                        }
+
+                        _messagesArray = value;
                     }
                 }
             });
@@ -100,25 +113,16 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
         // Init values
             this.appContainerObj = appContainerObj;
             this.parentContainer = this.appContainerObj.contentElement;
+            this.messagesToGet = 20;
 
 
         // Main app method
             this.run = function () {
-
                 var that = this;
 
-                // Clear content in AppContainer
-                this.appContainerObj.clearContent();
+                // Fetch messages from server
+                this.getMessages();
 
-                this.createElements();
-
-                // Event listener: Add message on submit button press
-                this.submitMsgButton.onclick = function () {
-                    that.addMessage();
-                };
-
-                // Event listener: Add message on enter key press
-                this.addEnterListener();
             };
         };
 
@@ -127,16 +131,104 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
         MessageBoard.prototype = {
             constructor: MessageBoard, // Reestablish constructor pointer
 
+            getMessages: function () {
+                var that = this;
+
+                // Fetch remote data and fill imagesDataArray, done in private.
+                this.appContainerObj.desktopObj.ajaxCall("GET", this.READ_SERVER_URL + "?history=" + this.messagesToGet, function (httpRequest) {
+                    that.handleAjaxResponse(httpRequest);
+                });
+
+            },
+
+            handleAjaxResponse: function (httpRequest) {
+
+                // When request is completed
+                if (httpRequest.readyState === 4 && httpRequest.responseText.length > 0) {
+
+                    // If the HTTP result code was "Bad request"
+                    if (httpRequest.status === 400) {
+                        throw new Error('MessageBoard: Ajax request returned 400 Bad Request');
+                    }
+                    // If the HTTP result code was "Not found"
+                    else if (httpRequest.status === 404) {
+                        throw new Error('MessageBoard: Ajax request returned 404 Not Found');
+                    }
+                    // If the HTTP result code was successful
+                    else if (httpRequest.status === 200) {
+                        var xmlResponse,
+                            that = this;
+
+                        // Get response
+                        xmlResponse = new DOMParser().parseFromString(httpRequest.responseText, 'text/xml');
+
+                        // Parse response
+                        this.parseXmlResponse(xmlResponse);
+
+                        // Clear content in AppContainer
+                        this.appContainerObj.clearContent();
+
+                        // Create elements
+                        this.createElements();
+
+                        // Render messages
+                        this.renderMessages();
+
+                        // Event listener: Add message on submit button press
+                        this.submitMsgButton.onclick = function () {
+                            that.addMessage();
+                        };
+
+                        // Event listener: Add message on enter key press
+                        this.addEnterListener();
+
+
+                    } else {
+                        throw new Error('MessageBoard: There was a problem with the ajax request.');
+                    }
+                }
+            },
+
+            parseXmlResponse: function (xmlResponse) {
+                var id,
+                    text,
+                    author,
+                    time,
+                    messagesNodeList,
+                    that = this;
+
+                // Get all messages
+                messagesNodeList = xmlResponse.querySelectorAll("message");
+
+                // Loop through messages
+                messagesNodeList.forEach(function (element) {
+
+                    // Get all values
+                    id = element.querySelector("id").innerHTML;
+                    text = element.querySelector("text").innerHTML;
+                    author = element.querySelector("author").innerHTML;
+                    time = new Date(element.querySelector("time").innerHTML * 1000);
+
+                    // Push values as message-objects to messagesArray
+                    that.messagesArray.push({
+                        id: id,
+                        text: text,
+                        author: author,
+                        time: time
+                    });
+                });
+            },
+
             addMessage: function () {
                 var that = this;
 
                 require(["app/message"], function (Message) {
 
                     // Create new message and push to container array
-                    that._messages.push(new Message(that.newMsgContainer.value));
+                    //that.messagesArray.push(new Message(that.newMsgContainer.value));
 
                     // Print out added message
-                    that.renderMessage(that._messages.length - 1, true);
+                    that.renderMessage(that.messagesArray.length - 1, true);
 
                     // Update count
                     that.updateCount();
@@ -145,7 +237,6 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     that.newMsgContainer.value = '';
                 });
             },
-
             createElements: function () {
 
                 var section,
@@ -201,14 +292,15 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 this.parentContainer.appendChild(this.msgContainer);
                 this.parentContainer.appendChild(section);
             },
-
+            /*
             removeMessage: function (index) {
                 if (confirm("Are you sure you want to remove this message?")) {
-                    this._messages.splice(index, 1);
+                    this.messagesArray.splice(index, 1);
                     this.renderMessages();
                     this.updateCount();
                 }
             },
+*/
 
             addEnterListener: function () {
 
@@ -242,7 +334,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                 var countText;
 
-                countText = document.createTextNode(this._messages.length);
+                countText = document.createTextNode(this.messagesArray.length);
 
                 this.removeChildren(this.msgCountContainer);
 
@@ -251,33 +343,43 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
             renderMessage: function (index, isNew) {
 
-                var msg,
+                var msgObj,
                     article,
+                    author,
                     text,
                     time,
                     flap,
                     close,
                     timeContent,
                     textContent,
+                    authorContent,
                     that;
 
-                msg = this._messages[index];
+
+
+                msgObj = this.messagesArray[index];
                 that = this;
+
+                // author, id, text, time
 
                 // Create elements
                 article = document.createElement("article");
+
+                author = document.createElement("span");
                 text = document.createElement("p");
                 time = document.createElement("a");
                 flap = document.createElement("div");
                 close = document.createElement("a");
 
+
                 // Create content
-                timeContent = document.createTextNode(msg.date.getHoursMinutesSeconds());
-                textContent = msg.getHTMLText();
+                timeContent = document.createTextNode(msgObj.time.getHoursMinutesSeconds());
+                textContent = msgObj.text;
+                authorContent = msgObj.author;
 
                 // Set classes
+                author.classList.add("author");
                 time.classList.add("time");
-
                 flap.classList.add("flap");
                 close.classList.add("close");
 
@@ -322,7 +424,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 this.removeChildren(this.msgContainer);
 
                 // Add all messages, including new one
-                for (index = 0; index < this._messages.length; index++) {
+                for (index = 0; index < this.messagesArray.length; index++) {
                     this.renderMessage(index, false);
                 }
             }

@@ -17,7 +17,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     icon: "img/icon/labby_mezzage.svg",
                     cssClass: "labby-mezzage",
                     width: 600,
-                    height: 415,
+                    height: 600,
                     isResizable: true,
                     hasStatusBar: true,
                     statusBarText: "Welcome to Labby Mezzage"

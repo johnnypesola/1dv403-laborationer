@@ -36,10 +36,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 },
                 "userGuessCount": {
                     get: function () { return _userGuessCount; },
-
                     set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue >= 0 && parsedValue % 1 === 0 && value == parsedValue)) {
+
+                        if (!parsedValue.isInt() || parsedValue < 0) {
                             throw new Error("MemoryBoards 'userGuessCount' property must be an integer and at least 0");
                         }
 
@@ -48,10 +48,9 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 },
                 "rows": {
                     get: function () { return _rows; },
-
                     set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)){
+                        if (!parsedValue.isInt() || parsedValue < 1) {
                             throw new Error("MemoryBoards 'rows' property must be an integer and at least 1");
                         }
 
@@ -60,10 +59,9 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 }, // Not used right now
                 "columns": {
                     get: function () { return _columns; },
-
                     set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)){
+                        if (!parsedValue.isInt() || parsedValue < 1) {
                             throw new Error("MemoryBoards 'columns' property must be an integer and at least 1");
                         }
 
@@ -72,10 +70,9 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 }, // Not used right now
                 "cardPairs": {
                     get: function () { return _cardPairs; },
-
                     set: function (value) {
                         var parsedValue = parseFloat(value);
-                        if (!(!isNaN(parsedValue) && isFinite(parsedValue) && parsedValue > 0 && parsedValue % 1 === 0 && value == parsedValue)) {
+                        if (!parsedValue.isInt() || parsedValue < 1) {
                             throw new Error("MemoryBoards 'cardPairs' property must be an integer and at least 1");
                         }
 
@@ -109,7 +106,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     get: function () { return _cardObjArray; },
                     set: function (value) {
                         if (!(value instanceof Array)) {
-                            throw new Error("MemoryBoards 'cardObjArray' property must be an Array.")
+                            throw new Error("MemoryBoards 'cardObjArray' property must be an Array.");
                         }
                         _cardObjArray = value;
                     }
@@ -130,7 +127,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 "cardsLocked": {
                     get: function () {return _cardsLocked; },
                     set: function (value) {
-                        if (typeof value !== "boolean" ) {
+                        if (typeof value !== "boolean") {
                             throw new Error("MemoryBoards 'cardsLocked' property must be a boolean type.");
                         }
 
@@ -138,10 +135,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     }
                 },
                 "CARDS_OPEN_TIME": {
-                    get: function(){ return _CARDS_OPEN_TIME }
+                    get: function () { return _CARDS_OPEN_TIME; }
                 },
                 "CARDS_FLIP_DURATION": {
-                    get: function(){ return _CARDS_FLIP_DURATION }
+                    get: function () { return _CARDS_FLIP_DURATION; }
                 },
                 "MAX_CARDS_OPEN": {
                     get: function () { return _MAX_CARDS_OPEN; }
@@ -151,7 +148,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         if (this.cardObjArray.length > 0) {
                             return this.cardObjArray[0].titleArray.length;
                         }
-                        throw new Error("MemoryBoard, cannot get MAX_CARD_PAIS at this time. cardObjArray is empty.");
+                        throw new Error("MemoryBoard, cannot get MAX_CARD_PAIRS at this time. cardObjArray is empty.");
                     }
                 }
             });
@@ -166,8 +163,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
         // Main app method
             this.run = function () {
-                var contextMenuInfoObj,
-                    that = this;
+                var contextMenuInfoObj;
 
                 // Clear container content
                 this.appContainerObj.clearContent();
@@ -245,7 +241,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 // Create option elements
                 for (i = 1; i <= this.MAX_CARD_PAIRS; i++) {
                     optionElement = document.createElement("option");
-                    optionElement.setAttribute("value", i);
+                    optionElement.setAttribute("value", i.toString());
 
                     optionElement.innerHTML = i + " par";
 
@@ -274,8 +270,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             },
 
             getPictureArray: function (numberOfImages) {
-                var numberOfImages,
-                    maxImageNumber,
+                var maxImageNumber,
                     i,
                     imgPlace = [],
                     currentImageNumber,
@@ -284,7 +279,6 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     randomOne,
                     randomTwo;
 
-                numberOfImages;
                 maxImageNumber = numberOfImages / 2;
 
                 // Place pictures in an Array..
@@ -525,7 +519,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 }, this.CARDS_FLIP_DURATION / 2);
             },
 
-            addCardInfo: function(cardContainer, cardId) {
+            addCardInfo: function (cardContainer, cardId) {
 
                 var titleTextNode,
                     titleTextContainer,

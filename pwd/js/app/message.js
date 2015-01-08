@@ -44,15 +44,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
             }
         };
 
-    /* Extended prototype method for Date data structure */
-        Date.prototype.getHoursMinutesSeconds = function(){
-            var hours = ('0' + this.getHours()).slice(-2),
-                minutes = ('0' + this.getMinutes()).slice(-2),
-                seconds = ('0' + this.getSeconds()).slice(-2);
-
-            return hours + ":" + minutes + ":" + seconds;
-        };
-
         return Message;
 
     }());
