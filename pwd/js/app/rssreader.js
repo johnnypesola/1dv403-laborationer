@@ -24,8 +24,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         src: "http://www.aftonbladet.se/rss.xml"
                     },
                     {
-                        name: "Expressen.se",
-                        src: "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss"
+                        name: "IDG Lagring",
+                        src: "http://www.idg.se/rss/lagring"
                     }
                 ],
                 _rssFeedSourceURL,

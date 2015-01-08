@@ -15,15 +15,15 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 _newMsgContainer,
                 _msgCountContainer,
                 _submitMsgButton,
-                _messagesToGet,
+                _MESSAGES_TO_GET = 20,
                 _messagesArray = [],
-                _updateInterval,
+                _UPDATE_INTERVAL = 60,
                 _updateIntervalID,
                 _numberOfUpdates,
                 _MAX_UPDATE_INTERVAL = 600,
                 _MIN_UPDATE_INTERVAL = 10,
                 _MAX_MESSAGES = 200,
-                _postMessageAlias,
+                _POST_MESSAGE_ALIAS = "Anonymous",
                 _hasEnterListener,
                 _wasManualUpdate;
 
@@ -96,7 +96,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     get: function () {return _READ_SERVER_URL; }
                 },
                 "messagesToGet": {
-                    get: function () { return _messagesToGet; },
+                    get: function () {
+                        // Return cookie value
+                        return parseInt(this.appContainerObj.desktopObj.readCookie("MSGBmessagesToGet"), 10) || _MESSAGES_TO_GET;
+                    },
                     set: function (value) {
                         var parsedValue = parseFloat(value);
 
@@ -104,7 +107,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                             throw new Error("MessageBoards 'messagesToGet' property must be an integer and at least 0");
                         }
 
-                        _messagesToGet = value;
+                        // Set cookie value
+                        this.appContainerObj.desktopObj.createCookie("MSGBmessagesToGet", parsedValue, 30);
                     }
                 },
                 "numberOfUpdates": {
@@ -129,7 +133,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     }
                 },
                 "updateInterval": {
-                    get: function () { return _updateInterval || ""; },
+                    get: function () {
+                        // Return cookie value
+                        return parseInt(this.appContainerObj.desktopObj.readCookie("MSGBupdateInterval"), 10) || _UPDATE_INTERVAL;
+                    },
 
                     set: function (value) {
                         var parsedValue = parseFloat(value),
@@ -141,8 +148,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                                 throw new Error("MessageBoards 'updateInterval' cannot be higher than " + this.MAX_UPDATE_INTERVAL);
                             }
 
-                            // Store update interval value
-                            _updateInterval = parsedValue;
+                            // Store update interval value in cookie
+                            this.appContainerObj.desktopObj.createCookie("MSGBupdateInterval", parsedValue, 30);
 
                             // Calculate minutes in ms
                             parsedValue = parsedValue * 1000;
@@ -187,13 +194,19 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 },
                 "postMessageAlias": {
                     get: function () {
-                        return _postMessageAlias || "";
+
+                        // Return cookie value
+                        return this.appContainerObj.desktopObj.readCookie("MSGBpostMessageAlias") || _POST_MESSAGE_ALIAS;
                     },
                     set: function (value) {
                         if (value !== null && typeof value === "string") {
 
                             // Remove non alphanumeric characters.
-                            _postMessageAlias = value.replace(/\W/g, '');
+                            value = value.replace(/[^\w\s]/gi, '');
+
+                            // Store update interval value in cookie
+                            this.appContainerObj.desktopObj.createCookie("MSGBpostMessageAlias", value, 30);
+
                         } else {
                             throw new Error("MessageBoards 'postMessageAlias' must be a string)");
                         }
@@ -218,18 +231,16 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         // Set value
                         _wasManualUpdate = value;
                     }
-                },
+                }
             });
 
         // Init values
             this.appContainerObj = appContainerObj;
             this.parentContainer = this.appContainerObj.contentElement;
             this.numberOfUpdates = 0;
-            this.messagesToGet = 20;
-            this.updateInterval = 60;
-            this.postMessageAlias = "Anonymous";
             this.hasEnterListener = false;
             this.wasManualUpdate = false;
+            this.updateInterval = this.updateInterval; // Will trigger setTimeout 
 
         // Main app method
             this.run = function () {
@@ -386,7 +397,6 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     // Fetch messages from server
                     that.getMessages();
                     that.appContainerObj.closePopups();
-
                 });
 
                 // Add select to container element
