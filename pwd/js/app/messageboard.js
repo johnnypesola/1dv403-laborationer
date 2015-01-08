@@ -7,7 +7,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
         var MessageBoard = function (appContainerObj) {
 
-            var _WRITE_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/setMessage.php",
+            var _WRITE_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/setMessage.php", // services/testservice.php"
                 _READ_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/getMessage.php",
                 _appContainerObj,
                 _parentContainer,
@@ -19,8 +19,13 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 _messagesArray = [],
                 _updateInterval,
                 _updateIntervalID,
+                _numberOfUpdates,
                 _MAX_UPDATE_INTERVAL = 600,
-                _MIN_UPDATE_INTERVAL = 10;
+                _MIN_UPDATE_INTERVAL = 10,
+                _MAX_MESSAGES = 200,
+                _postMessageAlias,
+                _hasEnterListener,
+                _wasManualUpdate;
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -67,7 +72,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 "msgCountContainer": {
                     get: function () { return _msgCountContainer || ""; },
                     set: function (element) {
-                        if (element !== null && typeof(element.nodeName) !== "undefined") {
+                        if (element !== null && element.nodeName !== "undefined") {
                             _msgCountContainer = element;
                         } else {
                             throw new Error("MessageBoards 'msgCountContainer' must be an element");
@@ -102,6 +107,17 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         _messagesToGet = value;
                     }
                 },
+                "numberOfUpdates": {
+                    get: function () { return _numberOfUpdates; },
+                    set: function (value) {
+                        var parsedValue = parseFloat(value);
+
+                        if (!parsedValue.isInt() || parsedValue < 0) {
+                            throw new Error("MessageBoards 'numberOfUpdates' property must be an integer and at least 0");
+                        }
+                        _numberOfUpdates = value;
+                    }
+                },
                 "messagesArray": {
                     get: function () { return _messagesArray; },
                     set: function (value) {
@@ -134,7 +150,6 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                             // Try to clear old interval
                             if (this.updateIntervalID) {
                                 window.clearInterval(this.updateIntervalID);
-                                console.log("cleared");
                             }
 
                             // Set interval and store ID
@@ -166,21 +181,68 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 },
                 "MIN_UPDATE_INTERVAL": {
                     get: function () { return _MIN_UPDATE_INTERVAL; }
-                }
+                },
+                "MAX_MESSAGES": {
+                    get: function () { return _MAX_MESSAGES; }
+                },
+                "postMessageAlias": {
+                    get: function () {
+                        return _postMessageAlias || "";
+                    },
+                    set: function (value) {
+                        if (value !== null && typeof value === "string") {
+
+                            // Remove non alphanumeric characters.
+                            _postMessageAlias = value.replace(/\W/g, '');
+                        } else {
+                            throw new Error("MessageBoards 'postMessageAlias' must be a string)");
+                        }
+                    }
+                },
+                "hasEnterListener": {
+                    get: function () { return _hasEnterListener; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("MessageBoards 'hasEnterListener' property must be a boolean type.");
+                        }
+                        // Set value
+                        _hasEnterListener = value;
+                    }
+                },
+                "wasManualUpdate": {
+                    get: function () { return _wasManualUpdate; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("MessageBoards 'wasManualUpdate' property must be a boolean type.");
+                        }
+                        // Set value
+                        _wasManualUpdate = value;
+                    }
+                },
             });
 
         // Init values
             this.appContainerObj = appContainerObj;
             this.parentContainer = this.appContainerObj.contentElement;
+            this.numberOfUpdates = 0;
             this.messagesToGet = 20;
             this.updateInterval = 60;
+            this.postMessageAlias = "Anonymous";
+            this.hasEnterListener = false;
+            this.wasManualUpdate = false;
 
         // Main app method
             this.run = function () {
                 var that = this;
 
+                // Clear area
+                this.appContainerObj.clearContent();
+
                 // Add contextMenu
                 this.appContainerObj.contextMenuObj.addMenuContent(this.defineContextMenuSettings());
+
+                // Create elements
+                this.createElements();
 
                 // Fetch messages from server
                 this.getMessages();
@@ -209,16 +271,129 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                         },
                         "Antal meddelanden": function () {
-                            that.popupSelectSourceOptions();
+                            that.popupMessagesToGetOptions();
                         },
                         "Alias": function () {
-                            that.popupSelectSourceOptions();
+                            that.popupEnterAliasOptions();
                         },
                         "Uppdatera nu": function () {that.getMessages(); }
                     }
                 };
 
                 return contextMenuInfoObj;
+            },
+
+            popupEnterAliasOptions: function () {
+                var enterAliasContent,
+                    popup;
+
+                // Get content for Update Interval popup
+                enterAliasContent = this.createEnterAliasContent();
+                popup = new Popup(this.appContainerObj, "Byt ditt Alias: ", enterAliasContent);
+            },
+
+            createEnterAliasContent: function () {
+
+                var containerElement,
+                    inputElement,
+                    submitElement,
+                    that = this;
+
+                // Create container element
+                containerElement = document.createElement("div");
+
+                containerElement.innerHTML = "Ange ditt alias : ";
+
+                // Create elements
+                inputElement = document.createElement("input");
+                submitElement = document.createElement("button");
+
+                inputElement.value = that.postMessageAlias;
+                inputElement.setAttribute("type", "text");
+                submitElement.innerHTML = "Verkställ";
+                submitElement.classList.add("submitbutton");
+
+                // Action on submit
+                submitElement.addEventListener("click", function () {
+                    that.postMessageAlias = inputElement.value;
+                    that.appContainerObj.statusBarText = "Alias bytt till " + inputElement.value;
+                    that.appContainerObj.closePopups();
+                });
+
+                // Add elements to container element
+                containerElement.appendChild(inputElement);
+                containerElement.appendChild(submitElement);
+
+                // Return containerElement
+                return containerElement;
+            },
+
+            popupMessagesToGetOptions: function () {
+                var messagesToGetContent,
+                    popup;
+
+                // Get content for Update Interval popup
+                messagesToGetContent = this.createMessagesToGetContent();
+                popup = new Popup(this.appContainerObj, "Välj antal meddelanden som hämtas", messagesToGetContent);
+            },
+
+            createMessagesToGetContent: function () {
+
+                var containerElement,
+                    selectElement,
+                    optionElement,
+                    i,
+                    that = this;
+
+                // Create container element
+                containerElement = document.createElement("div");
+
+                containerElement.innerHTML = "Hämta : ";
+
+                // Create select element
+                selectElement = document.createElement("select");
+
+                // Create option elements
+                for (i = 10; i <= this.MAX_MESSAGES; i += 10) {
+                    optionElement = document.createElement("option");
+                    optionElement.setAttribute("value", i);
+
+                    optionElement.innerHTML = i + " st. meddelanden";
+
+
+                    // Check if this option should be selected
+                    if (this.messagesToGet === i) {
+                        optionElement.setAttribute("selected", "selected");
+                    }
+
+                    // Add option to select
+                    selectElement.appendChild(optionElement);
+                }
+
+                // Action on select change
+                selectElement.addEventListener("change", function () {
+                    that.messagesToGet = this.value;
+
+                    // Clear content
+                    that.appContainerObj.clearContent();
+
+                    // Create elements
+                    that.createElements();
+
+                    // Mark update as manual
+                    that.wasManualUpdate = true;
+
+                    // Fetch messages from server
+                    that.getMessages();
+                    that.appContainerObj.closePopups();
+
+                });
+
+                // Add select to container element
+                containerElement.appendChild(selectElement);
+
+                // Return containerElement
+                return containerElement;
             },
 
             popupUpdateIntervalOptions: function () {
@@ -243,7 +418,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 // Create container element
                 containerElement = document.createElement("div");
 
-                containerElement.innerHTML = "Uppdatera flödet: "
+                containerElement.innerHTML = "Uppdatera flödet: ";
 
                 // Create select element
                 selectElement = document.createElement("select");
@@ -301,17 +476,20 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             getMessages: function () {
                 var that = this;
 
+                // Render app as loading
+//                this.appContainerObj.renderAsLoading();
+
                 // Remove old messages
                 this.messagesArray = [];
 
                 // Fetch remote data and fill imagesDataArray, done in private.
                 this.appContainerObj.desktopObj.ajaxCall("GET", this.READ_SERVER_URL + "?history=" + this.messagesToGet, function (httpRequest) {
-                    that.handleAjaxResponse(httpRequest);
+                    that.handleAjaxResponse(httpRequest, "GET");
                 });
 
             },
 
-            handleAjaxResponse: function (httpRequest) {
+            handleAjaxResponse: function (httpRequest, method) {
 
                 // When request is completed
                 if (httpRequest.readyState === 4 && httpRequest.responseText.length > 0) {
@@ -326,32 +504,19 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     }
                     // If the HTTP result code was successful
                     else if (httpRequest.status === 200) {
-                        var xmlResponse,
-                            that = this;
+                        var xmlResponse;
 
-                        // Get response
-                        xmlResponse = new DOMParser().parseFromString(httpRequest.responseText, 'text/xml');
+                        // If we get new messages, parse them.
+                        if (method === "GET") {
+                            // Get response
+                            xmlResponse = new DOMParser().parseFromString(httpRequest.responseText, 'text/xml');
 
-                        // Parse response
-                        this.parseXmlResponse(xmlResponse);
+                            // Parse response
+                            this.parseXmlResponse(xmlResponse);
 
-                        // Clear content in AppContainer
-                        this.appContainerObj.clearContent();
-
-                        // Create elements
-                        this.createElements();
-
-                        // Render messages
-                        this.renderMessages();
-
-                        // Event listener: Add message on submit button press
-                        this.submitMsgButton.onclick = function () {
-                            that.addMessage();
-                        };
-
-                        // Event listener: Add message on enter key press
-                        this.addEnterListener();
-
+                            // Render messages
+                            this.renderMessages();
+                        }
 
                     } else {
                         throw new Error('MessageBoard: There was a problem with the ajax request.');
@@ -392,20 +557,19 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             addMessage: function () {
                 var that = this;
 
-                require(["app/message"], function (Message) {
 
-                    // Create new message and push to container array
-                    //that.messagesArray.push(new Message(that.newMsgContainer.value));
+                // Fetch remote data and fill imagesDataArray, done in private.
+                this.appContainerObj.desktopObj.ajaxCall("POST", this.WRITE_SERVER_URL, function (httpRequest) {
 
-                    // Print out added message
-                    that.renderMessage(that.messagesArray.length - 1, true);
-
-                    // Update count
-                    that.updateCount();
+                    that.handleAjaxResponse(httpRequest, "POST");
 
                     // Empty the textarea
                     that.newMsgContainer.value = '';
-                });
+
+                    // Update messages
+                    that.getMessages();
+
+                }, "username=" + this.postMessageAlias + "&text=" + this.newMsgContainer.value);
             },
 
             createElements: function () {
@@ -415,7 +579,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     counterParent,
                     counterText,
                     bouble1,
-                    bouble2;
+                    bouble2,
+                    that = this;
 
                 // Message list
 
@@ -433,6 +598,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 // Submit button
                 this.submitMsgButton = document.createElement("button");
                 this.submitMsgButton.appendChild(document.createTextNode("Posta"));
+
+                // Event listener: Add message on submit button press
+                this.submitMsgButton.onclick = function () {
+                    that.addMessage();
+                };
 
                 // Counter
                 counterParent = document.createElement("div");
@@ -462,39 +632,35 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                 this.parentContainer.appendChild(this.msgContainer);
                 this.parentContainer.appendChild(section);
+
+                // Event listener: Add message on enter key press
+                this.addEnterListener();
             },
-            /*
-            removeMessage: function (index) {
-                if (confirm("Are you sure you want to remove this message?")) {
-                    this.messagesArray.splice(index, 1);
-                    this.renderMessages();
-                    this.updateCount();
-                }
-            },
-*/
 
             addEnterListener: function () {
 
-                var that;
+                var that = this;
 
-                that = this;
+                if (!this.hasEnterListener) {
+                    this.newMsgContainer.onkeypress = function (e) {
 
-                this.newMsgContainer.onkeypress = function (e) {
+                        // If enter is pressed without shift key.
+                        if (!e.shiftKey && e.keyCode === 13) {
 
-                    // If enter is pressed without shift key.
-                    if (!e.shiftKey && e.keyCode === 13) {
+                            that.addMessage();
 
-                        that.addMessage();
+                            // Prevent default new line behaviour (When pressing enter key.)
+                            return false;
+                        }
+                    };
 
-                        // Prevent default new line behaviour (When pressing enter key.)
-                        return false;
-                    }
-                };
+                    this.hasEnterListener = true;
+                }
             },
 
             removeChildren: function (parent) {
 
-                if (typeof(parent) !== "undefined") {
+                if (parent !== "undefined") {
                     while (parent.firstChild) {
                         parent.removeChild(parent.firstChild);
                     }
@@ -520,17 +686,12 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     text,
                     time,
                     flap,
-                    close,
                     dateObj,
                     timeContent,
                     textContent,
-                    authorContent,
-                    that;
-
-
+                    authorContent;
 
                 msgObj = this.messagesArray[index];
-                that = this;
 
                 // author, id, text, time
 
@@ -542,17 +703,14 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 time = document.createElement("span");
                 flap = document.createElement("div");
 
+                // Set ID
+                article.dataset.id = msgObj.id;
+
                 // Format time
-                dateObj = new Date( parseInt(msgObj.time,10));
+                dateObj = new Date(parseInt(msgObj.time, 10));
 
                 // Create content
-
-                timeContent = document.createTextNode(dateObj.getFullYear() + "-"
-                    + (dateObj.getMonth() + 1) + "-"
-                    + dateObj.getDate() + " ("
-                    + dateObj.getHoursMinutesSeconds() + ")"
-                );
-
+                timeContent = document.createTextNode(dateObj.getYearsMonthsDays() + " (" + dateObj.getHoursMinutesSeconds() + ")");
                 textContent = msgObj.text;
                 authorContent = msgObj.author;
 
@@ -582,24 +740,48 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
             renderMessages: function () {
 
-                var index;
+                var index,
+                    messageContainers,
+                    match,
+                    that = this;
 
                 // Clear previous messages
-                this.removeChildren(this.msgContainer);
+//                this.removeChildren(this.msgContainer);
+
+
+                messageContainers = this.msgContainer.querySelectorAll('article');
 
                 // Add all messages, including new one
                 for (index = 0; index < this.messagesArray.length; index++) {
-                    this.renderMessage(index, false);
+                    match = false;
+
+                    messageContainers.forEach(function(element) {
+                        if (element.dataset.id === that.messagesArray[index].id) {
+                            match = true;
+                        }
+                    });
+
+                    if (!match) {
+                        this.renderMessage(index, false);
+                    }
                 }
 
                 // Update Message count
                 this.updateCount(this.messagesArray.length);
 
-                // Scroll to the bottom
-                this.parentContainer.scrollTop = this.parentContainer.scrollHeight;
-
                 // Set last uppdated status text.
                 this.appContainerObj.statusBarText = "Senast uppdaterad: " + new Date().getHoursMinutesSeconds();
+
+                // Scroll to bottom if its the first update.
+                if (this.numberOfUpdates === 0 || this.wasManualUpdate) {
+                    // Scroll to the bottom
+                    this.parentContainer.scrollTop = this.parentContainer.scrollHeight;
+                    // Unmark manual update
+                    this.wasManualUpdate = false;
+                }
+
+                // Increase number of updates
+                this.numberOfUpdates++;
 
             }
         };

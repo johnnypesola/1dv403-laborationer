@@ -308,13 +308,9 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 });
             },
 
-            ajaxCall: function (method, url, callBackFunction, parametersObj) {
+            ajaxCall: function (method, url, callBackFunction, parameters) {
 
-                var httpRequest,
-                    parameters;
-
-                // Format parameters, if any
-                parameters = (parametersObj ? JSON.stringify(parametersObj) : null);
+                var httpRequest;
 
                 // Modern browsers
                 if (window.XMLHttpRequest) {
@@ -335,7 +331,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
 
                 // Optional parameters
                 if (method === "POST") {
-                    httpRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                    httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 }
 
                 // Send parameters
