@@ -20,7 +20,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     height: 600,
                     isResizable: true,
                     hasStatusBar: true,
-                    statusBarText: "Welcome to Labby Mezzage"
+                    statusBarText: "Välkommen till Labby Mezzage.",
+                    hasContextMenu: true
                 },
                 {
                     name: "RSS Reader",

@@ -16,7 +16,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 _msgCountContainer,
                 _submitMsgButton,
                 _messagesToGet,
-                _messagesArray = [];
+                _messagesArray = [],
+                _updateInterval,
+                _updateIntervalID,
+                _MAX_UPDATE_INTERVAL = 600,
+                _MIN_UPDATE_INTERVAL = 10;
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -107,6 +111,61 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                         _messagesArray = value;
                     }
+                },
+                "updateInterval": {
+                    get: function () { return _updateInterval || ""; },
+
+                    set: function (value) {
+                        var parsedValue = parseFloat(value),
+                            that = this;
+
+                        if (parsedValue.isInt() && parsedValue >= 0) {
+
+                            if (parsedValue > this.MAX_UPDATE_INTERVAL) {
+                                throw new Error("MessageBoards 'updateInterval' cannot be higher than " + this.MAX_UPDATE_INTERVAL);
+                            }
+
+                            // Store update interval value
+                            _updateInterval = parsedValue;
+
+                            // Calculate minutes in ms
+                            parsedValue = parsedValue * 1000;
+
+                            // Try to clear old interval
+                            if (this.updateIntervalID) {
+                                window.clearInterval(this.updateIntervalID);
+                                console.log("cleared");
+                            }
+
+                            // Set interval and store ID
+                            this.updateIntervalID = window.setInterval(function () {
+                                that.getMessages();
+                            }, parsedValue);
+
+                        } else {
+                            throw new Error("MessageBoards 'updateInterval' property must be an positive int.");
+                        }
+                    }
+                },
+                "updateIntervalID": {
+                    get: function () { return _updateIntervalID || false; },
+
+                    set: function (value) {
+
+                        if (value.isInt() && value >= 0) {
+
+                            _updateIntervalID = value;
+
+                        } else {
+                            throw new Error("Rss Readers 'updateIntervalID' property must be an int.");
+                        }
+                    }
+                },
+                "MAX_UPDATE_INTERVAL": {
+                    get: function () { return _MAX_UPDATE_INTERVAL; }
+                },
+                "MIN_UPDATE_INTERVAL": {
+                    get: function () { return _MIN_UPDATE_INTERVAL; }
                 }
             });
 
@@ -114,15 +173,22 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             this.appContainerObj = appContainerObj;
             this.parentContainer = this.appContainerObj.contentElement;
             this.messagesToGet = 20;
-
+            this.updateInterval = 60;
 
         // Main app method
             this.run = function () {
                 var that = this;
 
+                // Add contextMenu
+                this.appContainerObj.contextMenuObj.addMenuContent(this.defineContextMenuSettings());
+
                 // Fetch messages from server
                 this.getMessages();
 
+                // Make sure interval is stopped when application is closed
+                this.appContainerObj.onClose = function () {
+                    window.clearInterval(that.updateIntervalID);
+                };
             };
         };
 
@@ -131,8 +197,112 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
         MessageBoard.prototype = {
             constructor: MessageBoard, // Reestablish constructor pointer
 
+            defineContextMenuSettings: function () {
+                var that = this,
+                    contextMenuInfoObj;
+
+                // Setup settings for this appContainers contextMenu.
+                contextMenuInfoObj = {
+                    "Inställningar": {
+                        "Uppdateringsintervall": function () {
+                            that.popupUpdateIntervalOptions();
+
+                        },
+                        "Antal meddelanden": function () {
+                            that.popupSelectSourceOptions();
+                        },
+                        "Alias": function () {
+                            that.popupSelectSourceOptions();
+                        },
+                        "Uppdatera nu": function () {that.getMessages(); }
+                    }
+                };
+
+                return contextMenuInfoObj;
+            },
+
+            popupUpdateIntervalOptions: function () {
+                var updateIntervalContent,
+                    popup;
+
+                // Get content for Update Interval popup
+                updateIntervalContent = this.createUpdateIntervalPopupContent();
+                popup = new Popup(this.appContainerObj, "Välj uppdateringsintervall", updateIntervalContent);
+
+            },
+
+            createUpdateIntervalPopupContent: function () {
+
+                var containerElement,
+                    selectElement,
+                    optionElement,
+                    displayedValue,
+                    i,
+                    that = this;
+
+                // Create container element
+                containerElement = document.createElement("div");
+
+                containerElement.innerHTML = "Uppdatera flödet: "
+
+                // Create select element
+                selectElement = document.createElement("select");
+
+                // Create option elements
+                i = 0;
+                do {
+                    if (i >= 60) {
+                        // Increase value with 60 after 60.
+                        i += 60;
+
+                        // Different option text formatting depending on value
+                        if (i === 60) {
+                            displayedValue = "Varje minut";
+                        } else if (i === 120) {
+                            displayedValue = "Varannan minut";
+                        } else {
+                            displayedValue = "Var " + (i / 60) + ":e minut";
+                        }
+                    } else {
+                        // Increase by 10
+                        i += this.MIN_UPDATE_INTERVAL;
+                        displayedValue = "Var " + i + ":e sekund";
+                    }
+
+                    optionElement = document.createElement("option");
+                    optionElement.setAttribute("value", i);
+
+                    optionElement.innerHTML = displayedValue;
+
+                    // Check if this option should be selected
+                    if (this.updateInterval === i) {
+                        optionElement.setAttribute("selected", "selected");
+                    }
+
+                    // Add option to select
+                    selectElement.appendChild(optionElement);
+
+                } while (i <= this.MAX_UPDATE_INTERVAL);
+
+                // Action on select change
+                selectElement.addEventListener("change", function () {
+                    that.updateInterval = this.value;
+                    that.appContainerObj.statusBarText = "Flödet uppdateras nu: " + selectElement.options[selectElement.selectedIndex].innerText;
+                    that.appContainerObj.closePopups();
+                });
+
+                // Add select to container element
+                containerElement.appendChild(selectElement);
+
+                // Return containerElement
+                return containerElement;
+            },
+
             getMessages: function () {
                 var that = this;
+
+                // Remove old messages
+                this.messagesArray = [];
 
                 // Fetch remote data and fill imagesDataArray, done in private.
                 this.appContainerObj.desktopObj.ajaxCall("GET", this.READ_SERVER_URL + "?history=" + this.messagesToGet, function (httpRequest) {
@@ -237,6 +407,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     that.newMsgContainer.value = '';
                 });
             },
+
             createElements: function () {
 
                 var section,
@@ -261,11 +432,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                 // Submit button
                 this.submitMsgButton = document.createElement("button");
-                this.submitMsgButton.appendChild(document.createTextNode("Write"));
+                this.submitMsgButton.appendChild(document.createTextNode("Posta"));
 
                 // Counter
                 counterParent = document.createElement("div");
-                counterParentText = document.createTextNode("Message count: ");
+                counterParentText = document.createTextNode("Antal meddelanden: ");
                 counterParent.appendChild(counterParentText);
 
                 this.msgCountContainer = document.createElement("span");
@@ -379,7 +550,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 timeContent = document.createTextNode(dateObj.getFullYear() + "-"
                     + (dateObj.getMonth() + 1) + "-"
                     + dateObj.getDate() + " ("
-                    + dateObj.getHoursMinutes() + ")"
+                    + dateObj.getHoursMinutesSeconds() + ")"
                 );
 
                 textContent = msgObj.text;
@@ -420,6 +591,16 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 for (index = 0; index < this.messagesArray.length; index++) {
                     this.renderMessage(index, false);
                 }
+
+                // Update Message count
+                this.updateCount(this.messagesArray.length);
+
+                // Scroll to the bottom
+                this.parentContainer.scrollTop = this.parentContainer.scrollHeight;
+
+                // Set last uppdated status text.
+                this.appContainerObj.statusBarText = "Senast uppdaterad: " + new Date().getHoursMinutesSeconds();
+
             }
         };
 
