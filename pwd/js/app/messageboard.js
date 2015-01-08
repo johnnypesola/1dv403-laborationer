@@ -207,7 +207,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     id = element.querySelector("id").innerHTML;
                     text = element.querySelector("text").innerHTML;
                     author = element.querySelector("author").innerHTML;
-                    time = new Date(element.querySelector("time").innerHTML * 1000);
+                    time = element.querySelector("time").innerHTML;
 
                     // Push values as message-objects to messagesArray
                     that.messagesArray.push({
@@ -350,6 +350,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     time,
                     flap,
                     close,
+                    dateObj,
                     timeContent,
                     textContent,
                     authorContent,
@@ -367,13 +368,20 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                 author = document.createElement("span");
                 text = document.createElement("p");
-                time = document.createElement("a");
+                time = document.createElement("span");
                 flap = document.createElement("div");
-                close = document.createElement("a");
 
+                // Format time
+                dateObj = new Date( parseInt(msgObj.time,10));
 
                 // Create content
-                timeContent = document.createTextNode(msgObj.time.getHoursMinutesSeconds());
+
+                timeContent = document.createTextNode(dateObj.getFullYear() + "-"
+                    + (dateObj.getMonth() + 1) + "-"
+                    + dateObj.getDate() + " ("
+                    + dateObj.getHoursMinutes() + ")"
+                );
+
                 textContent = msgObj.text;
                 authorContent = msgObj.author;
 
@@ -381,11 +389,6 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 author.classList.add("author");
                 time.classList.add("time");
                 flap.classList.add("flap");
-                close.classList.add("close");
-
-                // Set href attributes
-                time.setAttribute("href", "#");
-                close.setAttribute("href", "#");
 
                 if (isNew) {
                     article.classList.add("message-animation");
@@ -394,22 +397,12 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 // Append elements
                 time.appendChild(timeContent);
                 text.innerHTML = textContent;
+                author.innerHTML = authorContent;
 
                 article.appendChild(text);
                 article.appendChild(time);
                 article.appendChild(flap);
-                article.appendChild(close);
-
-                // Add events
-                close.onclick = function (e) {
-                    e.preventDefault();
-                    that.removeMessage(index);
-                };
-
-                time.onclick = function (e) {
-                    e.preventDefault();
-                    alert("Inlägget skapades " + msg.date.toLocaleString());
-                };
+                article.appendChild(author);
 
                 // Add this new message to dom
                 this.msgContainer.appendChild(article);

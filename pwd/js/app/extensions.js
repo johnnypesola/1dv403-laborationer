@@ -25,12 +25,11 @@
     NodeList.prototype.forEach = Array.prototype.forEach;
 
     // Extended method for Date.
-    Date.prototype.getHoursMinutesSeconds = function () {
+    Date.prototype.getHoursMinutes = function () {
         var hours = ('0' + this.getHours()).slice(-2),
-            minutes = ('0' + this.getMinutes()).slice(-2),
-            seconds = ('0' + this.getSeconds()).slice(-2);
+            minutes = ('0' + this.getMinutes()).slice(-2);
 
-        return hours + ":" + minutes + ":" + seconds;
+        return hours + ":" + minutes;
     };
 
 }());
