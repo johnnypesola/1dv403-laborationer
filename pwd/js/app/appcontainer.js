@@ -39,7 +39,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _hasStatusBar,
                 _onClose;
 
-        // Properties with Getters and Setters
+            // Properties with Getters and Setters
             Object.defineProperties(this, {
                 "desktopObj": {
                     get: function () { return _desktopObj || ""; },
@@ -491,7 +491,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 }
             });
 
-        // Init values
+            // Init values
             this.desktopObj = desktopObj;
             this.appName = appName || "";
             this.UID = UID || desktopObj.generateUID();

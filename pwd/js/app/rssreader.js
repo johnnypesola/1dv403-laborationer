@@ -34,7 +34,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 _updateInterval,
                 _updateIntervalID;
 
-        // Properties with Getters and Setters
+            // Properties with Getters and Setters
             Object.defineProperties(this, {
 
                 "appContainerObj": {
@@ -136,12 +136,12 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 }
             });
 
-        // Init values
+            // Init values
             this.appContainerObj = appContainerObj;
             this.rssFeedSourceURL = encodeURI(this.AVAILABLE_RSS_SOURCES[0].src);
             this.updateInterval = 1;
 
-        // Private methods
+            // Private methods
             // Main app method
             this.run = function () {
                 var that = this;
@@ -292,7 +292,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                     // Check if this option should be selected
                     if (this.updateInterval === i) {
-                       optionElement.setAttribute("selected", "selected");
+                        optionElement.setAttribute("selected", "selected");
                     }
 
                     // Add option to select

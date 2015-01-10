@@ -240,7 +240,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             this.numberOfUpdates = 0;
             this.hasEnterListener = false;
             this.wasManualUpdate = false;
-            this.updateInterval = this.updateInterval; // Will trigger setTimeout 
+            this.updateInterval = this.updateInterval; // Will trigger setTimeout
 
         // Main app method
             this.run = function () {

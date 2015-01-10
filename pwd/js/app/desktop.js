@@ -11,52 +11,63 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
         var Desktop = function (contentElement) {
 
             var _availableApps = [
-                {
-                    name: "Labby Mezzage",
-                    exec: "app/messageboard",
-                    icon: "img/icon/labby_mezzage.svg",
-                    cssClass: "labby-mezzage",
-                    width: 600,
-                    height: 600,
-                    isResizable: true,
-                    hasStatusBar: true,
-                    statusBarText: "Välkommen till Labby Mezzage.",
-                    hasContextMenu: true
-                },
-                {
-                    name: "RSS Reader",
-                    exec: "app/rssreader",
-                    icon: "img/icon/rss.svg",
-                    cssClass: "rss-reader",
-                    width: 450,
-                    height: 500,
-                    isResizable: true,
-                    hasStatusBar: true,
-                    hasContextMenu: true
-                },
-                {
-                    name: "In Memory Of Amiga Games",
-                    exec: "app/memoryboard",
-                    cssClass: "memory",
-                    icon: "img/icon/memory.svg",
-                    width: 700,
-                    height: 655,
-                    isResizable: true,
-                    hasStatusBar: true,
-                    statusBarText: "Välkommen till Amigaspelsmemory. Gamla spel tillsammans i ett nytt.",
-                    hasContextMenu: true
-                },
-                {
-                    name: "Image Manager",
-                    exec: "app/imagemanager",
-                    cssClass: "image-manager",
-                    icon: "img/icon/image_manager.svg",
-                    width: 500,
-                    height: 500,
-                    isResizable: true,
-                    hasStatusBar: true
-                }
-            ],
+                    {
+                        name: "Labby Mezzage",
+                        exec: "app/messageboard",
+                        icon: "img/icon/labby_mezzage.svg",
+                        cssClass: "labby-mezzage",
+                        width: 600,
+                        height: 600,
+                        isResizable: true,
+                        hasStatusBar: true,
+                        statusBarText: "Välkommen till Labby Mezzage.",
+                        hasContextMenu: true
+                    },
+                    {
+                        name: "RSS Reader",
+                        exec: "app/rssreader",
+                        icon: "img/icon/rss.svg",
+                        cssClass: "rss-reader",
+                        width: 450,
+                        height: 500,
+                        isResizable: true,
+                        hasStatusBar: true,
+                        hasContextMenu: true
+                    },
+                    {
+                        name: "In Memory Of Amiga Games",
+                        exec: "app/memoryboard",
+                        cssClass: "memory",
+                        icon: "img/icon/memory.svg",
+                        width: 700,
+                        height: 655,
+                        isResizable: true,
+                        hasStatusBar: true,
+                        statusBarText: "Välkommen till Amigaspelsmemory. Gamla spel tillsammans i ett nytt.",
+                        hasContextMenu: true
+                    },
+                    {
+                        name: "Image Manager",
+                        exec: "app/imagemanager",
+                        cssClass: "image-manager",
+                        icon: "img/icon/image_manager.svg",
+                        width: 500,
+                        height: 500,
+                        isResizable: true,
+                        hasStatusBar: true
+                    },
+                    {
+                        name: "Paint",
+                        exec: "app/paint",
+                        cssClass: "paint",
+                        icon: "img/icon/paint.svg",
+                        width: 500,
+                        height: 500,
+                        isResizable: false,
+                        hasStatusBar: true,
+                        hasContextMenu: true
+                    }
+                ],
                 _APP_LOADER_IMG = '<img class="ajax-loader" src="img/ajax-loader.gif">',
                 _runningApps = [],
                 _startMenu,

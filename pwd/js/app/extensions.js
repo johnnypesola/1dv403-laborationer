@@ -41,4 +41,20 @@
         return years + "-" + months + "-" + days;
     };
 
+    // Better mouse position tracing.
+    Element.prototype.leftTopScreen = function () {
+        var x = this.offsetLeft;
+        var y = this.offsetTop;
+
+        var element = this.offsetParent;
+
+        while (element !== null) {
+            x = parseInt(x, 10) + parseInt(element.offsetLeft, 10);
+            y = parseInt(y, 10) + parseInt(element.offsetTop, 10);
+
+            element = element.offsetParent;
+        }
+
+        return {x: x, y: y};
+    };
 }());

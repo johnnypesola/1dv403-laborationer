@@ -387,6 +387,9 @@ div.window:before {
 	}
 
 		div.window .context-menu ul {
+
+			min-width: 55px;
+
 			padding: 0;
 			margin: 0;
 
@@ -395,7 +398,7 @@ div.window:before {
 		}
 
 			div.window .context-menu ul li {
-				padding: 3px 10px 3px 5px;
+				padding: 3px 5px 3px 5px;
 				margin: 0;
 				list-style: none;
 				position: relative;
@@ -457,6 +460,13 @@ div.window:before {
 
 /* Application specific*/
 
+	/* Paint */
+	.paint {
+		padding: 0 !important;
+		cursor: url('../img/cursor/paintbrush.cur'), auto;
+	}
+
+	/* Labby Mezzage */
 
 	.labby-mezzage {
 		background: #3C3658 !important;
