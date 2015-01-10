@@ -472,6 +472,23 @@ div.window:before {
 		cursor: url('../img/cursor/paintbrush.cur'), auto;
 	}
 
+		.paint .color-bar {
+			position: absolute;
+			top: 1px;
+			right: 1px;
+			width: 50px;
+			border: 1px solid #AAAAAA;
+		}
+
+			.paint .color-bar div {
+				float: left;
+				border: 1px solid #AAAAAA;
+				width: 24px;
+				height: 24px;
+				cursor: auto;
+			}
+
+
 	/* Labby Mezzage */
 
 	.labby-mezzage {

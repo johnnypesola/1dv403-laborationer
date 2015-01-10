@@ -13,6 +13,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
             var _appContainerObj,
                 _canvasElement,
+                _colorElements,
                 _canvas2d,
                 _offset,
                 _isPainting,
@@ -20,6 +21,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 _xTrace = [],
                 _yTrace = [],
                 _dragTrace = [],
+                _colorTrace = [],
                 _PARENT_H_OFFSET = 23,
                 _PARENT_W_OFFSET = 17,
                 _MIN_DIMENSIONS = { width: 250, height: 100 };
@@ -61,6 +63,17 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                             _canvasElement = element;
                         } else {
                             throw new Error("Paints 'canvasElement' property must be an element");
+                        }
+                    }
+                },
+                "colorElements": {
+                    get: function () { return _colorElements || ""; },
+
+                    set: function (obj) {
+                        if (obj !== null && typeof obj === "object") {
+                            _colorElements = obj;
+                        } else {
+                            throw new Error("Paints 'colorElements' property must be an object");
                         }
                     }
                 },
@@ -144,6 +157,21 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         }
                     }
                 },
+                "colorTrace": {
+                    get: function () {
+                        return _colorTrace || "";
+                    },
+
+                    set: function (array) {
+                        if (array !== null && array instanceof Array) {
+
+                            _colorTrace = array;
+
+                        } else {
+                            throw new Error("Paints 'colorTrace' property must be an array");
+                        }
+                    }
+                },
                 "PARENT_H_OFFSET": {
                     get: function () {
                         return _PARENT_H_OFFSET || "";
@@ -172,6 +200,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
         // Init values
             this.appContainerObj = appContainerObj;
+            this.currentColor = "#000000";
 
         // Private methods
             this.run = function () {
@@ -208,6 +237,9 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     // Get canvas reference
                     that.canvasElement = that.appContainerObj.contentElement.querySelector("canvas");
                     that.canvas2d = that.canvasElement.getContext("2d");
+
+                    // Get color references
+                    that.colorElements = that.appContainerObj.contentElement.querySelectorAll(".color-bar div");
 
                     // Attach events
                     that.attachEvents();
@@ -329,6 +361,20 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     offset,
                     that = this;
 
+                // Color elements
+                this.colorElements.forEach(function (element) {
+
+                    // Make the colors display their current color.
+                    element.style.backgroundColor = element.dataset.color;
+
+                    console.log(element.style.backgroundColor);
+
+                    // Change current color och mousedown
+                    element.addEventListener("mousedown", function () {
+                        that.currentColor = element.dataset.color;
+                    });
+                });
+
                 this.appContainerObj.headerElement.addEventListener("mouseleave", function () {
                     that.setOffset();
                 });
@@ -345,7 +391,12 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                 this.canvasElement.addEventListener("mousemove", function (e) {
                     if (that.isPainting) {
-                        that.traceDraw(e.pageX - this.offsetLeft - that.offset.x, e.pageY - this.offsetTop - that.offset.y, true);
+                        that.traceDraw(
+                            e.pageX - this.offsetLeft - that.offset.x,
+                            e.pageY - this.offsetTop - that.offset.y,
+                            that.currentColor,
+                            true
+                        );
                         that.redraw();
                     }
                 });
@@ -359,10 +410,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 });
             },
 
-            traceDraw: function (x, y, isDragged) {
+            traceDraw: function (x, y, color, isDragged) {
                 this.xTrace.push(x);
                 this.yTrace.push(y);
                 this.dragTrace.push(isDragged);
+                this.colorTrace.push(color);
             },
 
             clear: function () {
@@ -373,6 +425,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 this.xTrace = [];
                 this.yTrace = [];
                 this.dragTrace = [];
+                this.colorTrace = [];
             },
 
             redraw: function () {
@@ -381,7 +434,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                  // Clears the canvas
                 this.clear();
 
-                this.canvas2d.strokeStyle = "#df4b26";
+                //this.canvas2d.strokeStyle = this.currentColor;
                 this.canvas2d.lineJoin = "round";
                 this.canvas2d.lineWidth = 5;
 
@@ -394,6 +447,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     }
                     this.canvas2d.lineTo(this.xTrace[i], this.yTrace[i]);
                     this.canvas2d.closePath();
+                    this.canvas2d.strokeStyle = this.colorTrace[i];
                     this.canvas2d.stroke();
                 }
             }
