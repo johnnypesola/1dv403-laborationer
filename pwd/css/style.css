@@ -25,6 +25,12 @@ body {
 	display: none !important;
 }
 
+.no-scroll {
+	overflow-y: hidden !important;
+	overflow-x: hidden !important;
+	overflow: hidden !important;
+}
+
 h1, h2 {
     color: #3d3659;
     font-weight: normal;

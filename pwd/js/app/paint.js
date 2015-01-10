@@ -19,7 +19,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 _currentColor,
                 _xTrace = [],
                 _yTrace = [],
-                _dragTrace = [];
+                _dragTrace = [],
+                _PARENT_H_OFFSET = 23,
+                _PARENT_W_OFFSET = 17,
+                _MIN_DIMENSIONS = { width: 250, height: 100 };
 
         // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -140,6 +143,30 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                             throw new Error("Paints 'dragTrace' property must be an array");
                         }
                     }
+                },
+                "PARENT_H_OFFSET": {
+                    get: function () {
+                        return _PARENT_H_OFFSET || "";
+                    }
+                },
+                "PARENT_W_OFFSET": {
+                    get: function () {
+                        return _PARENT_W_OFFSET || "";
+                    }
+                },
+                "MAX_DIMENSIONS": {
+                    get: function () {
+
+                        return {
+                            width: parseInt(window.innerWidth, 10) - parseInt(this.offset.x, 10) - 10,
+                            height: parseInt(window.innerHeight, 10) - parseInt(this.offset.y, 10) - 10
+                        };
+                    }
+                },
+                "MIN_DIMENSIONS": {
+                    get: function () {
+                        return _MIN_DIMENSIONS;
+                    }
                 }
             });
 
@@ -153,6 +180,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                 // Add contextMenu
                 this.appContainerObj.contextMenuObj.addMenuContent(this.defineContextMenuSettings());
+
             };
         };
 
@@ -174,10 +202,6 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     width = parseInt(window.getComputedStyle(that.appContainerObj.contentElement).getPropertyValue("width"), 10);
                     height = parseInt(window.getComputedStyle(that.appContainerObj.contentElement).getPropertyValue("height"), 10);
 
-                    // Apply offset.
-                    width -= 17;
-                    height -= 23;
-
                     // Render data in template
                     that.appContainerObj.contentElement.innerHTML = Mustache.render(template, {width: width, height: height});
 
@@ -187,6 +211,9 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
                     // Attach events
                     that.attachEvents();
+
+                    // Set offset.
+                    that.setOffset();
                 });
             },
 
@@ -204,13 +231,92 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     },
                     "Inställningar": {
                         "Bildstorlek": function () {
-                            that.popupUpdateIntervalOptions();
+                            that.popupImageSizeOptions();
 
                         }
                     }
                 };
 
                 return contextMenuInfoObj;
+            },
+
+            popupImageSizeOptions: function () {
+                var enterImageSizeContent,
+                    popup;
+
+                enterImageSizeContent = this.createEnterImageSizeContent();
+                popup = new Popup(this.appContainerObj, "Ange bildstorlek", enterImageSizeContent);
+            },
+
+            createEnterImageSizeContent: function () {
+
+                var containerElement,
+                    widthInputElement,
+                    widthTextNode,
+                    heightInputElement,
+                    errorElement,
+                    heightTextNode,
+                    submitElement,
+                    that = this,
+                    popup;
+
+                // Create container element
+                containerElement = document.createElement("div");
+
+                // Create elements
+                widthInputElement = document.createElement("input");
+                heightInputElement = document.createElement("input");
+                submitElement = document.createElement("button");
+                errorElement = document.createElement("div");
+
+                widthTextNode = document.createTextNode("Bredd:");
+                heightTextNode = document.createTextNode("Höjd:");
+
+                widthInputElement.setAttribute("type", "text");
+                heightInputElement.setAttribute("type", "text");
+
+                widthInputElement.value = this.canvasElement.width;
+                heightInputElement.value = this.canvasElement.height;
+
+                widthInputElement.style.width = "50px";
+                widthInputElement.style.marginRight = "10px";
+                heightInputElement.style.width = "50px";
+
+                errorElement.style.color = "#AA0000";
+
+                submitElement.innerHTML = "Verkställ";
+                submitElement.classList.add("submitbutton");
+
+                // Action on submit
+                submitElement.addEventListener("click", function () {
+
+                    // If the given dimensions are too high
+                    if (that.MAX_DIMENSIONS.width < +widthInputElement.value || that.MAX_DIMENSIONS.height < +heightInputElement.value) {
+                        errorElement.innerHTML = "Max bredd är: " + that.MAX_DIMENSIONS.width + ".<br>Max höjd är: " + that.MAX_DIMENSIONS.height;
+                    } else if (that.MIN_DIMENSIONS.width > +widthInputElement.value || that.MIN_DIMENSIONS.height > +heightInputElement.value) {
+                        errorElement.innerHTML = "Minimum bredd är: " + that.MIN_DIMENSIONS.width + ".<br>Minimum höjd är: " + that.MIN_DIMENSIONS.height;
+                    } else {
+
+                        that.canvasElement.width = widthInputElement.value;
+                        that.canvasElement.height = heightInputElement.value;
+                        that.appContainerObj.width = parseInt(widthInputElement.value, 10) + that.PARENT_W_OFFSET;
+                        that.appContainerObj.height = parseInt(heightInputElement.value, 10) + that.PARENT_H_OFFSET + 37;
+
+                        that.redraw();
+                        that.appContainerObj.closePopups();
+                    }
+                });
+
+                // Add elements to container element
+                containerElement.appendChild(widthTextNode);
+                containerElement.appendChild(widthInputElement);
+                containerElement.appendChild(heightTextNode);
+                containerElement.appendChild(heightInputElement);
+                containerElement.appendChild(errorElement);
+                containerElement.appendChild(submitElement);
+
+                // Return containerElement
+                return containerElement;
             },
 
             setOffset: function () {
@@ -223,10 +329,12 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     offset,
                     that = this;
 
+                this.appContainerObj.headerElement.addEventListener("mouseleave", function () {
+                    that.setOffset();
+                });
+
                 this.canvasElement.addEventListener("mousedown", function (e) {
                     e.preventDefault();
-                    //mouseX = e.layerX; //e.pageX - this.offsetLeft;
-                    //mouseY = e.layerY; //e.pageY - this.offsetTop;
 
                     that.setOffset();
 
@@ -280,27 +388,14 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 for (i = 0; i < this.xTrace.length; i++) {
                     this.canvas2d.beginPath();
                     if (this.dragTrace[i] && i) {
-                        this.canvas2d.moveTo(this.xTrace[i-1], this.yTrace[i-1]);
+                        this.canvas2d.moveTo(this.xTrace[i - 1], this.yTrace[i - 1]);
                     } else {
-                        this.canvas2d.moveTo(this.xTrace[i]-1, this.yTrace[i]);
+                        this.canvas2d.moveTo(this.xTrace[i] - 1, this.yTrace[i]);
                     }
                     this.canvas2d.lineTo(this.xTrace[i], this.yTrace[i]);
                     this.canvas2d.closePath();
                     this.canvas2d.stroke();
                 }
-            },
-
-            // Update Rss feed.
-            update: function () {
-                var that = this;
-
-                // Set loading image in app.
-                this.appContainerObj.renderAsLoading();
-
-                // Fetch remote data and fill imagesDataArray, done in private.
-                this.appContainerObj.desktopObj.ajaxCall("GET", this.REMOTE_PROXY_URL + this.rssFeedSourceURL, function (httpRequest) {
-                    that.handleAjaxResponse(httpRequest);
-                });
             }
         };
 

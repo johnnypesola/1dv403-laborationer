@@ -64,8 +64,9 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                         width: 500,
                         height: 500,
                         isResizable: false,
-                        hasStatusBar: true,
-                        hasContextMenu: true
+                        hasStatusBar: false,
+                        hasContextMenu: true,
+                        hasScrollBars: false
                     }
                 ],
                 _APP_LOADER_IMG = '<img class="ajax-loader" src="img/ajax-loader.gif">',
@@ -216,7 +217,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     (typeof appInfoObj.isResizable === "boolean" ? appInfoObj.isResizable : true),
                     (typeof appInfoObj.hasContextMenu === "boolean" ? appInfoObj.hasContextMenu : false),
                     (typeof appInfoObj.hasStatusBar === "boolean" ? appInfoObj.hasStatusBar : false),
-                    appInfoObj.statusBarText
+                    appInfoObj.statusBarText,
+                    (typeof appInfoObj.hasScrollBars === "boolean" ? appInfoObj.hasScrollBars : true)
                 );
 
                 // Render app for user

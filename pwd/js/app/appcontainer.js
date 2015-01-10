@@ -8,7 +8,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasContextMenu, hasStatusBar, statusBarText) {
+        var AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasContextMenu, hasStatusBar, statusBarText, hasScrollBars) {
 
             var _desktopObj,
                 _appName,
@@ -37,6 +37,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _hasContextMenu,
                 _isResizable,
                 _hasStatusBar,
+                _hasScrollBars,
                 _onClose;
 
             // Properties with Getters and Setters
@@ -468,6 +469,17 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         _hasStatusBar = value;
                     }
                 },
+                "hasScrollBars": {
+                    get: function () { return _hasScrollBars; },
+                    set: function (value) {
+                        if (typeof value !== "boolean") {
+                            throw new Error("AppContainers 'hasScrollBars' property must be a boolean type.");
+                        }
+
+                        // Set value
+                        _hasScrollBars = value;
+                    }
+                },
                 "isRendered": {
                     get: function () {
                         return (this.containerElement !== "" && this.containerElement !== this.desktopObj.APP_LOADER_IMG);
@@ -507,6 +519,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.hasContextMenu = (typeof hasContextMenu === "boolean" ? hasContextMenu : true);
             this.hasStatusBar = (typeof hasStatusBar === "boolean" ? hasStatusBar : false);
             this.statusBarText = statusBarText || "";
+            this.hasScrollBars = (typeof hasScrollBars === "boolean" ? hasScrollBars : true);
         };
 
         AppContainer.prototype = {
@@ -538,6 +551,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                     // Set css class, (will actually set class on contentElement)
                     that.cssClass = that.cssClass;
+
+                    // Remove scrollbars if configured
+                    if (!that.hasScrollBars) {
+                        that.contentElement.classList.add("no-scroll");
+                    }
 
                     // Append appContainer to desktop
                     that.desktopObj.contentElement.appendChild(that.containerElement);
