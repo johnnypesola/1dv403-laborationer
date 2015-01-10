@@ -7,12 +7,13 @@
 * {margin:0;padding:0;border: 0 none;position: relative;}
 
 html {
-	background: url('../img/wallpaper_background.png') repeat-x #3d3659 fixed; /* fixed is nicer, but slow in chrome */
-	background-size: cover;
+
 }
 
 body {
-    background: inherit;
+	background: url('../img/wallpaper_background.png') repeat-x #3d3659 fixed; /* fixed is nicer, but slow in chrome */
+	background-size: cover;
+
     margin: 0;
     text-align: center;
     font-family: 'Dosis', sans-serif, verdana;
@@ -465,6 +466,13 @@ div.window:before {
 	}
 
 /* Application specific*/
+	.painted-bg-image {
+		position:absolute;
+		left:0;
+		right:0;
+		margin-left:auto;
+		margin-right:auto;
+	}
 
 	/* Paint */
 	.paint {
@@ -473,19 +481,22 @@ div.window:before {
 	}
 
 		.paint .color-bar {
+			border-radius: 5px;
 			position: absolute;
 			top: 1px;
 			right: 1px;
-			width: 50px;
-			border: 1px solid #AAAAAA;
+			width: 54px;
+			padding: 1px;
+			border: 2px solid #EEEEEE;
 		}
 
 			.paint .color-bar div {
+				border-radius: 5px;
 				float: left;
-				border: 1px solid #AAAAAA;
-				width: 24px;
-				height: 24px;
-				cursor: auto;
+				width: 22px;
+				height: 22px;
+				cursor: pointer;
+				margin: 1px;
 			}
 
 

@@ -251,7 +251,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
             defineContextMenuSettings: function () {
                 var that = this,
-                    contextMenuInfoObj;
+                    contextMenuInfoObj,
+                    savedCanvasData,
+                    backgroundImageElement,
+                    oldBackgroundImageElement;
 
                 // Setup settings for this appContainers contextMenu.
                 contextMenuInfoObj = {
@@ -259,6 +262,21 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         "Ny bild": function () {
                             that.clear();
                             that.forgetTrace();
+                        },
+                        "Lägg till som bakgrund": function () {
+
+                            // Remove old images
+                            oldBackgroundImageElement = document.querySelector("img.painted-bg-image");
+                            if (oldBackgroundImageElement) {
+                                document.body.removeChild(oldBackgroundImageElement);
+                            }
+
+                            // Create new image
+                            savedCanvasData = that.canvasElement.toDataURL();
+                            backgroundImageElement = document.createElement("img");
+                            backgroundImageElement.classList.add("painted-bg-image");
+                            backgroundImageElement.src = savedCanvasData;
+                            document.body.insertBefore(backgroundImageElement, document.body.firstChild);
                         }
                     },
                     "Inställningar": {
@@ -385,7 +403,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     that.setOffset();
 
                     that.isPainting = true;
-                    that.traceDraw(e.pageX - this.offsetLeft - that.offset.x, e.pageY - this.offsetTop - that.offset.y);
+                    that.traceDraw(
+                        e.pageX - this.offsetLeft - that.offset.x,
+                        e.pageY - this.offsetTop - that.offset.y,
+                        that.currentColor
+                    );
                     that.redraw();
                 });
 
