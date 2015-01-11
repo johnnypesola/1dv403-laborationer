@@ -2,6 +2,7 @@
  * Created by Johnny on 2015-01-03.
  */
 
+
 "use strict";
 
 define(["mustache", "app/extensions"], function (Mustache) {
@@ -602,8 +603,6 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                     require([this.exec], function (AppToRun) {
 
-                        console.log("test");
-
                         that.runningAppObj = new AppToRun(that);
 
                         that.runningAppObj.run();
@@ -680,7 +679,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.minimizeButton.addEventListener("click", function () {
 
                     // Create minimized app element
-                    minimizedAppElement = document.createElement("div");
+                    minimizedAppElement = document.createElement("li");
                     minimizedAppElement.innerText = that.appName;
 
                     // Restore app when minimized app element is clicked

@@ -1,5 +1,9 @@
-"use strict"
+/**
+ * Created by Johnny on 2015-01-08.
+ */
 
+
+"use strict";
 
 define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
 
@@ -459,7 +463,7 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                     }
 
                     optionElement = document.createElement("option");
-                    optionElement.setAttribute("value", i);
+                    optionElement.setAttribute("value", i.toString());
 
                     optionElement.innerHTML = displayedValue;
 

@@ -1,4 +1,9 @@
-"use strict"
+/**
+ * Created by Johnny on 2015-01-08.
+ */
+
+
+"use strict";
 
 
 define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
@@ -265,7 +270,7 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                 selectElement.addEventListener("change", function () {
                     that.cardPairs = this.value;
                     that.appContainerObj.closePopups();
-                    that.resetGame("Spelet har nu " + selectElement.options[selectElement.selectedIndex].innerText);
+                    that.resetGame("Spelet har nu " + selectElement.options[selectElement.selectedIndex].innerHTML);
                 });
 
                 // Add select to container element
@@ -410,7 +415,8 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
 
             showCard: function (cardContainer, cardId) {
 
-                var that = this;
+                var that = this,
+                    popup;
 
                 // Open a card if we are under the max amount, and the card isnt allready opened
                 if (!this.cardsLocked &&
@@ -435,6 +441,8 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                         // Is game finished?
                         if (this.isGameFinished()) {
                             this.appContainerObj.statusBarText = "Bra jobbat! Spelet avklarad på " + this.userGuessCount + " försök.";
+
+                            popup = new Popup(this.appContainerObj, "Bra jobbat!", document.createTextNode("Spelet avklarad på " + this.userGuessCount + " försök."));
                         }
                     }
                 }

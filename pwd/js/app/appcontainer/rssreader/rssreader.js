@@ -104,7 +104,6 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                             // Try to clear old interval
                             if (this.updateIntervalID) {
                                 window.clearInterval(this.updateIntervalID);
-                                console.log("cleared");
                             }
 
                             // Set interval and store ID
@@ -132,13 +131,13 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                     }
                 },
                 "MAX_UPDATE_INTERVAL": {
-                    get: function () { return _MAX_UPDATE_INTERVAL }
+                    get: function () { return _MAX_UPDATE_INTERVAL; }
                 },
                 "AVAILABLE_RSS_SOURCES": {
-                    get: function () { return _AVAILABLE_RSS_SOURCES }
+                    get: function () { return _AVAILABLE_RSS_SOURCES; }
                 },
                 "REMOTE_PROXY_URL": {
-                    get: function () { return _REMOTE_PROXY_URL}
+                    get: function () { return _REMOTE_PROXY_URL; }
                 }
             });
 
@@ -193,11 +192,11 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                         throw new Error('RssReader: Ajax request returned 400 Bad Request');
                     }
                     // If the HTTP result code was "Not found"
-                    else if (httpRequest.status === 404) {
+                    if (httpRequest.status === 404) {
                         throw new Error('RssReader: Ajax request returned 404 Not Found');
                     }
                     // If the HTTP result code was successful
-                    else if (httpRequest.status === 200) {
+                    if (httpRequest.status === 200) {
 
                         // Render RSS flow
                         this.renderRssFlow(httpRequest.responseText);
@@ -277,7 +276,7 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                 // Create container element
                 containerElement = document.createElement("div");
 
-                containerElement.innerHTML = "Uppdatera flödet: "
+                containerElement.innerHTML = "Uppdatera flödet: ";
 
                 // Create select element
                 selectElement = document.createElement("select");
@@ -288,9 +287,9 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
                     optionElement.setAttribute("value", i);
 
                     // Different option text formatting depending on value
-                    if(i === 1) {
+                    if (i === 1) {
                         optionElement.innerHTML = "Varje minut";
-                    } else if(i === 2) {
+                    } else if (i === 2) {
                         optionElement.innerHTML = "Varannan minut";
                     } else {
                         optionElement.innerHTML = "Var " + i + ":e minut";
@@ -323,7 +322,6 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
             createSelectSourcePopupContent: function () {
                 var containerElement,
                     radioElement,
-                    radioElements,
                     i,
                     submitElement,
                     inputElement,

@@ -2,6 +2,7 @@
  * Created by Johnny on 2015-01-03.
  */
 
+
 "use strict";
 
 define(["mustache", "app/appcontainer/appcontainer", "app/startmenu", "app/extensions"], function (Mustache, AppContainer, StartMenu) {

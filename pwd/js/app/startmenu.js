@@ -65,10 +65,9 @@ define(["app/extensions"], function () {
             constructor: PWD.Desktop.StartMenu,
 
             // Render app
-            render: function (content) {
+            render: function () {
 
-                var that = this,
-                    i,
+                var i,
                     img;
 
                 // Create container
@@ -94,7 +93,7 @@ define(["app/extensions"], function () {
                 }
 
                 // Create area for minimized applications
-                this.minimizedContentElement = document.createElement("div");
+                this.minimizedContentElement = document.createElement("ul");
                 this.minimizedContentElement.classList.add("minimized-apps");
                 this.containerElement.appendChild(this.minimizedContentElement);
 
@@ -105,7 +104,7 @@ define(["app/extensions"], function () {
             addStartAppEvent: function (element, appInfoObj) {
                 var that = this;
 
-                element.addEventListener("click", function (e) {
+                element.addEventListener("click", function () {
                     that.desktopObj.startApp(appInfoObj);
                 });
             }

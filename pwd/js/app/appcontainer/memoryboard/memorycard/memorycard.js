@@ -1,5 +1,9 @@
-"use strict"
+/**
+ * Created by Johnny on 2015-01-08.
+ */
 
+
+"use strict";
 
 define(["mustache", "app/extensions"], function (Mustache) {
 
@@ -82,7 +86,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             },
 
             isEqualTo: function (obj) {
-                if (obj instanceof MemoryCard && obj.cardNum === this.cardNum) {
+                if (obj instanceof PWD.Desktop.AppContainer.MemoryBoard.MemoryCard && obj.cardNum === this.cardNum) {
                     return true;
                 }
                 return false;

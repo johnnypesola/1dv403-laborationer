@@ -126,7 +126,11 @@ div#startmenu {
 		overflow: auto;
 	}
 
-		div#startmenu .minimized-apps div {
+		div#startmenu .minimized-apps li {
+
+			transition: all 0.1s ease-out;
+
+			list-style: none;
 			color: #000000;
 			float: left;
 
@@ -148,6 +152,10 @@ div#startmenu {
 
 			cursor: pointer;
 		}
+
+			.minimized-apps li:hover {
+				background: #EEEEEE !important;
+			}
 
 div#desktop .credits {
 	color: #FFFFFF;
@@ -1006,6 +1014,78 @@ div.window a.close:active, div.window a.minimize:active {
 			background-position: -180px -360px;
 		}
 
+/* Clouds */
+
+/* Fun stuff */
+
+div.moon {
+	position: absolute;
+	top: 250px;
+	left: 260px;
+
+	background: url('../img/image_map.svg') no-repeat;
+	height: 50px;
+	width: 50px;
+	background-position: -506px -64px;
+}
+
+div.cloud1 {
+	top: 40px;
+	left: -170px;
+
+	background: url('../img/image_map.svg') no-repeat;
+	height: 72px;
+	width: 170px;
+	background-position: -313px -103px;
+}
+
+div.cloud2 {
+	top: 110px;
+	left: -128px;
+
+	background: url('../img/image_map.svg') no-repeat;
+	height: 50px;
+	width: 128px;
+	background-position: -313px -43px;
+
+	-webkit-animation-delay: 20s; /* Chrome, Safari, Opera */
+	animation-delay: 20s;
+}
+
+div.cloud3 {
+	top: 160px;
+	left: -71px;
+
+	background: url('../img/image_map.svg') no-repeat;
+	height: 34px;
+	width: 71px;
+	background-position: -313px 0px;
+
+	-webkit-animation-delay: 60s; /* Chrome, Safari, Opera */
+	animation-delay: 60s;
+}
+
+div.cloud4 {
+	top: 250px;
+	left: -95px;
+
+	background: url('../img/image_map.svg') no-repeat;
+	height: 46px;
+	width: 95px;
+	background-position: -486px -126px;
+
+	-webkit-animation-delay: 8s; /* Chrome, Safari, Opera */
+	animation-delay: 8s;
+}
+
+.cloud-animation {
+	opacity: 1;
+	position: fixed;
+	-webkit-animation:cloud 160s linear infinite;
+	-moz-animation:cloud 160s linear infinite;
+	animation:cloud 160s linear infinite;
+}
+
 /* Animations */
 
 /* Spin */
@@ -1074,3 +1154,15 @@ div.window a.close:active, div.window a.minimize:active {
 		from { opacity: 0; }
 		to   { opacity: 1; }
 	}
+
+/* Cloud */
+@-moz-keyframes cloud {
+	100% { -moz-transform: translate(2000px, 0); opacity: 0;}
+}
+@-webkit-keyframes cloud {
+	100% { -webkit-transform: translate(2000px, 0); opacity: 0;}
+}
+@keyframes cloud {
+	100% { -webkit-transform: translate(2000px, 0); transform:translate(2000px, 0); opacity: 0; }
+}
+
