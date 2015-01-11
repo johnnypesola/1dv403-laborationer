@@ -9,7 +9,10 @@ requirejs.config({
     baseUrl: 'js/lib',
     paths: {
         app: '../app',
-        tpl: '../tpl'
+        tpl: '../tpl',
+        mustache: 'mustache',
+        popup: '../app/appcontainer/popup/popup',
+        contextmenu: '../app/appcontainer/contextmenu/contextmenu'
     },
     urlArgs: "preventCaching=" + (new Date()).getTime()
 });

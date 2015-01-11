@@ -9,7 +9,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var ContextMenu = function (appContainerObj, contextMenuInfoObj) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare ContextMenu
+        PWD.Desktop.AppContainer.ContextMenu = function (appContainerObj, contextMenuInfoObj) {
 
             var _appContainerObj,
                 _containerElement,
@@ -63,8 +69,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.create();
         };
 
-        ContextMenu.prototype = {
-            constructor: ContextMenu,
+        PWD.Desktop.AppContainer.ContextMenu.prototype = {
+            constructor: PWD.Desktop.AppContainer.ContextMenu,
 
             create: function () {
 
@@ -171,7 +177,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
         };
 
-        return ContextMenu;
+        return PWD.Desktop.AppContainer.ContextMenu;
 
     }());
 });

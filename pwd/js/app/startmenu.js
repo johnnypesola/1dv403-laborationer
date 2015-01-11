@@ -8,7 +8,13 @@ define(["app/extensions"], function () {
 
     return (function () {
 
-        var Constructor = function (desktopObj) {
+
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+
+        // Declare StartMenu
+        PWD.Desktop.StartMenu = function (desktopObj) {
 
             var _desktopObj,
                 _minimizedContentElement,
@@ -55,8 +61,8 @@ define(["app/extensions"], function () {
             this.desktopObj = desktopObj;
         };
 
-        Constructor.prototype = {
-            constructor: Constructor,
+        PWD.Desktop.StartMenu.prototype = {
+            constructor: PWD.Desktop.StartMenu,
 
             // Render app
             render: function (content) {
@@ -105,8 +111,7 @@ define(["app/extensions"], function () {
             }
         };
 
-
-        return Constructor;
+        return PWD.Desktop.StartMenu;
 
     }());
 });

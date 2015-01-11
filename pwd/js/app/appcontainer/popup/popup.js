@@ -9,7 +9,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var Popup = function (appContainerObj, header, content) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare Popup
+        PWD.Desktop.AppContainer.Popup = function (appContainerObj, header, content) {
 
             var _appContainerObj,
                 _containerElement,
@@ -111,8 +117,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.create();
         };
 
-        Popup.prototype = {
-            constructor: Popup,
+        PWD.Desktop.AppContainer.Popup.prototype = {
+            constructor: PWD.Desktop.AppContainer.Popup,
 
             // Create and render Popup (without data) on AppContainer
             create: function () {
@@ -123,7 +129,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.containerElement.classList.add("popup");
 
                 // Fetch template
-                require(["text!tpl/popup.html"], function (template) {
+                require(["text!tpl/appcontainer/popup/popup.html"], function (template) {
 
                     // Render data in template
                     that.containerElement.innerHTML = Mustache.render(template, {header: that.header});
@@ -159,7 +165,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             }
         };
 
-        return Popup;
+        return PWD.Desktop.AppContainer.Popup;
 
     }());
 });

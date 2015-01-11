@@ -1,11 +1,17 @@
 "use strict"
 
 
-define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
+define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
 
     return (function () {
 
-        var MemoryBoard = function (appContainerObj) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare MemoryBoard
+        PWD.Desktop.AppContainer.MemoryBoard = function (appContainerObj) {
 
             var _appContainerObj,
                 _rows,
@@ -189,9 +195,9 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             };
         };
 
-        MemoryBoard.prototype = {
+        PWD.Desktop.AppContainer.MemoryBoard.prototype = {
 
-            constructor: MemoryBoard,
+            constructor: PWD.Desktop.AppContainer.MemoryBoard,
 
             defineContextMenuSettings: function () {
                 var that = this,
@@ -320,7 +326,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     that = this;
 
                 // Require Memorycard object.
-                require(["app/memorycard"], function (MemoryCard) {
+                require(["app/appcontainer/memoryboard/memorycard/memorycard"], function (MemoryCard) {
 
                 // Generate card for each entry in templateArray
                     for (i = 0; i < templateArray.length; i++) {
@@ -591,7 +597,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             }
         };
 
-        return MemoryBoard;
+        return PWD.Desktop.AppContainer.MemoryBoard;
 
     }());
 

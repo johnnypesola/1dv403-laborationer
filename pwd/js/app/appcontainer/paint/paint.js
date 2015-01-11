@@ -5,11 +5,17 @@
 
 "use strict";
 
-define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
+define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
 
     return (function () {
 
-        var Paint = function (appContainerObj) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare Paint app
+        PWD.Desktop.AppContainer.Paint = function (appContainerObj) {
 
             var _appContainerObj,
                 _canvasElement,
@@ -213,8 +219,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             };
         };
 
-        Paint.prototype = {
-            constructor: Paint,
+        PWD.Desktop.AppContainer.Paint.prototype = {
+            constructor: PWD.Desktop.AppContainer.Paint,
 
             createElements: function () {
                 var that = this,
@@ -225,7 +231,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 this.appContainerObj.clearContent();
 
                 // Fetch template
-                require(["text!tpl/paint.html"], function (template) {
+                require(["text!tpl/appcontainer/paint/paint.html"], function (template) {
 
                     // Figure out dimensions
                     width = parseInt(window.getComputedStyle(that.appContainerObj.contentElement).getPropertyValue("width"), 10);
@@ -291,11 +297,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             },
 
             popupImageSizeOptions: function () {
-                var enterImageSizeContent,
-                    popup;
+                var enterImageSizeContent;
 
                 enterImageSizeContent = this.createEnterImageSizeContent();
-                popup = new Popup(this.appContainerObj, "Ange bildstorlek", enterImageSizeContent);
+                new Popup(this.appContainerObj, "Ange bildstorlek", enterImageSizeContent);
             },
 
             createEnterImageSizeContent: function () {
@@ -307,8 +312,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     errorElement,
                     heightTextNode,
                     submitElement,
-                    that = this,
-                    popup;
+                    that = this;
 
                 // Create container element
                 containerElement = document.createElement("div");
@@ -374,10 +378,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             },
 
             attachEvents: function () {
-                var mouseX,
-                    mouseY,
-                    offset,
-                    that = this;
+                var that = this;
 
                 // Color elements
                 this.colorElements.forEach(function (element) {
@@ -488,7 +489,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             }
         };
 
-        return Paint;
+        return PWD.Desktop.AppContainer.Paint;
 
     }());
 

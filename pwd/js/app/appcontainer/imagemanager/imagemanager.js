@@ -9,7 +9,13 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var ImageManager = function (appContainerObj) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare ImageManager
+        PWD.Desktop.AppContainer.ImageManager = function (appContainerObj) {
 
 
             var _REMOTE_SOURCE_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/imgviewer/",
@@ -59,7 +65,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.appContainerObj = appContainerObj;
 
         // Main app method
-            this.run = function(){
+            this.run = function () {
                 var that = this;
                 // Fetch remote data and fill imagesDataArray, done in private.
                 this.appContainerObj.desktopObj.ajaxCall("GET", _REMOTE_SOURCE_URL, function (httpRequest) {
@@ -69,8 +75,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
             };
         };
 
-        ImageManager.prototype = {
-            constructor: ImageManager,
+        PWD.Desktop.AppContainer.ImageManager.prototype = {
+            constructor: PWD.Desktop.AppContainer.ImageManager,
 
             handleAjaxResponse: function (httpRequest) {
 
@@ -82,11 +88,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         throw new Error('Image manager: Ajax request returned 400 Bad Request');
                     }
                     // If the HTTP result code was "Not found"
-                    else if (httpRequest.status === 404) {
+                    if (httpRequest.status === 404) {
                         throw new Error('Image manager: Ajax request returned 404 Not Found');
                     }
                     // If the HTTP result code was successful
-                    else if (httpRequest.status === 200) {
+                    if (httpRequest.status === 200) {
 
                         // Parse and store image data.
                         this.imagesDataArray = JSON.parse(httpRequest.responseText);
@@ -189,7 +195,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
         };
 
 
-        return ImageManager;
+        return PWD.Desktop.AppContainer.ImageManager;
 
     }());
 

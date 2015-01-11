@@ -8,7 +8,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasContextMenu, hasStatusBar, statusBarText, hasScrollBars) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+
+        // Declare AppContainer
+        PWD.Desktop.AppContainer = function (desktopObj, appName, UID, exec, cssClass, icon, x, y, width, height, zIndex, isResizable, hasContextMenu, hasStatusBar, statusBarText, hasScrollBars) {
 
             var _desktopObj,
                 _appName,
@@ -524,8 +529,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
             this.hasScrollBars = (typeof hasScrollBars === "boolean" ? hasScrollBars : true);
         };
 
-        AppContainer.prototype = {
-            constructor: AppContainer,
+        PWD.Desktop.AppContainer.prototype = {
+            constructor: PWD.Desktop.AppContainer,
 
             // Render app
             render: function (content) {
@@ -536,11 +541,14 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.containerElement = document.createElement("div");
                 this.containerElement.classList.add("window");
 
+
                 // Fetch template
-                require(["text!tpl/appcontainer.html"], function (template) {
+                require(["text!tpl/appcontainer/appcontainer.html"], function (template) {
+
 
                     // Render data in template
                     that.containerElement.innerHTML = Mustache.render(template, {appName: that.appName, content: content, icon: that.icon, status: that.statusBarText});
+
 
                     // Get references from containerElement object
                     that.getContainerElementReferences();
@@ -591,7 +599,10 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 // Execute app.
                 if (this.exec !== "") {
+
                     require([this.exec], function (AppToRun) {
+
+                        console.log("test");
 
                         that.runningAppObj = new AppToRun(that);
 
@@ -607,7 +618,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 // Only add contextmenu if exists in config
                 if (this.hasContextMenu) {
                     // Require contextmenu
-                    require(["app/contextmenu"], function (ContextMenuObj) {
+                    require(["app/appcontainer/contextmenu/contextmenu"], function (ContextMenuObj) {
 
                         // Add Contextmenu object to this AppContainer
                         that.contextMenuObj = new ContextMenuObj(that);
@@ -812,7 +823,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             }
         };
 
-        return AppContainer;
+        return PWD.Desktop.AppContainer;
 
     }());
 });

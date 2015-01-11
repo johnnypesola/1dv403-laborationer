@@ -1,11 +1,17 @@
 "use strict"
 
 
-define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
+define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
 
     return (function () {
 
-        var MessageBoard = function (appContainerObj) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare MessageBoard
+        PWD.Desktop.AppContainer.MessageBoard = function (appContainerObj) {
 
             var _WRITE_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/setMessage.php", // services/testservice.php"
                 _READ_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/getMessage.php",
@@ -267,8 +273,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
         /* Prototype methods, replace prototype with custom object with methods */
 
-        MessageBoard.prototype = {
-            constructor: MessageBoard, // Reestablish constructor pointer
+        PWD.Desktop.AppContainer.MessageBoard.prototype = {
+            constructor: PWD.Desktop.AppContainer.MessageBoard, // Reestablish constructor pointer
 
             defineContextMenuSettings: function () {
                 var that = this,
@@ -507,11 +513,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         throw new Error('MessageBoard: Ajax request returned 400 Bad Request');
                     }
                     // If the HTTP result code was "Not found"
-                    else if (httpRequest.status === 404) {
+                    if (httpRequest.status === 404) {
                         throw new Error('MessageBoard: Ajax request returned 404 Not Found');
                     }
                     // If the HTTP result code was successful
-                    else if (httpRequest.status === 200) {
+                    if (httpRequest.status === 200) {
                         var xmlResponse;
 
                         // If we get new messages, parse them.
@@ -770,7 +776,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 for (index = 0; index < this.messagesArray.length; index++) {
                     match = false;
 
-                    messageContainers.forEach(function(element) {
+                    messageContainers.forEach(function (element) {
                         if (element.dataset.id === that.messagesArray[index].id) {
                             match = true;
                         }
@@ -801,7 +807,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             }
         };
 
-        return MessageBoard;
+        return PWD.Desktop.AppContainer.MessageBoard;
 
     }());
 

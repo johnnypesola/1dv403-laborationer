@@ -5,11 +5,17 @@
 
 "use strict";
 
-define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
+define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
 
     return (function () {
 
-        var RssReader = function (appContainerObj) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+
+        // Declare RssReader
+        PWD.Desktop.AppContainer.RssReader = function (appContainerObj) {
 
 
             var _REMOTE_PROXY_URL = "http://homepage.lnu.se/staff/tstjo/labbyServer/rssproxy/?url=",
@@ -161,8 +167,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
         };
 
-        RssReader.prototype = {
-            constructor: RssReader,
+        PWD.Desktop.AppContainer.RssReader.prototype = {
+            constructor: PWD.Desktop.AppContainer.RssReader,
 
             // Update Rss feed.
             update: function () {
@@ -398,7 +404,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             }
         };
 
-        return RssReader;
+        return PWD.Desktop.AppContainer.RssReader;
 
     }());
 

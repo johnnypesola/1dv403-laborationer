@@ -4,16 +4,20 @@
 
 "use strict";
 
-define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], function (Mustache, AppContainer, StartMenu) {
+define(["mustache", "app/appcontainer/appcontainer", "app/startmenu", "app/extensions"], function (Mustache, AppContainer, StartMenu) {
 
     return (function () {
 
-        var Desktop = function (contentElement) {
+        // Set up namespace
+        var PWD = PWD || {};
+
+        // Declare Desktop
+        PWD.Desktop = function (contentElement) {
 
             var _availableApps = [
                     {
                         name: "Labby Mezzage",
-                        exec: "app/messageboard",
+                        exec: "app/appcontainer/messageboard/messageboard",
                         icon: "img/icon/labby_mezzage.svg",
                         cssClass: "labby-mezzage",
                         width: 600,
@@ -25,7 +29,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     },
                     {
                         name: "RSS Reader",
-                        exec: "app/rssreader",
+                        exec: "app/appcontainer/rssreader/rssreader",
                         icon: "img/icon/rss.svg",
                         cssClass: "rss-reader",
                         width: 450,
@@ -36,7 +40,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     },
                     {
                         name: "In Memory Of Amiga Games",
-                        exec: "app/memoryboard",
+                        exec: "app/appcontainer/memoryboard/memoryboard",
                         cssClass: "memory",
                         icon: "img/icon/memory.svg",
                         width: 700,
@@ -48,7 +52,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     },
                     {
                         name: "Image Manager",
-                        exec: "app/imagemanager",
+                        exec: "app/appcontainer/imagemanager/imagemanager",
                         cssClass: "image-manager",
                         icon: "img/icon/image_manager.svg",
                         width: 500,
@@ -58,7 +62,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                     },
                     {
                         name: "Paint",
-                        exec: "app/paint",
+                        exec: "app/appcontainer/paint/paint",
                         cssClass: "paint",
                         icon: "img/icon/paint.svg",
                         width: 700,
@@ -194,8 +198,8 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             this.addCredits();
         };
 
-        Desktop.prototype = {
-            constructor: Desktop,
+        PWD.Desktop.prototype = {
+            constructor: PWD.Desktop,
 
             addCredits: function () {
                 var creditsElement;
@@ -260,7 +264,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             attachCheckAppsOutOfViewEvent: function () {
                 var that = this;
 
-                window.onresize = function () {
+                window.addEventListener("resize", function () {
 
                     // Move apps that are outside the viewport to Next App StartPos
                     that.runningApps.forEach(function (app) {
@@ -269,10 +273,10 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                         }
 
                         if (app.y + app.height > window.innerHeight) {
-                            app.y = that.getNextAppAppearPos(app.width, app.height).x;
+                            app.y = that.getNextAppAppearPos(app.width, app.height).y;
                         }
                     });
-                };
+                });
             },
 
             addStartmenu: function () {
@@ -427,7 +431,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             }
         };
 
-        return Desktop;
+        return PWD.Desktop;
 
     }());
 });

@@ -5,7 +5,14 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
     return (function () {
 
-        var MemoryCard = function (number) {
+        // Set up namespace
+        var PWD = PWD || {};
+        PWD.Desktop = PWD.Desktop || {};
+        PWD.Desktop.AppContainer = PWD.Desktop.AppContainer || {};
+        PWD.Desktop.AppContainer.MemoryBoard = PWD.Desktop.AppContainer.MemoryBoard || {};
+
+        // Declare MemoryCard
+        PWD.Desktop.AppContainer.MemoryBoard.MemoryCard = function (number) {
             var _cardNum,
                 _isCardOpen,
                 _isMatchFound;
@@ -52,8 +59,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
         };
 
     /* Prototype */
-        MemoryCard.prototype = {
-            constructor:    MemoryCard,
+        PWD.Desktop.AppContainer.MemoryBoard.MemoryCard.prototype = {
+            constructor:    PWD.Desktop.AppContainer.MemoryBoard.MemoryCard,
 
             titleArray: [
                 "Simon the sorcerer",
@@ -83,7 +90,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
         };
 
-        return MemoryCard;
+        return PWD.Desktop.AppContainer.MemoryBoard.MemoryCard;
 
     }());
 
