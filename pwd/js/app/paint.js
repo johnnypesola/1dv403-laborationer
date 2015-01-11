@@ -385,11 +385,11 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     // Make the colors display their current color.
                     element.style.backgroundColor = element.dataset.color;
 
-                    console.log(element.style.backgroundColor);
-
                     // Change current color och mousedown
                     element.addEventListener("mousedown", function () {
-                        that.currentColor = element.dataset.color;
+
+                        // Add selected color class to new color
+                        that.selectColorEvent(element);
                     });
                 });
 
@@ -430,6 +430,19 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 this.canvasElement.addEventListener("mouseleave", function () {
                     that.isPainting = false;
                 });
+            },
+
+            selectColorEvent: function (newSelectedColorElement) {
+                // Assign new current color
+                this.currentColor = newSelectedColorElement.dataset.color;
+
+                // Remove old selected class.
+                this.colorElements.forEach(function (colorElement) {
+                    colorElement.classList.remove("selected-color");
+                });
+
+                // Set selected class to color element
+                newSelectedColorElement.classList.add("selected-color");
             },
 
             traceDraw: function (x, y, color, isDragged) {

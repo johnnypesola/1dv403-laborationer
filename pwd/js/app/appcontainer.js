@@ -633,10 +633,12 @@ define(["mustache", "app/extensions"], function (Mustache) {
             addCloseAppEvent: function () {
                 var that = this;
 
+                // Stop parents mousedown event
                 this.closeButton.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
                 });
 
+                // Close on click
                 this.closeButton.addEventListener('click', function () {
 
                     // Remove from DOM
@@ -653,9 +655,43 @@ define(["mustache", "app/extensions"], function (Mustache) {
             },
 
             addMinifyAppEvent: function () {
-                this.minifyButton.addEventListener("click", function () {
-                    console.log("not implemented yet");
+                var that = this,
+                    minifiedAppElement;
+
+                // Stop parents mousedown event
+                this.minifyButton.addEventListener('mousedown', function (e) {
+                    e.stopPropagation();
                 });
+
+                // Minify on click
+                this.minifyButton.addEventListener("click", function () {
+
+                    // Create Minified app element
+                    minifiedAppElement = document.createElement("div");
+                    minifiedAppElement.innerText = that.appName;
+
+                    // Restore app when minified app element is clicked
+                    minifiedAppElement.addEventListener("click", function () {
+                        that.showApp();
+
+                        // Remove minified app from minifiedContentElement area
+                        this.parentNode.removeChild(this);
+                    });
+
+                    that.hideApp();
+
+                    // Add minified element to minifiedContentElement area.
+                    that.desktopObj.startMenu.minifiedContentElement.appendChild(minifiedAppElement);
+
+                });
+            },
+
+            showApp: function () {
+                this.containerElement.style.display = "";
+            },
+
+            hideApp: function () {
+                this.containerElement.style.display = "none";
             },
 
             addDragAppEvent: function () {

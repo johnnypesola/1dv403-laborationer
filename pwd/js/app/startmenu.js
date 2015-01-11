@@ -11,6 +11,7 @@ define(["app/extensions"], function () {
         var Constructor = function (desktopObj) {
 
             var _desktopObj,
+                _minifiedContentElement,
                 _contentElement;
 
         // Properties with Getters and Setters
@@ -34,6 +35,17 @@ define(["app/extensions"], function () {
                             _contentElement = element;
                         } else {
                             throw new Error("StartMenus 'contentElement' property must be an element");
+                        }
+                    }
+                },
+                "minifiedContentElement": {
+                    get: function () { return _minifiedContentElement || ""; },
+
+                    set: function (element) {
+                        if (element !== null && element.nodeName !== "undefined") {
+                            _minifiedContentElement = element;
+                        } else {
+                            throw new Error("StartMenus 'minifiedContentElement' property must be an element");
                         }
                     }
                 }
@@ -75,12 +87,13 @@ define(["app/extensions"], function () {
                     }
                 }
 
+                // Create area for minified applications
+                this.minifiedContentElement = document.createElement("div");
+                this.minifiedContentElement.classList.add("minified-apps");
+                this.containerElement.appendChild(this.minifiedContentElement);
+
                 // Add startmenu element to desktop
                 this.desktopObj.contentElement.appendChild(this.containerElement);
-
-                // Add events
-//                this.addEvents();
-
             },
 
             addStartAppEvent: function (element, appInfoObj) {

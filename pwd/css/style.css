@@ -70,6 +70,7 @@ div#startmenu {
 	left: 30%;
 	right: 30%;
 
+	text-align: left;
 
 	padding: 10px;
 
@@ -79,10 +80,15 @@ div#startmenu {
 
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+
+
+	left: 0;
+	right: 0;
 }
 
 	div#startmenu img {
 
+		float: left;
 		cursor: pointer;
 
 		transition: all 0.1s ease-out;
@@ -108,6 +114,7 @@ div#startmenu {
 		opacity: 0.5;
 
 		box-shadow: 0px 10px 20px -2px rgba(0,0,0,0.75);
+
 	}
 
 	div#startmenu img:hover {
@@ -135,6 +142,39 @@ div#startmenu {
 
 		filter: url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20version%3D%221.1%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22blur%22%3E%3CfeGaussianBlur%20stdDeviation%3D%225%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3C%2Fsvg%3E#blur");
 	}
+
+	div#startmenu .minified-apps {
+		float: left;
+		margin: 0 0 0 20px;
+		display: inline-block;
+		height: 60px;
+		color: #FFFFFF;
+		max-width: 50%;
+		overflow: auto;
+	}
+
+		div#startmenu .minified-apps div {
+			color: #000000;
+			float: left;
+
+			text-align: left;
+			padding: 2px 6px 2px 6px;
+			margin: 3px 5px;
+
+			background: -moz-linear-gradient(top,  rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 56%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.5)), color-stop(56%,rgba(255,255,255,0.3)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+			background: -webkit-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+			background: -o-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+			background: -ms-linear-gradient(top,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* IE10+ */
+			background: linear-gradient(to bottom,  rgba(255,255,255,0.5) 0%,rgba(255,255,255,0.3) 56%,rgba(255,255,255,0) 100%); /* W3C */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80ffffff', endColorstr='#00ffffff',GradientType=0 ); /* IE6-9 */
+
+			border-radius: 3px;
+
+			text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+
+			cursor: pointer;
+		}
 
 img.ajax-loader {
 	margin: 10px;
@@ -285,11 +325,7 @@ div.window:before {
 	    padding: 0 4px 1px 4px;
 	    border-radius: 2px;
 	}
-
-	div.window a.close:active {
-		background: #FFEEEE;
-	}
-
+	
 	div.window .resize {
 		position: absolute;
 		bottom: 0;
@@ -316,6 +352,10 @@ div.window:before {
 	    padding: 3px 4px 0 4px;
 	    border-radius: 2px;
 	}
+
+div.window a.close:active, div.window a.minify:active {
+	background: #FFEEEE;
+}
 
 	    div.window a.close:hover, div.window a.minify:hover {
 	        cursor: pointer;
@@ -465,6 +505,8 @@ div.window:before {
 		cursor: se-resize !important;
 	}
 
+
+
 /* Application specific*/
 	.painted-bg-image {
 		position:absolute;
@@ -477,7 +519,7 @@ div.window:before {
 	/* Paint */
 	.paint {
 		padding: 0 !important;
-		cursor: url('../img/cursor/paintbrush.cur'), auto;
+		cursor: url('../img/cursor/paintbrush.cur'), url('img/cursor/paintbrush.cur'), auto;
 	}
 
 		.paint .color-bar {
@@ -491,12 +533,17 @@ div.window:before {
 		}
 
 			.paint .color-bar div {
-				border-radius: 5px;
+				border-radius: 4px;
 				float: left;
 				width: 22px;
 				height: 22px;
 				cursor: pointer;
 				margin: 1px;
+				border: 1px solid #FFFFFF;
+			}
+
+			.paint .color-bar div.selected-color {
+				border: 1px dashed #FFFFFF;
 			}
 
 
@@ -506,6 +553,49 @@ div.window:before {
 		background: #3C3658 !important;
 		text-align: center !important;
 	}
+
+	.labby-mezzage header {
+		background: url('../img/image_map.svg') no-repeat;
+		background-position: 0px 0px;
+		height: 170px;
+		width: 308px;
+		text-transform: uppercase;
+		margin: 30px auto;
+
+	}
+
+		header h1 {
+			color: #ffffff;
+			font-family: verdana, sans-serif;
+			font-weight: normal;
+			font-size: 11px;
+			position: relative;
+			top: 174px;
+			opacity: 0.5;
+		}
+
+		header div.lightning1 {
+			position: absolute;
+			top: 115px;
+			left: 45px;
+
+			background: url('../img/image_map.svg') no-repeat;
+			height: 35px;
+			width: 25px;
+			background-position: -380px 0px;
+		}
+
+		header div.lightning2 {
+			position: absolute;
+			top: 115px;
+			left: 190px;
+
+			background: url('../img/image_map.svg') no-repeat;
+			height: 35px;
+			width: 25px;
+			background-position: -406px 0px;
+		}
+
 
 	.labby-mezzage > div {
 		margin: 0 auto;
@@ -517,7 +607,8 @@ div.window:before {
 		background: #FFFFFF;
 		position: relative;
 		text-shadow: 0px 0px 10px rgba(150, 150, 150, 0.5);
-		line-height: 90px;
+
+		padding: 30px 0;
 
 		margin: 30px auto;
 		max-width: 500px;
@@ -549,7 +640,7 @@ div.window:before {
 		color: #BBBBBB;
 	}
 
-	main article a.time:hover {
+	.labby-mezzage main article a.time:hover {
 		color: #000000;
 	}
 

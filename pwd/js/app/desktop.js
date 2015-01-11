@@ -61,7 +61,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                         exec: "app/paint",
                         cssClass: "paint",
                         icon: "img/icon/paint.svg",
-                        width: 500,
+                        width: 700,
                         height: 500,
                         isResizable: false,
                         hasStatusBar: false,

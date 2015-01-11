@@ -441,9 +441,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                         i += 60;
 
                         // Different option text formatting depending on value
-                        if (i === 60) {
-                            displayedValue = "Varje minut";
-                        } else if (i === 120) {
+                        if (i === 120) {
                             displayedValue = "Varannan minut";
                         } else {
                             displayedValue = "Var " + (i / 60) + ":e minut";
@@ -535,10 +533,10 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
             },
 
             parseXmlResponse: function (xmlResponse) {
-                var id,
-                    text,
-                    author,
-                    time,
+                var idElement,
+                    textElement,
+                    authorElement,
+                    timeElement,
                     messagesNodeList,
                     that = this;
 
@@ -548,18 +546,19 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 // Loop through messages
                 messagesNodeList.forEach(function (element) {
 
-                    // Get all values
-                    id = element.querySelector("id").innerHTML;
-                    text = element.querySelector("text").innerHTML;
-                    author = element.querySelector("author").innerHTML;
-                    time = element.querySelector("time").innerHTML;
+
+                    // Get all references
+                    idElement = element.querySelector("id");
+                    textElement = element.querySelector("text");
+                    authorElement = element.querySelector("author");
+                    timeElement = element.querySelector("time");
 
                     // Push values as message-objects to messagesArray
                     that.messagesArray.push({
-                        id: id,
-                        text: text,
-                        author: author,
-                        time: time
+                        id: (idElement.childNodes.length > 0 ? idElement.firstChild.nodeValue : ""),
+                        text: (textElement.childNodes.length > 0 ? textElement.firstChild.nodeValue : ""),
+                        author: (authorElement.childNodes.length > 0 ? authorElement.firstChild.nodeValue : ""),
+                        time: (timeElement.childNodes.length > 0 ? timeElement.firstChild.nodeValue : "")
                     });
                 });
             },
@@ -584,7 +583,8 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
 
             createElements: function () {
 
-                var section,
+                var header,
+                    section,
                     counterParentText,
                     counterParent,
                     counterText,
@@ -592,12 +592,16 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                     bouble2,
                     that = this;
 
-                // Message list
+            // Header with logo
+                header = document.createElement("header");
+                header.innerHTML = ' <header><h1>Labby Mezzage version 0.2</h1><div class="lightning1 spin-animation"></div><div class="lightning2 spin-animation"></div></header>';
+
+            // Message list
 
                 // Container
                 this.msgContainer = document.createElement("div");
 
-                // Message form
+            // Message form
 
                 // Section parent tag
                 section = document.createElement("section");
@@ -640,6 +644,7 @@ define(["mustache", "app/popup", "app/extensions"], function (Mustache, Popup) {
                 section.appendChild(bouble1);
                 section.appendChild(bouble2);
 
+                this.parentContainer.appendChild(header);
                 this.parentContainer.appendChild(this.msgContainer);
                 this.parentContainer.appendChild(section);
 
