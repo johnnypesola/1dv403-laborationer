@@ -1020,8 +1020,8 @@ div.window a.close:active, div.window a.minimize:active {
 
 div.moon {
 	position: absolute;
-	top: 250px;
-	left: 260px;
+	top: 20%;
+	left: 15%;
 
 	background: url('../img/image_map.svg') no-repeat;
 	height: 50px;
