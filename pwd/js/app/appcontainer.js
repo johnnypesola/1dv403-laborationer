@@ -21,7 +21,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 _width,
                 _height,
                 _zIndex,
-                _minifyButton,
+                _minimizeButton,
                 _closeButton,
                 _resizeElement,
                 _containerElement,
@@ -140,7 +140,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             }
 
                             // Don't let the window outside boundaries.
-                            if (!(parsedValue < 0 || (actualWidth && parsedValue + actualWidth > this.desktopObj.contentElement.offsetWidth))) {
+                            if (!(parsedValue < 0 || (actualWidth && parsedValue + actualWidth > this.desktopObj.contentElement.offsetWidth)) ||
+                                    (parsedValue > 0 && parsedValue < _x)) {
                                 _x = parsedValue;
                             }
 
@@ -169,7 +170,8 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             }
 
                             // Don't let the window outside boundaries.
-                            if (!(parsedValue < 0 || (actualHeight && parsedValue + actualHeight > this.desktopObj.contentElement.offsetHeight))) {
+                            if (!(parsedValue < 0 || (actualHeight && parsedValue + actualHeight > this.desktopObj.contentElement.offsetHeight)) ||
+                                    (parsedValue > 0 && parsedValue < _y)) {
                                 _y = parsedValue;
                             }
 
@@ -251,14 +253,14 @@ define(["mustache", "app/extensions"], function (Mustache) {
                         }
                     }
                 },
-                "minifyButton": {
-                    get: function () { return _minifyButton || ""; },
+                "minimizeButton": {
+                    get: function () { return _minimizeButton || ""; },
 
                     set: function (element) {
                         if (element !== null && element.nodeName !== "undefined") {
-                            _minifyButton = element;
+                            _minimizeButton = element;
                         } else {
-                            throw new Error("AppContainers 'minifyButton' property must be an element");
+                            throw new Error("AppContainers 'minimizeButton' property must be an element");
                         }
                     }
                 },
@@ -576,7 +578,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
             getContainerElementReferences: function () {
                 // Fetch references.
                 this.closeButton = this.containerElement.querySelector('a.close');
-                this.minifyButton = this.containerElement.querySelector('a.minify');
+                this.minimizeButton = this.containerElement.querySelector('a.minimize');
                 this.headerElement = this.containerElement.querySelector('div.header');
                 this.headerTextElement = this.containerElement.querySelector('div.header h2');
                 this.contentElement = this.containerElement.querySelector('div.content');
@@ -622,7 +624,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                 this.addResizeAppEvent();
 
-                this.addMinifyAppEvent();
+                this.addminimizeAppEvent();
 
                 // Focus whole app on mousedown
                 this.containerElement.addEventListener('mousedown', function () {
@@ -654,34 +656,34 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 });
             },
 
-            addMinifyAppEvent: function () {
+            addminimizeAppEvent: function () {
                 var that = this,
-                    minifiedAppElement;
+                    minimizedAppElement;
 
                 // Stop parents mousedown event
-                this.minifyButton.addEventListener('mousedown', function (e) {
+                this.minimizeButton.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
                 });
 
-                // Minify on click
-                this.minifyButton.addEventListener("click", function () {
+                // minimize on click
+                this.minimizeButton.addEventListener("click", function () {
 
-                    // Create Minified app element
-                    minifiedAppElement = document.createElement("div");
-                    minifiedAppElement.innerText = that.appName;
+                    // Create minimized app element
+                    minimizedAppElement = document.createElement("div");
+                    minimizedAppElement.innerText = that.appName;
 
-                    // Restore app when minified app element is clicked
-                    minifiedAppElement.addEventListener("click", function () {
+                    // Restore app when minimized app element is clicked
+                    minimizedAppElement.addEventListener("click", function () {
                         that.showApp();
 
-                        // Remove minified app from minifiedContentElement area
+                        // Remove minimized app from minimizedContentElement area
                         this.parentNode.removeChild(this);
                     });
 
                     that.hideApp();
 
-                    // Add minified element to minifiedContentElement area.
-                    that.desktopObj.startMenu.minifiedContentElement.appendChild(minifiedAppElement);
+                    // Add minimized element to minimizedContentElement area.
+                    that.desktopObj.startMenu.minimizedContentElement.appendChild(minimizedAppElement);
 
                 });
             },

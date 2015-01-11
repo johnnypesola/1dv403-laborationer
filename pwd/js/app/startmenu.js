@@ -11,7 +11,7 @@ define(["app/extensions"], function () {
         var Constructor = function (desktopObj) {
 
             var _desktopObj,
-                _minifiedContentElement,
+                _minimizedContentElement,
                 _contentElement;
 
         // Properties with Getters and Setters
@@ -38,14 +38,14 @@ define(["app/extensions"], function () {
                         }
                     }
                 },
-                "minifiedContentElement": {
-                    get: function () { return _minifiedContentElement || ""; },
+                "minimizedContentElement": {
+                    get: function () { return _minimizedContentElement || ""; },
 
                     set: function (element) {
                         if (element !== null && element.nodeName !== "undefined") {
-                            _minifiedContentElement = element;
+                            _minimizedContentElement = element;
                         } else {
-                            throw new Error("StartMenus 'minifiedContentElement' property must be an element");
+                            throw new Error("StartMenus 'minimizedContentElement' property must be an element");
                         }
                     }
                 }
@@ -87,10 +87,10 @@ define(["app/extensions"], function () {
                     }
                 }
 
-                // Create area for minified applications
-                this.minifiedContentElement = document.createElement("div");
-                this.minifiedContentElement.classList.add("minified-apps");
-                this.containerElement.appendChild(this.minifiedContentElement);
+                // Create area for minimized applications
+                this.minimizedContentElement = document.createElement("div");
+                this.minimizedContentElement.classList.add("minimized-apps");
+                this.containerElement.appendChild(this.minimizedContentElement);
 
                 // Add startmenu element to desktop
                 this.desktopObj.contentElement.appendChild(this.containerElement);

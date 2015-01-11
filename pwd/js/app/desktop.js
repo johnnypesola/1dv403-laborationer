@@ -181,13 +181,36 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
             this.startMenu = {};
             this.contentElement = contentElement || document.body;
 
-
+            // Add startmenu
             this.addStartmenu();
+
+            // Add drop eventlistener, in case something is dragged and dropped on desktop
             this.addDropEventListener();
+
+            // Make sure no apps get outside viewport
+            this.attachCheckAppsOutOfViewEvent();
+
+            // Add credits
+            this.addCredits();
         };
 
         Desktop.prototype = {
             constructor: Desktop,
+
+            addCredits: function () {
+                var creditsElement;
+
+                creditsElement = document.createElement("div");
+                creditsElement.classList.add("credits");
+
+                creditsElement.innerHTML = 'Icons: ' +
+                    '<a href="http://www.icomoon.io">www.icomoon.io</a>, ' +
+                    '<a href="http://appzgear.com">appzgear.com</a>, ' +
+                    '<a href="http://www.freepik.com">www.freepik.com</a>, ' +
+                    '<a href="http://www.meanicons.com">www.meanicons.com</a>';
+
+                this.contentElement.appendChild(creditsElement);
+            },
 
             startApp: function (appInfoObj, content) {
 
@@ -199,7 +222,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 zIndex = this.runningApps.length + 2;
 
                 // Get app startposition
-                appStartPos = this.getNextAppStartPos(appInfoObj.width, appInfoObj.height);
+                appStartPos = this.getNextAppAppearPos(appInfoObj.width, appInfoObj.height);
 
                 // Start App
                 newApp = new AppContainer(
@@ -234,6 +257,24 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 this.focusApp(newApp);
             },
 
+            attachCheckAppsOutOfViewEvent: function () {
+                var that = this;
+
+                window.onresize = function () {
+
+                    // Move apps that are outside the viewport to Next App StartPos
+                    that.runningApps.forEach(function (app) {
+                        if (app.x + app.width > window.innerWidth) {
+                            app.x = that.getNextAppAppearPos(app.width, app.height).x;
+                        }
+
+                        if (app.y + app.height > window.innerHeight) {
+                            app.y = that.getNextAppAppearPos(app.width, app.height).x;
+                        }
+                    });
+                };
+            },
+
             addStartmenu: function () {
 
                 this.startMenu = new StartMenu(this);
@@ -241,7 +282,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 this.startMenu.render();
             },
 
-            getNextAppStartPos: function (width, height) {
+            getNextAppAppearPos: function (width, height) {
                 var x = this.lastAppStartPos.x += 20,
                     y = this.lastAppStartPos.y += 20;
 
@@ -292,8 +333,6 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 for (i = 0; i < this.runningApps.length; i++) {
                     if (this.runningApps[i].UID === targetAppObj.UID) {
                         this.runningApps.splice(i, 1);
-
-                        console.log("closed " + targetAppObj.UID);
 
                         break;
                     }
@@ -364,7 +403,7 @@ define(["mustache", "app/appcontainer", "app/startmenu", "app/extensions"], func
                 }
 
                 // Write cookie
-                document.cookie = name+"="+value+expires+"; path=/";
+                document.cookie = name + "=" + value + expires + "; path=/";
             },
 
             readCookie: function (name) {
