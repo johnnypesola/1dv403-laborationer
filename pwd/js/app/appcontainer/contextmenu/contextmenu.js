@@ -78,6 +78,11 @@ define(["mustache", "app/extensions"], function (Mustache) {
                 this.containerElement = document.createElement("div");
                 this.containerElement.classList.add("context-menu");
 
+                // Prevent default mousedown events, in case of weird behaviour
+                this.containerElement.addEventListener("mousedown", function (e) {
+                    e.preventDefault();
+                });
+
                 // Flag appContainer to have a contextMenu, modify appearance
                 this.appContainerObj.containerElement.classList.add("has-context-menu");
 

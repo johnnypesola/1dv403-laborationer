@@ -63,6 +63,12 @@ div#startmenu {
 
 	div#startmenu img {
 
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+
 		float: left;
 		cursor: pointer;
 
@@ -277,6 +283,13 @@ div.window:before {
 	}
 
 	div.window .status {
+
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+
 		position: relative;
 		bottom: 63px;
 
@@ -320,6 +333,13 @@ div.window:before {
 	}
 
 	div.window .resize {
+
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+
 		position: absolute;
 		bottom: 0;
 		right: 0;
@@ -409,6 +429,13 @@ div.window a.close:active, div.window a.minimize:active {
 		}
 
 	div.window .context-menu {
+
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+
 		color: #000000;
 		height: 20px;
 		position: relative;
