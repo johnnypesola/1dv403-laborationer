@@ -2,7 +2,6 @@
  * Created by Johnny on 2015-01-03.
  */
 
-
 'use strict';
 
 // Settings
@@ -20,7 +19,7 @@ requirejs.config({
 
 
 // Require desktop js file
-require(["app/desktop"], function(Desktop){
+require(["app/desktop"], function (Desktop) {
 
     // Set up namespace
     var PWD = PWD || {};

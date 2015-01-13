@@ -59,7 +59,7 @@ define(["mustache", "app/appcontainer/appcontainer", "app/startmenu", "app/exten
                         width: 500,
                         height: 500,
                         isResizable: true,
-                        hasStatusBar: true
+                        hasStatusBar: false
                     },
                     {
                         name: "Paint",
@@ -80,7 +80,7 @@ define(["mustache", "app/appcontainer/appcontainer", "app/startmenu", "app/exten
                 _contentElement,
                 _appIsBeingDragged,
                 _appIsBeingResized,
-                _lastAppStartPos = {x: 20, y: 20};
+                _lastAppStartPos;
 
             // Properties with Getters and Setters
             Object.defineProperties(this, {
@@ -184,6 +184,7 @@ define(["mustache", "app/appcontainer/appcontainer", "app/startmenu", "app/exten
 
             // Init variables
             this.startMenu = {};
+            this.lastAppStartPos = {x: 20, y: 20};
             this.contentElement = contentElement || document.body;
 
             // Add startmenu

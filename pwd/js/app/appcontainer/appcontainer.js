@@ -149,6 +149,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             if (!(parsedValue < 0 || (actualWidth && parsedValue + actualWidth > this.desktopObj.contentElement.offsetWidth)) ||
                                     (parsedValue > 0 && parsedValue < _x)) {
                                 _x = parsedValue;
+                            } else {
+                                // Set max or min x pos
+                                _x = (parsedValue > 0 ? (this.desktopObj.contentElement.offsetWidth - actualWidth < 0 ? 20 : this.desktopObj.contentElement.offsetWidth - actualWidth) : 0);
                             }
 
                             // Apply this value to html if this app is rendered
@@ -179,6 +182,9 @@ define(["mustache", "app/extensions"], function (Mustache) {
                             if (!(parsedValue < 0 || (actualHeight && parsedValue + actualHeight > this.desktopObj.contentElement.offsetHeight)) ||
                                     (parsedValue > 0 && parsedValue < _y)) {
                                 _y = parsedValue;
+                            } else {
+                                // Set max or min y pos
+                                _y = (parsedValue > 0 ? (this.desktopObj.contentElement.offsetHeight - actualHeight < 0 ? 20 : this.desktopObj.contentElement.offsetHeight - actualHeight) : 0);
                             }
 
                             // Apply this value if this app is rendered
@@ -680,7 +686,7 @@ define(["mustache", "app/extensions"], function (Mustache) {
 
                     // Create minimized app element
                     minimizedAppElement = document.createElement("li");
-                    minimizedAppElement.innerText = that.appName;
+                    minimizedAppElement.innerHTML = that.appName;
 
                     // Restore app when minimized app element is clicked
                     minimizedAppElement.addEventListener("click", function () {

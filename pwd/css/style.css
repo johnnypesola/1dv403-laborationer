@@ -502,7 +502,6 @@ div.window a.close:active, div.window a.minimize:active {
 	}
 
 .being-dragged {
-	transform: scale(0.98);
 	opacity: 0.5;
 	cursor: move !important;
 }
