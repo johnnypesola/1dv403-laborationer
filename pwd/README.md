@@ -1,9 +1,9 @@
 ﻿Personal Web Desktop
 ====================
 
-Live demo går att hitta på http://johnnypesola.github.io/1dv403-laborationer/pdw/ eller http://pesola.se/webbprogrammerare/1dv403/pwd
+Live demo går att hitta på http://johnnypesola.github.io/1dv403-laborationer/pdw/ eller http://pesola.se/webbprogrammerare/1dv403/pwd/
 
-En webbserver krävs p.g.a require.js text plugin. 
+En webbserver krävs p.g.a require.js text plugin.
 
 
 Kända mindre grafiska problem:
