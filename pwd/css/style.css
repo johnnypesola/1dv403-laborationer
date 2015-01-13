@@ -860,10 +860,14 @@ div.window a.close:active, div.window a.minimize:active {
 			display: -ms-flexbox;
 			display: flex;
 
+			-ms-flex-pack: center;
+
 			justify-content: center; /* align horizontal */
 			align-items: center; /* align vertical */
 
 			box-shadow: 1px 1px 1px 0 rgba(50, 50, 50, 0.3);
+
+			cursor: pointer;
 		}
 
 		.image-manager .thumbnail:hover {
@@ -871,8 +875,8 @@ div.window a.close:active, div.window a.minimize:active {
 		}
 
 			.image-manager .thumbnail img {
+
 				border-radius: inherit;
-				cursor: pointer;
 			}
 
 	/* Memory */

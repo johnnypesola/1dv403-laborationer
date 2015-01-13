@@ -17,7 +17,7 @@ define(["mustache", "popup", "app/extensions"], function (Mustache, Popup) {
         // Declare MessageBoard
         PWD.Desktop.AppContainer.MessageBoard = function (appContainerObj) {
 
-            var _WRITE_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/setMessage.php", // services/testservice.php"
+            var _WRITE_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/setMessage.php", // services/testservice.php
                 _READ_SERVER_URL = "http://homepage.lnu.se/staff/tstjo/labbyserver/getMessage.php",
                 _appContainerObj,
                 _parentContainer,
